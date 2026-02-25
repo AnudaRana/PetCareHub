@@ -1,0 +1,151 @@
+/* File: src/styles/Dashboard.css */
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+    background: var(--color-bg);
+}
+
+.dashboard-main {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.dashboard-topbar {
+    height: 64px;
+    background: var(--color-white);
+    border-bottom: 1.5px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.topbar-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.88rem;
+}
+
+.topbar-breadcrumb .breadcrumb-home {
+    color: var(--color-text-light);
+}
+
+.topbar-breadcrumb .breadcrumb-sep {
+    color: var(--color-border);
+}
+
+.topbar-breadcrumb .breadcrumb-current {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.topbar-greeting {
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+}
+
+.topbar-greeting strong {
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.topbar-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(54, 184, 183, 0.35);
+}
+
+.dashboard-content {
+    flex: 1;
+    padding: 32px;
+    overflow-y: auto;
+}
+
+/* Coming Soon Panel */
+.coming-soon-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 64px 32px;
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    border: 1.5px dashed var(--color-border);
+    max-width: 460px;
+    margin: 0 auto;
+    box-shadow: var(--shadow-sm);
+}
+
+.coming-soon-icon-placeholder {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--color-primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    color: var(--color-primary);
+}
+
+.coming-soon-panel h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 10px;
+}
+
+.coming-soon-panel p {
+    font-size: 0.875rem;
+    color: var(--color-text-light);
+    line-height: 1.7;
+    max-width: 340px;
+}
+
+.coming-soon-badge {
+    margin-top: 20px;
+    display: inline-block;
+    padding: 5px 18px;
+    background: var(--color-primary-light);
+    color: var(--color-primary-dark);
+    border-radius: 99px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border: 1px solid rgba(54, 184, 183, 0.25);
+}
+
+@media (max-width: 768px) {
+    .dashboard-main {
+        margin-left: 0;
+    }
+
+    .dashboard-content {
+        padding: 20px 16px;
+    }
+}
