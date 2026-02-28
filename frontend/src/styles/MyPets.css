@@ -122,19 +122,37 @@
     }
 }
 
-/* Empty state */
+/* Empty state (Add New Pet inline card) */
 .empty-state {
     text-align: center;
     padding: 60px 20px;
-    background: var(--color-white);
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: var(--radius-lg);
-    border: 2px dashed var(--color-border);
+    border: 2px dashed rgba(0, 0, 0, 0.15);
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.empty-state:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--color-accent);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
 }
 
 .empty-state-icon {
-    font-size: 4rem;
+    font-size: 3.5rem;
     display: block;
     margin-bottom: 12px;
+    opacity: 0.8;
+    transition: var(--transition);
+}
+
+.empty-state:hover .empty-state-icon {
+    opacity: 1;
+    transform: scale(1.05);
 }
 
 .empty-state h3 {
@@ -142,6 +160,7 @@
     font-weight: 700;
     color: var(--color-text);
     margin-bottom: 6px;
+    font-family: 'DM Sans', sans-serif;
 }
 
 .empty-state p {
@@ -152,8 +171,8 @@
 
 /* Error state */
 .error-banner {
-    background: #fff5f5;
-    border: 1.5px solid #fed7d7;
+    background: var(--color-white);
+    border: 1.5px solid var(--color-error);
     border-radius: var(--radius-sm);
     padding: 14px 18px;
     color: var(--color-error);

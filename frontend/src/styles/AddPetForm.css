@@ -2,61 +2,99 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(10, 15, 36, 0.4);
+    /* Deep navy tint overlay */
+    backdrop-filter: blur(6px);
     z-index: 300;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
+    animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .modal-container {
-    background: var(--color-white);
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
     border-radius: var(--radius-lg);
     width: 100%;
     max-width: 640px;
     max-height: 92vh;
     overflow-y: auto;
     box-shadow: var(--shadow-lg);
-    animation: slideUp 0.25s ease;
+    animation: slideUp 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: none;
+        opacity: 1;
+    }
 }
 
 .modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 22px 28px 16px;
-    border-bottom: 1.5px solid var(--color-border);
+    padding: 24px 32px 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    /* Subtle split */
 }
 
 .modal-header h2 {
-    font-size: 1.25rem;
+    font-size: 1.35rem;
     font-weight: 700;
     color: var(--color-text);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: -0.01em;
 }
 
 .modal-close-btn {
-    background: none;
-    border: none;
-    font-size: 1.3rem;
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
     cursor: pointer;
     color: var(--color-text-light);
-    transition: color var(--transition);
-    line-height: 1;
+    transition: var(--transition);
 }
 
 .modal-close-btn:hover {
     color: var(--color-error);
+    background: rgba(255, 59, 48, 0.05);
+    border-color: rgba(255, 59, 48, 0.15);
 }
 
 .pet-form {
-    padding: 24px 28px 28px;
+    padding: 24px 32px 32px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 18px;
 }
 
 .form-row {
@@ -68,7 +106,7 @@
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
 }
 
 .form-group.full-width {
@@ -76,70 +114,74 @@
 }
 
 .form-label {
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     font-weight: 600;
     color: var(--color-text);
 }
 
 .form-label .required {
-    color: var(--color-accent);
-    margin-left: 2px;
+    color: var(--color-error);
+    margin-left: 4px;
 }
 
 .form-input,
 .form-select,
 .form-textarea {
-    padding: 10px 14px;
-    border: 1.5px solid var(--color-border);
+    padding: 12px 16px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: var(--radius-sm);
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: var(--color-text);
-    background: var(--color-white);
-    transition: border-color var(--transition), box-shadow var(--transition);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(4px);
+    transition: var(--transition);
     outline: none;
 }
 
 .form-input:focus,
 .form-select:focus,
 .form-textarea:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(54, 184, 183, 0.15);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 4px rgba(0, 240, 255, 0.15);
+    background: var(--color-white);
 }
 
 .form-input.error,
 .form-select.error,
 .form-textarea.error {
     border-color: var(--color-error);
-    box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.12);
+    box-shadow: 0 0 0 4px rgba(255, 59, 48, 0.1);
 }
 
 .form-textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 90px;
 }
 
 .form-error-msg {
     color: var(--color-error);
-    font-size: 0.76rem;
+    font-size: 0.78rem;
     font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
 }
 
 .image-upload-area {
-    border: 2px dashed var(--color-border);
+    border: 2px dashed rgba(0, 0, 0, 0.15);
     border-radius: var(--radius-sm);
-    padding: 20px;
+    padding: 24px;
     text-align: center;
     cursor: pointer;
-    transition: border-color var(--transition), background var(--transition);
+    background: rgba(255, 255, 255, 0.4);
+    transition: var(--transition);
     position: relative;
 }
 
 .image-upload-area:hover {
-    border-color: var(--color-primary);
-    background: var(--color-primary-light);
+    border-color: var(--color-accent);
+    background: rgba(0, 240, 255, 0.05);
+    /* Soft cyan glow */
 }
 
 .image-upload-area input[type="file"] {
@@ -247,13 +289,13 @@
 }
 
 .form-alert.success {
-    background: #f0fff4;
+    background: var(--color-bg);
     color: var(--color-success);
-    border: 1.5px solid #c6f6d5;
+    border: 1.5px solid var(--color-success);
 }
 
 .form-alert.error {
-    background: #fff5f5;
+    background: var(--color-white);
     color: var(--color-error);
-    border: 1.5px solid #fed7d7;
+    border: 1.5px solid var(--color-error);
 }

@@ -36,9 +36,11 @@ const PetDetail = ({ pet, onClose }) => {
                             alt={pet.name}
                         />
                     ) : (
-                        <span className="pet-detail-placeholder">{emoji}</span>
+                        <div className="pet-detail-avatar-fallback">
+                            <span>{emoji}</span>
+                        </div>
                     )}
-                    <button className="pet-detail-back-btn" onClick={onClose} aria-label="Close">←</button>
+                    <button className="pet-detail-back-btn" onClick={onClose} aria-label="Close">✕</button>
                 </div>
 
                 <div className="pet-detail-body">

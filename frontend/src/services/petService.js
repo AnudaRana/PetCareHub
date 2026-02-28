@@ -8,6 +8,11 @@ const API_BASE = '/api/pets';
 // No JWT headers needed as requested
 const noAuthHeader = () => ({});
 
+const getAuthHeaders = () => {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 /**
  * Register a new pet (multipart/form-data with image and ownerId)
  */
@@ -16,6 +21,7 @@ export const registerPet = async (formData) => {
     const response = await axios.post(`${API_BASE_URL}${API_BASE}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
+            ...getAuthHeaders()
         },
     });
     return response.data;
@@ -26,7 +32,8 @@ export const registerPet = async (formData) => {
  */
 export const getPetsByOwner = async (ownerId) => {
     const response = await axios.get(`${API_BASE_URL}${API_BASE}`, {
-        params: { ownerId }
+        params: { ownerId },
+        headers: getAuthHeaders()
     });
     return response.data;
 };
@@ -36,7 +43,8 @@ export const getPetsByOwner = async (ownerId) => {
  */
 export const getPetById = async (petId, ownerId) => {
     const response = await axios.get(`${API_BASE_URL}${API_BASE}/${petId}`, {
-        params: { ownerId }
+        params: { ownerId },
+        headers: getAuthHeaders()
     });
     return response.data;
 };
@@ -46,7 +54,8 @@ export const getPetById = async (petId, ownerId) => {
  */
 export const searchPetsByOwner = async (ownerId, name) => {
     const response = await axios.get(`${API_BASE_URL}${API_BASE}/search`, {
-        params: { ownerId, name }
+        params: { ownerId, name },
+        headers: getAuthHeaders()
     });
     return response.data;
 };

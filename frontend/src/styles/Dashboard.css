@@ -3,6 +3,11 @@
     display: flex;
     min-height: 100vh;
     background: var(--color-bg);
+    /* Subtle mesh gradient background */
+    background-image: radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(20, 27, 61, 0.05) 0px, transparent 50%);
+    background-attachment: fixed;
+    font-family: var(--font-family);
 }
 
 .dashboard-main {
@@ -10,13 +15,17 @@
     margin-left: var(--sidebar-width);
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    overflow: hidden;
 }
 
 .dashboard-topbar {
-    height: 64px;
-    background: var(--color-white);
-    border-bottom: 1.5px solid var(--color-border);
+    height: 72px;
+    /* Slightly taller */
+    background: var(--glass-bg);
+    /* Translucent glass */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--glass-border);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -24,18 +33,21 @@
     position: sticky;
     top: 0;
     z-index: 50;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    flex-shrink: 0;
+    transition: var(--transition);
 }
 
 .topbar-breadcrumb {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     font-size: 0.88rem;
 }
 
 .topbar-breadcrumb .breadcrumb-home {
     color: var(--color-text-light);
+    font-weight: 500;
 }
 
 .topbar-breadcrumb .breadcrumb-sep {
@@ -44,100 +56,71 @@
 
 .topbar-breadcrumb .breadcrumb-current {
     color: var(--color-primary);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .topbar-right {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 20px;
+}
+
+.topbar-user-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .topbar-greeting {
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     color: var(--color-text-light);
 }
 
 .topbar-greeting strong {
     color: var(--color-text);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .topbar-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary));
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: 700;
-    font-size: 0.82rem;
+    font-size: 0.9rem;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(54, 184, 183, 0.35);
+    box-shadow: 0 4px 12px rgba(20, 27, 61, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: var(--transition);
+}
+
+.topbar-avatar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(20, 27, 61, 0.2);
 }
 
 .dashboard-content {
     flex: 1;
-    padding: 32px;
+    padding: 40px;
+    /* Breathes a bit more */
     overflow-y: auto;
+    animation: fadeUp 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Coming Soon Panel */
-.coming-soon-panel {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 64px 32px;
-    background: var(--color-white);
-    border-radius: var(--radius-lg);
-    border: 1.5px dashed var(--color-border);
-    max-width: 460px;
-    margin: 0 auto;
-    box-shadow: var(--shadow-sm);
-}
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
 
-.coming-soon-icon-placeholder {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    background: var(--color-primary-light);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-    color: var(--color-primary);
-}
-
-.coming-soon-panel h2 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--color-text);
-    margin-bottom: 10px;
-}
-
-.coming-soon-panel p {
-    font-size: 0.875rem;
-    color: var(--color-text-light);
-    line-height: 1.7;
-    max-width: 340px;
-}
-
-.coming-soon-badge {
-    margin-top: 20px;
-    display: inline-block;
-    padding: 5px 18px;
-    background: var(--color-primary-light);
-    color: var(--color-primary-dark);
-    border-radius: 99px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    border: 1px solid rgba(54, 184, 183, 0.25);
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
 
 @media (max-width: 768px) {
@@ -146,6 +129,6 @@
     }
 
     .dashboard-content {
-        padding: 20px 16px;
+        padding: 24px 20px;
     }
 }

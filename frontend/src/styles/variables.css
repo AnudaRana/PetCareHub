@@ -1,40 +1,60 @@
 /* File: src/styles/variables.css */
 /* =============================================
-   PetCareHub - Design Tokens
-   Primary: Teal #36B8B7
-   Accent:  Orange #F4811F
+   PetCareHub - SaaS Premium Theme Tokens
+   Primary: Deep Navy
+   Accent:  Electric Cyan / Sky Blue
 ============================================= */
 :root {
-  --color-primary: #36B8B7;
-  --color-primary-dark: #2a9a99;
-  --color-primary-light: #d0f0f0;
-  --color-accent: #F4811F;
-  --color-accent-dark: #d96c10;
-  --color-accent-light: #fde8d3;
+  /* Core Colors */
+  --color-primary-dark: #0A0F24;
+  /* Deep Navy Background */
+  --color-primary: #141B3D;
+  /* Slightly lighter Navy for cards/elements */
+  --color-primary-light: #212B58;
+  /* Hover states for navy */
 
-  --color-sidebar-bg: #1b3d3d;
-  --color-sidebar-text: #c8e6e6;
-  --color-sidebar-active: #36B8B7;
-  --color-sidebar-hover: #2a5050;
+  --color-accent: #00F0FF;
+  /* Electric Cyan */
+  --color-accent-dark: #00B8C4;
+  --color-accent-light: #5CE6FF;
 
-  --color-bg: #e6f0f0;
-  --color-white: #f5fdfd;
-  --color-border: #e0eaea;
-  --color-text: #2c3e50;
-  --color-text-light: #6b7e8a;
-  --color-error: #e53e3e;
-  --color-success: #38a169;
+  /* Sidebar Specifics */
+  --color-sidebar-bg: var(--color-primary-dark);
+  --color-sidebar-text: rgba(255, 255, 255, 0.75);
+  --color-sidebar-active: #FFFFFF;
+  --color-sidebar-active-bg: rgba(0, 240, 255, 0.1);
+  /* Subtle cyan tint */
+  --color-sidebar-hover: rgba(255, 255, 255, 0.05);
 
-  --shadow-sm: 0 2px 8px rgba(54, 184, 183, 0.12);
-  --shadow-md: 0 4px 16px rgba(54, 184, 183, 0.18);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.14);
+  /* Layout Background */
+  --color-bg: #F4F7FB;
+  /* Premium soft cool gray */
+  --color-white: #FFFFFF;
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
+  /* Text & Borders */
+  --color-border: rgba(0, 0, 0, 0.06);
+  --color-text: #1E2335;
+  /* Deep slate */
+  --color-text-light: #64748B;
+  /* Cool gray slate */
 
-  --font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-  --transition: 0.2s ease;
+  /* Status Colors */
+  --color-error: #FF3B30;
+  --color-success: #34C759;
 
+  /* Glassmorphism & Shadows */
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --shadow-sm: 0 4px 12px rgba(10, 15, 36, 0.04);
+  --shadow-md: 0 12px 32px rgba(10, 15, 36, 0.08);
+  --shadow-glow: 0 0 20px rgba(0, 240, 255, 0.3);
+
+  /* Structure */
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
+  --transition: 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  /* Silky smooth easing */
   --sidebar-width: 260px;
 }

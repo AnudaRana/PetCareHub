@@ -20,8 +20,15 @@ const TAB_META = {
 const ComingSoon = ({ tabKey }) => {
     const meta = TAB_META[tabKey] || { label: tabKey };
     return (
-        <div className="coming-soon-panel">
-            <div className="coming-soon-icon-placeholder">
+        <div style={{
+            height: '60vh', display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center', gap: '16px',
+        }}>
+            <div style={{
+                width: '80px', height: '80px', borderRadius: '50%',
+                background: `linear-gradient(135deg, rgba(62,64,149,0.18), rgba(0,174,239,0.18))`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)',
+            }}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
                     fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10" />
@@ -29,12 +36,17 @@ const ComingSoon = ({ tabKey }) => {
                     <line x1="12" y1="16" x2="12.01" y2="16" />
                 </svg>
             </div>
-            <h2>{meta.label}</h2>
-            <p>
-                This section is currently under development and will be available soon.
-                Stay tuned for updates.
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: '28px', color: 'var(--color-primary)', margin: 0 }}>
+                {meta.label}
+            </h2>
+            <p style={{ color: 'var(--color-border)', fontSize: '14px', textAlign: 'center', maxWidth: '320px', margin: 0, lineHeight: 1.6 }}>
+                This section is currently under development and will be available soon. Stay tuned!
             </p>
-            <span className="coming-soon-badge">Coming Soon</span>
+            <span style={{
+                background: `linear-gradient(90deg, var(--color-primary), var(--color-accent))`,
+                color: 'var(--color-white)', padding: '6px 18px', borderRadius: '20px',
+                fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+            }}>Coming Soon</span>
         </div>
     );
 };
@@ -48,40 +60,51 @@ const Dashboard = () => {
 
     // ── User info ──────────────────────────────────────────────────
     const [user, setUser] = useState({
+        userId: 1, // Fallback ID
         firstName: '',
         lastName: '',
-        fullName: 'Pet Owner',
-        email: 'owner@petcarehub.com',
-        initials: 'PO',
+        fullName: 'User',
+        email: 'user@petcarehub.com',
+        initials: 'U',
     });
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
                 const username = sessionStorage.getItem('username');
-                if (!username) return;
 
-                const { data } = await axios.get(
-                    `${API_BASE_URL}/api/admin/users/search?name=${encodeURIComponent(username)}`
-                );
-
-                if (Array.isArray(data) && data.length > 0) {
-                    // Match by username field (set during login) or fall back to first result
-                    const found = data.find(u => u.username === username) || data[0];
-                    if (found) {
-                        const firstName = found.firstName || '';
-                        const lastName = found.lastName || '';
-                        setUser({
-                            firstName,
-                            lastName,
-                            fullName: `${firstName} ${lastName}`.trim() || username,
-                            email: found.email || 'owner@petcarehub.com',
-                            initials: getInitials(firstName, lastName),
-                        });
+                let foundUser;
+                if (username) {
+                    // 1. Try search by username (email)
+                    const { data } = await axios.get(
+                        `${API_BASE_URL}/api/admin/users/search?name=${encodeURIComponent(username)}`
+                    );
+                    if (Array.isArray(data) && data.length > 0) {
+                        foundUser = data.find(u => u.username === username) || data[0];
                     }
                 }
+
+                if (!foundUser) {
+                    // 2. Fallback: Fetch by a known testing ID (1)
+                    const { data } = await axios.get(`${API_BASE_URL}/api/admin/users/1`);
+                    if (data && data.userId) {
+                        foundUser = data;
+                    }
+                }
+
+                if (foundUser) {
+                    const firstName = foundUser.firstName || '';
+                    const lastName = foundUser.lastName || '';
+                    setUser({
+                        userId: foundUser.userId || 1,
+                        firstName,
+                        lastName,
+                        fullName: `${firstName} ${lastName}`.trim() || foundUser.username || foundUser.email || 'User',
+                        email: foundUser.email || foundUser.username || 'user@petcarehub.com',
+                        initials: getInitials(firstName, lastName),
+                    });
+                }
             } catch (err) {
-                // Silently keep the default placeholder values
                 console.warn('Could not load user profile:', err);
             }
         };
@@ -109,12 +132,15 @@ const Dashboard = () => {
                         <span className="breadcrumb-sep">›</span>
                         <span className="breadcrumb-current">{currentMeta.label}</span>
                     </div>
+
                     <div className="topbar-right">
-                        <span className="topbar-greeting">
-                            Welcome back, <strong>{user.fullName}</strong>
-                        </span>
-                        <div className="topbar-avatar" title="Profile">
-                            {user.initials}
+                        <div className="topbar-user-section">
+                            <span className="topbar-greeting">
+                                Welcome, <strong>{user.fullName}</strong>
+                            </span>
+                            <div className="topbar-avatar" title="Profile">
+                                {user.initials}
+                            </div>
                         </div>
                     </div>
                 </header>

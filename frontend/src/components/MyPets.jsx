@@ -47,7 +47,7 @@ const MyPets = () => {
                 }
 
                 // Fallback: hardcoded for testing before login is wired
-                setUserId(2);
+                setUserId(1);
 
             } catch (error) {
                 console.error('❌ Error fetching user ID:', error);
@@ -119,10 +119,10 @@ const MyPets = () => {
     return (
         <div className="my-pets-container">
             {/* Header */}
-            <div className="my-pets-header">
-                <div className="my-pets-title">
-                    <h1>My Pets 🐾</h1>
-                    <p>Manage and view all your registered pet profiles</p>
+            <div style={{ marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                    <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 700, color: 'var(--color-primary)', margin: '0 0 6px' }}>My Pets</h2>
+                    <p style={{ color: 'var(--color-text-light)', fontSize: 14, margin: 0 }}>Manage and track your beloved companions</p>
                 </div>
                 <button
                     className="btn-add-pet"
@@ -133,9 +133,32 @@ const MyPets = () => {
                 </button>
             </div>
 
+            {/* Stats row (Reduced to just the one requested by user) */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
+                <div style={{
+                    background: 'var(--color-white)',
+                    borderRadius: 14,
+                    padding: '20px 22px',
+                    boxShadow: '0 2px 12px rgba(62,64,149,0.07)',
+                    borderTop: `3px solid var(--color-primary)`,
+                    transition: 'transform 0.18s, box-shadow 0.18s',
+                }}>
+                    <div style={{ fontSize: 30, fontWeight: 800, color: 'var(--color-primary)', fontFamily: "'Playfair Display', serif" }}>
+                        {!loading && !error ? pets.length : '-'}
+                    </div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-text)', marginTop: 2 }}>My Pets</div>
+                    <div style={{ fontSize: 11, color: 'var(--color-text-light)', marginTop: 1 }}>registered</div>
+                </div>
+            </div>
+
             {/* Search */}
             <div className="search-bar-wrapper">
-                <span className="search-icon">🔍</span>
+                <span className="search-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </span>
                 <input
                     className="search-input"
                     type="text"
@@ -197,6 +220,29 @@ const MyPets = () => {
                                     onSelect={setSelectedPet}
                                 />
                             ))}
+
+                            {/* Add pet card empty state (from inspiration) */}
+                            {!searchQuery && (
+                                <div style={{
+                                    borderRadius: 18, border: `2px dashed rgba(188,190,192,0.5)`,
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                                    minHeight: 240, cursor: 'pointer', gap: 10, color: 'var(--color-text-light)',
+                                    transition: 'border-color 0.18s',
+                                    background: 'var(--color-white)',
+                                }}
+                                    onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--color-accent)'}
+                                    onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(188,190,192,0.5)'}
+                                    onClick={() => setShowAddForm(true)}
+                                >
+                                    <div style={{
+                                        width: 46, height: 46, borderRadius: '50%',
+                                        background: `rgba(0,174,239,0.1)`,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, color: 'var(--color-accent)',
+                                    }}>+</div>
+                                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-primary)' }}>Add New Pet</span>
+                                    <span style={{ fontSize: 12, color: 'var(--color-text-light)' }}>Register a companion</span>
+                                </div>
+                            )}
                         </div>
                     )}
                 </>

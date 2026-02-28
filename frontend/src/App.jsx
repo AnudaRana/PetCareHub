@@ -13,17 +13,17 @@ const LoginPage = () => (
         fontFamily: 'Inter, system-ui, sans-serif'
     }}>
         <div style={{
-            background: '#fff', padding: '40px 48px', borderRadius: '16px',
+            background: 'var(--color-white)', padding: '40px 48px', borderRadius: '16px',
             boxShadow: '0 8px 32px rgba(0,0,0,0.12)', textAlign: 'center', maxWidth: 380, width: '100%'
         }}>
             <div style={{ fontSize: '3rem', marginBottom: '12px' }}>🐾</div>
-            <h1 style={{ color: '#36B8B7', fontSize: '1.5rem', fontWeight: 800, marginBottom: '6px' }}>
+            <h1 style={{ color: 'var(--color-primary)', fontSize: '1.5rem', fontWeight: 800, marginBottom: '6px' }}>
                 PetCareHub
             </h1>
-            <p style={{ color: '#6b7e8a', fontSize: '0.85rem', marginBottom: '24px' }}>
+            <p style={{ color: 'var(--color-text-light)', fontSize: '0.85rem', marginBottom: '24px' }}>
                 Please log in to access your dashboard.
             </p>
-            <p style={{ color: '#2c3e50', fontSize: '0.88rem' }}>
+            <p style={{ color: 'var(--color-text)', fontSize: '0.88rem' }}>
                 Set your username in <code>sessionStorage</code> under key <code>"username"</code> for testing.
             </p>
         </div>

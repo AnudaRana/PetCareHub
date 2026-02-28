@@ -22,30 +22,37 @@ const PetCard = ({ pet, onSelect }) => {
     const gender = GENDER_DISPLAY[pet.gender] || GENDER_DISPLAY.UNKNOWN;
 
     return (
-        <article className="pet-card" onClick={() => onSelect(pet)} aria-label={`View ${pet.name}'s profile`}>
-            <div className="pet-card-image-wrapper">
+        <div className="pet-card-container" onClick={() => onSelect(pet)}>
+            {/* Top dark blue banner with the gradient */}
+            <div className="pet-card-banner">
                 {pet.petImagePath ? (
                     <img
-                        className="pet-card-image"
+                        className="pet-card-avatar-img"
                         src={`${API_BASE_URL}/${pet.petImagePath}`}
                         alt={pet.name}
                     />
                 ) : (
-                    <span className="pet-card-placeholder">{speciesEmoji}</span>
+                    <div className="pet-card-avatar">
+                        <span style={{ fontSize: 24 }}>{speciesEmoji}</span>
+                    </div>
                 )}
-                <span className="pet-card-species-tag">{pet.species}</span>
             </div>
 
-            <div className="pet-card-body">
-                <h3 className="pet-card-name">{pet.name}</h3>
-                <p className="pet-card-breed">{pet.breed || 'Mixed breed'}</p>
-
-                <div className="pet-card-footer">
-                    <span className="pet-card-gender">{gender.label}</span>
-                    <button className="pet-card-view-btn">View Profile →</button>
+            <div className="pet-card-content">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                        <h3 className="pet-card-title">{pet.name}</h3>
+                        <p className="pet-card-subtitle">{pet.breed || 'Mixed breed'}</p>
+                    </div>
+                    {/* Status pills removed as per instructions */}
                 </div>
             </div>
-        </article>
+
+            <div className="pet-card-footer">
+                <span className="pet-card-gender">{gender.label}</span>
+                <span className="pet-card-species">{pet.species}</span>
+            </div>
+        </div>
     );
 };
 
