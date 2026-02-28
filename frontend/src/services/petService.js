@@ -59,3 +59,16 @@ export const searchPetsByOwner = async (ownerId, name) => {
     });
     return response.data;
 };
+
+/**
+ * Update an existing pet profile
+ */
+export const updatePet = async (petId, formData) => {
+    const response = await axios.put(`${API_BASE_URL}${API_BASE}/${petId}`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            ...getAuthHeaders()
+        },
+    });
+    return response.data;
+};

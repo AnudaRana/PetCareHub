@@ -64,4 +64,16 @@ public class PetController {
         List<PetResponseDTO> pets = petService.searchPets(ownerId, name);
         return ResponseEntity.ok(ApiResponse.success(pets, "Search results retrieved successfully"));
     }
+
+    @Operation(summary = "Update an existing pet")
+    @PutMapping(value = "/{petId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<PetResponseDTO>> updatePet(
+            @PathVariable Long petId,
+            @RequestParam("ownerId") Long ownerId,
+            @Valid @ModelAttribute PetRequestDTO petRequestDTO,
+            @RequestParam(value = "image", required = false) MultipartFile image) {
+
+        PetResponseDTO updatedPet = petService.updatePet(petId, ownerId, petRequestDTO, image);
+        return ResponseEntity.ok(ApiResponse.success(updatedPet, "Pet profile updated successfully"));
+    }
 }

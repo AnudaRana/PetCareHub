@@ -111,7 +111,7 @@ const Sidebar = ({ activeTab, onTabChange, user = {} }) => {
                 />
                 <div className="sidebar-logo-text">
                     <h2 style={{ fontFamily: "'Playfair Display', serif" }}>PetCareHub</h2>
-                    <p>Pet Management Portal</p>
+                    <p font size = "">Mans's best friend is his pet!...</p>
                 </div>
             </div>
 

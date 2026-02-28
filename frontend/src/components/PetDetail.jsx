@@ -1,12 +1,25 @@
-// File: src/components/PetDetail.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { API_BASE_URL } from '../services/petService';
 import '../styles/PetDetail.css';
+import EditPetForm from './EditPetForm';
 
 const SPECIES_EMOJI = { Dog: '🐕', Cat: '🐈', Bird: '🐦', Rabbit: '🐇', Fish: '🐟' };
 
-const PetDetail = ({ pet, onClose }) => {
+const PetDetail = ({ pet, onClose, onUpdateSuccess, userId }) => {
+    const [isEditing, setIsEditing] = useState(false);
+
     if (!pet) return null;
+
+    if (isEditing) {
+        return (
+            <EditPetForm
+                pet={pet}
+                onClose={() => setIsEditing(false)}
+                onUpdateSuccess={onUpdateSuccess}
+                userId={userId}
+            />
+        );
+    }
 
     const emoji = SPECIES_EMOJI[pet.species] || '🐾';
 
@@ -90,6 +103,27 @@ const PetDetail = ({ pet, onClose }) => {
                                 <div className="pet-detail-field-value">{pet.knownIllnesses}</div>
                             </div>
                         )}
+                    </div>
+
+                    <div className="upcoming-vax-section">
+                        <div className="vax-title">
+                            Upcoming Vaccinations
+                        </div>
+                        <p className="vax-info">
+                            If you have any upcoming vaccinations they will be displayed here
+                        </p>
+                    </div>
+
+                    <div className="pet-detail-actions">
+                        <button
+                            className="pet-detail-btn primary"
+                            onClick={() => setIsEditing(true)}
+                        >
+                            Edit Profile
+                        </button>
+                        <button className="pet-detail-btn secondary">
+                            View Medical Records
+                        </button>
                     </div>
 
                     <p className="pet-detail-registered">

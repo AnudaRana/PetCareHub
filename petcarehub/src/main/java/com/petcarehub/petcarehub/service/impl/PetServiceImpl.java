@@ -61,6 +61,37 @@ public class PetServiceImpl implements PetService {
     }
 
     @Override
+    public PetResponseDTO updatePet(Long petId, Long userId, PetRequestDTO dto, MultipartFile image) {
+        // Find pet
+        Pet pet = petRepository.findById(petId)
+                .orElseThrow(() -> new PetNotFoundException(petId));
+
+        // Check authorization
+        if (!pet.getOwner().getUserId().equals(userId)) {
+            throw new UnauthorizedAccessException(userId, petId);
+        }
+
+        // Update fields
+        pet.setName(dto.getName());
+        pet.setSpecies(dto.getSpecies());
+        pet.setBreed(dto.getBreed());
+        pet.setGender(dto.getGender());
+        pet.setDateOfBirth(dto.getDateOfBirth());
+        pet.setWeight(dto.getWeight());
+        pet.setKnownIllnesses(dto.getKnownIllnesses());
+
+        // Update image if provided
+        if (image != null && !image.isEmpty()) {
+            String imagePath = saveImage(image);
+            pet.setPetImagePath(imagePath);
+        }
+
+        // Save and return
+        Pet updatedPet = petRepository.save(pet);
+        return PetResponseDTO.fromEntity(updatedPet);
+    }
+
+    @Override
     public List<PetResponseDTO> getPetsByOwner(Long userId) {
         return petRepository.findByOwner_UserId(userId)
                 .stream()

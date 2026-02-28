@@ -16,4 +16,6 @@ public interface PetService {
     PetResponseDTO getPetById(Long petId, Long userId);
 
     List<PetResponseDTO> searchPets(Long userId, String name);
+
+    PetResponseDTO updatePet(Long petId, Long userId, PetRequestDTO dto, MultipartFile image);
 }

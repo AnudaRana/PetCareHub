@@ -253,6 +253,8 @@ const MyPets = () => {
                 <PetDetail
                     pet={selectedPet}
                     onClose={() => setSelectedPet(null)}
+                    onUpdateSuccess={handleAddSuccess}
+                    userId={userId}
                 />
             )}
 

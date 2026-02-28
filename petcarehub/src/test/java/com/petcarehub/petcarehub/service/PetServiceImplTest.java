@@ -179,4 +179,44 @@ class PetServiceImplTest {
 
         assertThat(result).isEmpty();
     }
+
+    // ── updatePet ──────────────────────────────────────────────
+
+    @Test
+    void updatePet_ShouldUpdateAndReturnDTO_WhenValid() {
+        PetRequestDTO updateDto = new PetRequestDTO();
+        updateDto.setName("Buddy Updated");
+        updateDto.setSpecies("Dog");
+        updateDto.setBreed("Golden Retriever");
+        updateDto.setGender(PetGender.MALE);
+        updateDto.setDateOfBirth(LocalDate.of(2021, 3, 15));
+        updateDto.setWeight(30.0);
+
+        when(petRepository.findById(10L)).thenReturn(Optional.of(pet));
+        when(petRepository.save(any(Pet.class))).thenReturn(pet);
+
+        PetResponseDTO result = petService.updatePet(10L, 1L, updateDto, null);
+
+        assertThat(result.getName()).isEqualTo("Buddy Updated");
+        assertThat(result.getWeight()).isEqualTo(30.0);
+        verify(petRepository).save(any(Pet.class));
+    }
+
+    @Test
+    void updatePet_ShouldThrowUnauthorized_WhenOwnerMismatches() {
+        PetRequestDTO updateDto = new PetRequestDTO();
+        when(petRepository.findById(10L)).thenReturn(Optional.of(pet));
+
+        assertThatThrownBy(() -> petService.updatePet(10L, 99L, updateDto, null))
+                .isInstanceOf(UnauthorizedAccessException.class);
+    }
+
+    @Test
+    void updatePet_ShouldThrowNotFound_WhenPetDoesNotExist() {
+        PetRequestDTO updateDto = new PetRequestDTO();
+        when(petRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> petService.updatePet(999L, 1L, updateDto, null))
+                .isInstanceOf(PetNotFoundException.class);
+    }
 }
