@@ -1,4 +1,3 @@
-// File: src/main/java/com/petcarehub/petcarehub/repository/UserRepository.java
 package com.petcarehub.petcarehub.repository;
 
 import com.petcarehub.petcarehub.entity.User;

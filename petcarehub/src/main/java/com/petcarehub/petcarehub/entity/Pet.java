@@ -1,4 +1,3 @@
-// File: src/main/java/com/petcarehub/petcarehub/entity/Pet.java
 package com.petcarehub.petcarehub.entity;
 
 import com.petcarehub.petcarehub.enums.PetGender;

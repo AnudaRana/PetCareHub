@@ -1,5 +1,6 @@
 // File: src/components/Sidebar.jsx
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/Sidebar.css';
 
 /* ── SVG Icon Components ─────────────────────────────── */
@@ -91,9 +92,16 @@ const NAV_ITEMS = [
 
 /* ── Component ────────────────────────────────────────── */
 const Sidebar = ({ activeTab, onTabChange, user = {} }) => {
+    const navigate = useNavigate();
     const displayName = user.fullName || 'User';
     const displayEmail = user.email || 'user@petcarehub.com';
     const displayInitials = user.initials || 'U';
+
+    const handleSignOut = () => {
+        sessionStorage.clear();
+        localStorage.removeItem('token');
+        navigate('/login');
+    };
 
     return (
         <aside className="sidebar">
@@ -111,7 +119,7 @@ const Sidebar = ({ activeTab, onTabChange, user = {} }) => {
                 />
                 <div className="sidebar-logo-text">
                     <h2 style={{ fontFamily: "'Playfair Display', serif" }}>PetCareHub</h2>
-                    <p font size = "">Mans's best friend is his pet!...</p>
+                    <p>Mans's best friend is his pet!...</p>
                 </div>
             </div>
 
@@ -146,7 +154,7 @@ const Sidebar = ({ activeTab, onTabChange, user = {} }) => {
                         <p className="sidebar-user-email" title={displayEmail}>{displayEmail}</p>
                     </div>
                 </div>
-                <button className="sidebar-signout">
+                <button className="sidebar-signout" onClick={handleSignOut}>
                     <SignOutIcon />
                     <span>Sign Out</span>
                 </button>

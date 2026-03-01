@@ -1,4 +1,3 @@
-// File: src/main/java/com/petcarehub/petcarehub/config/SecurityConfig.java
 package com.petcarehub.petcarehub.config;
 
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,3 @@
-// File: src/main/java/com/petcarehub/petcarehub/service/impl/PetServiceImpl.java
 package com.petcarehub.petcarehub.service.impl;
 
 import com.petcarehub.petcarehub.dto.PetRequestDTO;
@@ -132,5 +131,13 @@ public class PetServiceImpl implements PetService {
         } catch (IOException e) {
             throw new RuntimeException("Failed to store image: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public List<PetResponseDTO> getAllPets() {
+        return petRepository.findAll()
+                .stream()
+                .map(PetResponseDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 }

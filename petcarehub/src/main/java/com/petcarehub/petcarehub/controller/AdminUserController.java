@@ -1,4 +1,3 @@
-// File: src/main/java/com/petcarehub/petcarehub/controller/AdminUserController.java
 package com.petcarehub.petcarehub.controller;
 
 import com.petcarehub.petcarehub.entity.User;
@@ -33,10 +32,11 @@ public class AdminUserController {
         return users.stream().map(user -> {
             Map<String, Object> map = new HashMap<>();
             map.put("userId", user.getUserId());
-            map.put("username", user.getEmail()); // email = login identifier
+            map.put("username", user.getEmail());
             map.put("firstName", user.getFirstName());
             map.put("lastName", user.getLastName());
             map.put("email", user.getEmail());
+            map.put("roles", user.getRoles());   // <-- ADD THIS
             return map;
         }).collect(Collectors.toList());
     }
@@ -54,6 +54,7 @@ public class AdminUserController {
             map.put("firstName", user.getFirstName());
             map.put("lastName", user.getLastName());
             map.put("email", user.getEmail());
+            map.put("roles", user.getRoles());   // <-- ADD THIS
             return map;
         }).orElse(new HashMap<>());
     }

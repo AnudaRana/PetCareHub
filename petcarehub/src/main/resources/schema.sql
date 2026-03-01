@@ -1,7 +1,3 @@
--- File: src/main/resources/schema.sql
--- Pet Clinic Hub - Database Schema
--- Run this script against your MySQL 'petcarehub' database
-
 CREATE DATABASE IF NOT EXISTS petcarehub;
 USE petcarehub;
 

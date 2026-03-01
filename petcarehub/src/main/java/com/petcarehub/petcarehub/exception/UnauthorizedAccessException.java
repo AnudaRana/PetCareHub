@@ -1,4 +1,3 @@
-// File: src/main/java/com/petcarehub/petcarehub/exception/UnauthorizedAccessException.java
 package com.petcarehub.petcarehub.exception;
 
 public class UnauthorizedAccessException extends RuntimeException {

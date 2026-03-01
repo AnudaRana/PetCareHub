@@ -1,4 +1,3 @@
-// File: src/main/java/com/petcarehub/petcarehub/dto/PetResponseDTO.java
 package com.petcarehub.petcarehub.dto;
 
 import com.petcarehub.petcarehub.entity.Pet;

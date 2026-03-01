@@ -1,4 +1,4 @@
-// File: src/components/PetCard.jsx
+
 import React from 'react';
 import { API_BASE_URL } from '../services/petService';
 import '../styles/PetCard.css';

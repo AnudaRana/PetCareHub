@@ -1,6 +1,3 @@
--- File: src/main/resources/data.sql
--- Pet Clinic Hub - Initial Setup
--- Passwords are bcrypt-encoded. Plain text password for all initial users is: 12345
 
 -- ============================================================
 -- INITIAL USERS
@@ -23,13 +20,19 @@ VALUES
  '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a',
  'piyumi@gmail.com', 1);
 
--- ============================================================
--- INITIAL ROLES
--- ============================================================
+
 INSERT IGNORE INTO user_roles (user_id, role) VALUES
 (1, 'OWNER'),
 (2, 'OWNER'),
 (3, 'OWNER'),
 (4, 'OWNER');
 
--- Pets table is left completely empty at beginning as requested.
+
+INSERT IGNORE INTO users (user_id, first_name, last_name, mobile_number, password, email, enabled)
+VALUES
+(5, 'Nimal', 'Perera', '0776543210',
+ '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.AQubh4a',
+ 'dr.nimal@petcarehub.com', 1);
+
+INSERT IGNORE INTO user_roles (user_id, role) VALUES
+(5, 'VET');

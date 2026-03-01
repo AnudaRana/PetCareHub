@@ -1,4 +1,3 @@
-// File: src/main/java/com/petcarehub/petcarehub/dto/PetRequestDTO.java
 package com.petcarehub.petcarehub.dto;
 
 import com.petcarehub.petcarehub.enums.PetGender;

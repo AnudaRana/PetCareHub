@@ -1,4 +1,3 @@
-// File: src/main/java/com/petcarehub/petcarehub/config/WebConfig.java
 package com.petcarehub.petcarehub.config;
 
 import org.springframework.beans.factory.annotation.Value;

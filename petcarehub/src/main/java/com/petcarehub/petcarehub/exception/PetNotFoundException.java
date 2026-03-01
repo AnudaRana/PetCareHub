@@ -1,4 +1,3 @@
-// File: src/main/java/com/petcarehub/petcarehub/exception/PetNotFoundException.java
 package com.petcarehub.petcarehub.exception;
 
 public class PetNotFoundException extends RuntimeException {

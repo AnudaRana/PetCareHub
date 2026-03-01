@@ -1,4 +1,3 @@
-// File: src/main/java/com/petcarehub/petcarehub/dto/ApiResponse.java
 package com.petcarehub.petcarehub.dto;
 
 public class ApiResponse<T> {

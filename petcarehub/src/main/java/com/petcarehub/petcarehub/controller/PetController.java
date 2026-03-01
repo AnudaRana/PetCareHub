@@ -1,4 +1,3 @@
-// File: src/main/java/com/petcarehub/petcarehub/controller/PetController.java
 package com.petcarehub.petcarehub.controller;
 
 import com.petcarehub.petcarehub.dto.ApiResponse;
@@ -75,5 +74,12 @@ public class PetController {
 
         PetResponseDTO updatedPet = petService.updatePet(petId, ownerId, petRequestDTO, image);
         return ResponseEntity.ok(ApiResponse.success(updatedPet, "Pet profile updated successfully"));
+    }
+
+    @Operation(summary = "Get all pets in the system (Doctor access)")
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<PetResponseDTO>>> getAllPets() {
+        List<PetResponseDTO> pets = petService.getAllPets();
+        return ResponseEntity.ok(ApiResponse.success(pets, "All pets retrieved successfully"));
     }
 }

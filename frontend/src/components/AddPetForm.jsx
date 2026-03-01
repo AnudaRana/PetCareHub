@@ -1,4 +1,4 @@
-// File: src/components/AddPetForm.jsx
+
 import React, { useState } from 'react';
 import { registerPet } from '../services/petService';
 import '../styles/AddPetForm.css';

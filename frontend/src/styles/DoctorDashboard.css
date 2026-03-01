@@ -1,0 +1,486 @@
+/* ── Doctor Sidebar Extras ─────────────────────────────── */
+.doc-sidebar {
+  /* Slightly different teal-tinted dark for doctor context */
+  background: linear-gradient(180deg, #0A1628 0%, #0D1F3C 100%);
+}
+
+.doc-sidebar-role-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 16px 12px;
+  padding: 8px 14px;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 10px;
+  color: #93C5FD;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.doc-sidebar-role-icon {
+  font-size: 1rem;
+}
+
+.doc-user-avatar {
+  background: linear-gradient(135deg, #3B82F6, #1D4ED8) !important;
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.35) !important;
+}
+
+/* ── Doctor Avatar in topbar ───────────────────────────── */
+.doc-avatar {
+  background: linear-gradient(135deg, #3B82F6, #1D4ED8) !important;
+}
+
+/* ── Doctor Home ───────────────────────────────────────── */
+.doc-home {
+  max-width: 1000px;
+}
+
+.doc-home-greeting {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.doc-home-greeting h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0 0 6px;
+}
+
+.doc-home-greeting p {
+  color: var(--color-text-light);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.doc-role-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1.5px solid rgba(59, 130, 246, 0.3);
+  border-radius: 20px;
+  color: #2563EB;
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* ── Stats Grid ────────────────────────────────────────── */
+.doc-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.doc-stat-card {
+  background: var(--color-white);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0 2px 12px rgba(10, 15, 36, 0.07);
+  border-top: 3px solid var(--accent, #3B82F6);
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+
+.doc-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(10, 15, 36, 0.1);
+}
+
+.doc-stat-icon {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.doc-stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--accent, #3B82F6);
+  font-family: 'Playfair Display', serif;
+  line-height: 1;
+}
+
+.doc-stat-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-top: 4px;
+}
+
+.doc-stat-sub {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+  margin-top: 2px;
+}
+
+/* Inline stat card (used in All Pets) */
+.doc-stat-card-inline {
+  background: var(--color-white);
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0 2px 12px rgba(62, 64, 149, 0.07);
+  border-top: 3px solid var(--accent, #3B82F6);
+}
+
+/* ── Quick Actions ─────────────────────────────────────── */
+.doc-quick-actions {
+  margin-top: 8px;
+}
+
+.doc-quick-actions h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 16px;
+}
+
+.doc-action-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.doc-action-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  background: var(--color-white);
+  border: 1.5px solid var(--color-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  font-family: var(--font-family);
+}
+
+.doc-action-card:hover {
+  border-color: #3B82F6;
+  background: rgba(59, 130, 246, 0.04);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12);
+}
+
+.doc-action-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.doc-action-label {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.doc-action-arrow {
+  color: #3B82F6;
+  font-size: 1rem;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+
+.doc-action-card:hover .doc-action-arrow {
+  opacity: 1;
+}
+
+/* ── Coming Soon ───────────────────────────────────────── */
+.doc-coming-soon {
+  height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.doc-coming-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(29, 78, 216, 0.18));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3B82F6;
+}
+
+.doc-coming-soon h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.doc-coming-soon p {
+  color: var(--color-text-light);
+  font-size: 14px;
+  text-align: center;
+  max-width: 320px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.doc-coming-badge {
+  background: linear-gradient(90deg, #3B82F6, #1D4ED8);
+  color: white;
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Read-only Banner ──────────────────────────────────── */
+.doc-readonly-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  background: rgba(59, 130, 246, 0.07);
+  border: 1.5px solid rgba(59, 130, 246, 0.2);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  color: #1D4ED8;
+  margin-bottom: 20px;
+}
+
+/* ── Pets Table ────────────────────────────────────────── */
+.doc-pets-table {
+  background: var(--color-white);
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(10, 15, 36, 0.05);
+}
+
+.doc-pets-table-header {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 0.7fr 0.8fr 1fr;
+  gap: 0;
+  padding: 12px 20px;
+  background: rgba(10, 15, 36, 0.03);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-light);
+}
+
+.doc-pets-table-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.5fr 0.7fr 0.8fr 1fr;
+  gap: 0;
+  padding: 14px 20px;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.doc-pets-table-row:last-child {
+  border-bottom: none;
+}
+
+.doc-pets-table-row:hover {
+  background: rgba(59, 130, 246, 0.04);
+}
+
+.doc-pet-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.doc-pet-mini-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.doc-pet-mini-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.doc-pet-mini-avatar span {
+  font-size: 1.1rem;
+}
+
+.doc-view-btn {
+  padding: 6px 14px;
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563EB;
+  border: 1.5px solid rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  font-family: var(--font-family);
+}
+
+.doc-view-btn:hover {
+  background: #3B82F6;
+  color: white;
+  border-color: #3B82F6;
+}
+
+/* ── Doctor Pet Detail extras ──────────────────────────── */
+.doc-pet-detail-panel {
+  max-width: 620px !important;
+}
+
+.doc-pet-detail-header {
+  background: linear-gradient(135deg, #0A1628, #1D4ED8) !important;
+}
+
+.doc-readonly-pill {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(8px);
+}
+
+.doc-owner-info-card {
+  background: rgba(59, 130, 246, 0.07);
+  border: 1.5px solid rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.doc-owner-info-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #2563EB;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.doc-owner-info-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.doc-owner-info-sub {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+}
+
+/* ── Medical Section ───────────────────────────────────── */
+.doc-medical-section {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1.5px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  padding: 18px;
+  margin-top: 4px;
+}
+
+.doc-medical-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.doc-medical-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  gap: 6px;
+  color: var(--color-text-light);
+}
+
+.doc-medical-empty span {
+  font-size: 2rem;
+}
+
+.doc-medical-empty p {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 0;
+  color: var(--color-text-light);
+}
+
+.doc-medical-empty small {
+  font-size: 0.78rem;
+  color: var(--color-text-light);
+  opacity: 0.7;
+}
+
+/* ── Add Record button (disabled/coming soon) ──────────── */
+.doc-add-record-btn {
+  background: rgba(59, 130, 246, 0.1) !important;
+  color: #2563EB !important;
+  border: 1.5px solid rgba(59, 130, 246, 0.3) !important;
+  opacity: 0.5;
+  cursor: not-allowed !important;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .doc-stats-grid,
+  .doc-action-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .doc-pets-table-header,
+  .doc-pets-table-row {
+    grid-template-columns: 2fr 1fr 1fr 0.6fr;
+  }
+
+  .doc-pets-table-header span:nth-child(5),
+  .doc-pets-table-header span:nth-child(6),
+  .doc-pets-table-row span:nth-child(5),
+  .doc-pets-table-row span:nth-child(6) {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .doc-stats-grid,
+  .doc-action-cards {
+    grid-template-columns: 1fr 1fr;
+  }
+}

@@ -1,4 +1,3 @@
-// File: src/main/java/com/petcarehub/petcarehub/service/PetService.java
 package com.petcarehub.petcarehub.service;
 
 import com.petcarehub.petcarehub.dto.PetRequestDTO;
@@ -18,4 +17,6 @@ public interface PetService {
     List<PetResponseDTO> searchPets(Long userId, String name);
 
     PetResponseDTO updatePet(Long petId, Long userId, PetRequestDTO dto, MultipartFile image);
+
+    List<PetResponseDTO> getAllPets();
 }

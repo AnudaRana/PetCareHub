@@ -1,17 +1,14 @@
-// File: src/components/MyPets.jsx
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
 import { getPetsByOwner, searchPetsByOwner } from '../services/petService';
-import { API_BASE_URL } from '../services/petService';
 import PetCard from './PetCard';
 import PetDetail from './PetDetail';
 import AddPetForm from './AddPetForm';
 import '../styles/MyPets.css';
+import useCurrentUser from '../hooks/useCurrentUser';
 
 const MyPets = () => {
-    // ─── User State (same pattern as CheckoutPage) ───────────────
-    const [userId, setUserId] = useState(null);
-    const [loadingUser, setLoadingUser] = useState(true);
+    // ─── User State ──────────────────────────────────────────────
+    const { userId, loading: loadingUser } = useCurrentUser();
 
     // ─── Pet State ───────────────────────────────────────────────
     const [pets, setPets] = useState([]);
@@ -20,47 +17,6 @@ const MyPets = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedPet, setSelectedPet] = useState(null);
     const [showAddForm, setShowAddForm] = useState(false);
-
-    // ─── Step 1: Resolve userId from sessionStorage ──────────────
-    // Mirrors the CheckoutPage pattern:
-    //   - Reads username stored in sessionStorage at login
-    //   - Searches the backend to find the matching userId
-    //   - Falls back to hardcoded ID 3 for testing while login is not yet wired
-    useEffect(() => {
-        const getCurrentUserId = async () => {
-            try {
-                const username = sessionStorage.getItem('username');
-
-                if (username) {
-                    // Ask the backend for user info by username
-                    const response = await axios.get(
-                        `${API_BASE_URL}/api/admin/users/search?name=${encodeURIComponent(username)}`
-                    );
-
-                    if (response.data && response.data.length > 0) {
-                        const user = response.data.find(u => u.username === username);
-                        if (user) {
-                            setUserId(user.userId);
-                            return; // found — no fallback needed
-                        }
-                    }
-                }
-
-                // Fallback: hardcoded for testing before login is wired
-                setUserId(1);
-
-            } catch (error) {
-                console.error('❌ Error fetching user ID:', error);
-                console.error('❌ Error details:', error.response?.data);
-                // Fallback to default user ID for testing
-                setUserId(3);
-            } finally {
-                setLoadingUser(false);
-            }
-        };
-
-        getCurrentUserId();
-    }, []);
 
     // ─── Step 2: Fetch pets once userId is known ─────────────────
     const fetchPets = useCallback(async (query = '') => {

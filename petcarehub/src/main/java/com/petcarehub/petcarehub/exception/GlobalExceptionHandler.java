@@ -1,4 +1,3 @@
-// File: src/main/java/com/petcarehub/petcarehub/exception/GlobalExceptionHandler.java
 package com.petcarehub.petcarehub.exception;
 
 import com.petcarehub.petcarehub.dto.ApiResponse;

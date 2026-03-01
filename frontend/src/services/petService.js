@@ -1,4 +1,3 @@
-// File: src/services/petService.js
 import axios from 'axios';
 
 export const API_BASE_URL = 'http://localhost:8081';

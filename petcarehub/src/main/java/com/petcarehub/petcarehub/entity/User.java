@@ -1,4 +1,3 @@
-// File: src/main/java/com/petcarehub/petcarehub/entity/User.java
 package com.petcarehub.petcarehub.entity;
 
 import jakarta.persistence.*;

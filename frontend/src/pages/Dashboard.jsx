@@ -1,10 +1,8 @@
-// File: src/pages/Dashboard.jsx
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import MyPets from '../components/MyPets';
-import { API_BASE_URL } from '../services/petService';
 import '../styles/Dashboard.css';
+import useCurrentUser from '../hooks/useCurrentUser';
 
 const TAB_META = {
     'home': { label: 'Home' },
@@ -51,66 +49,9 @@ const ComingSoon = ({ tabKey }) => {
     );
 };
 
-/** Build initials from first + last name, e.g. "John Smith" → "JS" */
-const getInitials = (firstName = '', lastName = '') =>
-    `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || 'U';
-
 const Dashboard = () => {
     const [activeTab, setActiveTab] = useState('my-pets');
-
-    // ── User info ──────────────────────────────────────────────────
-    const [user, setUser] = useState({
-        userId: 1, // Fallback ID
-        firstName: '',
-        lastName: '',
-        fullName: 'User',
-        email: 'user@petcarehub.com',
-        initials: 'U',
-    });
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const username = sessionStorage.getItem('username');
-
-                let foundUser;
-                if (username) {
-                    // 1. Try search by username (email)
-                    const { data } = await axios.get(
-                        `${API_BASE_URL}/api/admin/users/search?name=${encodeURIComponent(username)}`
-                    );
-                    if (Array.isArray(data) && data.length > 0) {
-                        foundUser = data.find(u => u.username === username) || data[0];
-                    }
-                }
-
-                if (!foundUser) {
-                    // 2. Fallback: Fetch by a known testing ID (1)
-                    const { data } = await axios.get(`${API_BASE_URL}/api/admin/users/1`);
-                    if (data && data.userId) {
-                        foundUser = data;
-                    }
-                }
-
-                if (foundUser) {
-                    const firstName = foundUser.firstName || '';
-                    const lastName = foundUser.lastName || '';
-                    setUser({
-                        userId: foundUser.userId || 1,
-                        firstName,
-                        lastName,
-                        fullName: `${firstName} ${lastName}`.trim() || foundUser.username || foundUser.email || 'User',
-                        email: foundUser.email || foundUser.username || 'user@petcarehub.com',
-                        initials: getInitials(firstName, lastName),
-                    });
-                }
-            } catch (err) {
-                console.warn('Could not load user profile:', err);
-            }
-        };
-
-        fetchUser();
-    }, []);
+    const user = useCurrentUser();
 
     // ── Content renderer ───────────────────────────────────────────
     const renderContent = () => {
