@@ -1,0 +1,99 @@
+.testimonials{
+    position: relative;
+    margin: 40px auto;
+    padding: 0 80px;
+    position: relative;
+}
+
+.slider{
+    overflow: hidden;
+}
+
+.slider ul{
+    display: flex;
+    width: 200%;
+    overflow-x: hidden;
+    transition: 0.5s; 
+}
+
+.slider ul li{
+    list-style: none;
+    width: 50%;
+    padding: 20px;
+}
+
+.slide{
+    height: 100%;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    padding: 40px;
+    border-radius: 10px;
+    color: #888;
+    line-height: 1.4;
+}
+
+.slide img{
+    width: 65px;
+    height: 65px;
+    min-width: 65px; 
+    border-radius: 50%;
+    margin-right: 10px;
+    border: 3px solid #0a0f23;
+    object-fit: cover; 
+    object-position: center;
+}
+
+.user-info{
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 15px;
+}
+
+.user-info h3{
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+/* Responsive Styles */
+@media (max-width: 850px) {
+    .testimonials{
+        padding: 0 40px;
+    }
+
+    .next-btn, .prev-btn{
+        width: 35px;
+    }
+
+    .testimonials ul li{
+        padding: 10px;
+    }
+
+    .slide{
+        padding: 10px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+
+    .slide img{
+        width: 50px;
+        border: 2px solid #0a0f23;
+    } 
+}
+
+@media (max-width: 650px) {
+    .user-info{
+        display: block;
+        margin-bottom: 10px;
+        font-size: 12px;
+    }
+
+    .user-info h3{
+        font-size: 16px;
+    }
+
+    .slider p{
+        font-size: 12px;
+    }
+
+}

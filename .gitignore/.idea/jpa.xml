@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PersistenceUnitSettings">
+    <persistence-units>
+      <persistence-unit moduleName="petcarehub" name="petcarehub" framework="JPA" ormUnit="petcarehub:petcarehub" defaultDataSourceId="2753591c-224f-4a43-b79e-405a13d9c78f" />
+    </persistence-units>
+  </component>
+</project>
