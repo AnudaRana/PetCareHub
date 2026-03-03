@@ -1,7 +1,7 @@
-/* ── Doctor Sidebar Extras ─────────────────────────────── */
+﻿/* â”€â”€ Doctor Sidebar Extras â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .doc-sidebar {
-  /* Slightly different teal-tinted dark for doctor context */
-  background: linear-gradient(180deg, #0A1628 0%, #0D1F3C 100%);
+  /* Slightly different Sky-blue tinted dark for doctor/vet context */
+  background: linear-gradient(180deg, #082F49 0%, #0C3F5F 100%);
 }
 
 .doc-sidebar-role-badge {
@@ -10,10 +10,10 @@
   gap: 8px;
   margin: 0 16px 12px;
   padding: 8px 14px;
-  background: rgba(59, 130, 246, 0.12);
-  border: 1px solid rgba(59, 130, 246, 0.25);
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.25);
   border-radius: 10px;
-  color: #93C5FD;
+  color: #BAE6FD;
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -25,16 +25,16 @@
 }
 
 .doc-user-avatar {
-  background: linear-gradient(135deg, #3B82F6, #1D4ED8) !important;
-  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.35) !important;
+  background: linear-gradient(135deg, #0EA5E9, #0284C7) !important;
+  box-shadow: 0 2px 10px rgba(14, 165, 233, 0.35) !important;
 }
 
-/* ── Doctor Avatar in topbar ───────────────────────────── */
+/* â”€â”€ Doctor Avatar in topbar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .doc-avatar {
-  background: linear-gradient(135deg, #3B82F6, #1D4ED8) !important;
+  background: linear-gradient(135deg, #0EA5E9, #0284C7) !important;
 }
 
-/* ── Doctor Home ───────────────────────────────────────── */
+/* â”€â”€ Doctor Home â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .doc-home {
   max-width: 1000px;
 }
@@ -67,16 +67,16 @@
   align-items: center;
   gap: 8px;
   padding: 8px 20px;
-  background: rgba(59, 130, 246, 0.1);
-  border: 1.5px solid rgba(59, 130, 246, 0.3);
+  background: rgba(14, 165, 233, 0.1);
+  border: 1.5px solid rgba(14, 165, 233, 0.3);
   border-radius: 20px;
-  color: #2563EB;
+  color: #0284C7;
   font-weight: 700;
   font-size: 0.85rem;
   white-space: nowrap;
 }
 
-/* ── Stats Grid ────────────────────────────────────────── */
+/* â”€â”€ Stats Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .doc-stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -89,7 +89,7 @@
   border-radius: 14px;
   padding: 20px 22px;
   box-shadow: 0 2px 12px rgba(10, 15, 36, 0.07);
-  border-top: 3px solid var(--accent, #3B82F6);
+  border-top: 3px solid var(--accent, #0EA5E9);
   transition: transform 0.18s, box-shadow 0.18s;
 }
 
@@ -106,7 +106,7 @@
 .doc-stat-value {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--accent, #3B82F6);
+  color: var(--accent, #0EA5E9);
   font-family: 'Playfair Display', serif;
   line-height: 1;
 }
@@ -130,10 +130,10 @@
   border-radius: 14px;
   padding: 20px 22px;
   box-shadow: 0 2px 12px rgba(62, 64, 149, 0.07);
-  border-top: 3px solid var(--accent, #3B82F6);
+  border-top: 3px solid var(--accent, #0EA5E9);
 }
 
-/* ── Quick Actions ─────────────────────────────────────── */
+/* â”€â”€ Quick Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .doc-quick-actions {
   margin-top: 8px;
 }
@@ -166,10 +166,10 @@
 }
 
 .doc-action-card:hover {
-  border-color: #3B82F6;
-  background: rgba(59, 130, 246, 0.04);
+  border-color: #0EA5E9;
+  background: rgba(14, 165, 233, 0.04);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12);
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.12);
 }
 
 .doc-action-icon {
@@ -185,7 +185,7 @@
 }
 
 .doc-action-arrow {
-  color: #3B82F6;
+  color: #0EA5E9;
   font-size: 1rem;
   font-weight: 700;
   opacity: 0;
@@ -196,7 +196,7 @@
   opacity: 1;
 }
 
-/* ── Coming Soon ───────────────────────────────────────── */
+/* â”€â”€ Coming Soon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .doc-coming-soon {
   height: 60vh;
   display: flex;
@@ -210,11 +210,11 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(29, 78, 216, 0.18));
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.18), rgba(2, 132, 199, 0.18));
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #3B82F6;
+  color: #0EA5E9;
 }
 
 .doc-coming-soon h2 {
@@ -234,7 +234,7 @@
 }
 
 .doc-coming-badge {
-  background: linear-gradient(90deg, #3B82F6, #1D4ED8);
+  background: linear-gradient(90deg, #0EA5E9, #0284C7);
   color: white;
   padding: 6px 18px;
   border-radius: 20px;
@@ -244,21 +244,21 @@
   text-transform: uppercase;
 }
 
-/* ── Read-only Banner ──────────────────────────────────── */
+/* â”€â”€ Read-only Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .doc-readonly-banner {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 12px 18px;
-  background: rgba(59, 130, 246, 0.07);
-  border: 1.5px solid rgba(59, 130, 246, 0.2);
+  background: rgba(14, 165, 233, 0.07);
+  border: 1.5px solid rgba(14, 165, 233, 0.2);
   border-radius: 10px;
   font-size: 0.85rem;
-  color: #1D4ED8;
+  color: #0284C7;
   margin-bottom: 20px;
 }
 
-/* ── Pets Table ────────────────────────────────────────── */
+/* â”€â”€ Pets Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .doc-pets-table {
   background: var(--color-white);
   border-radius: 14px;
@@ -297,7 +297,7 @@
 }
 
 .doc-pets-table-row:hover {
-  background: rgba(59, 130, 246, 0.04);
+  background: rgba(14, 165, 233, 0.04);
 }
 
 .doc-pet-name-cell {
@@ -330,9 +330,9 @@
 
 .doc-view-btn {
   padding: 6px 14px;
-  background: rgba(59, 130, 246, 0.1);
-  color: #2563EB;
-  border: 1.5px solid rgba(59, 130, 246, 0.3);
+  background: rgba(14, 165, 233, 0.1);
+  color: #0284C7;
+  border: 1.5px solid rgba(14, 165, 233, 0.3);
   border-radius: 8px;
   font-size: 0.78rem;
   font-weight: 700;
@@ -343,18 +343,18 @@
 }
 
 .doc-view-btn:hover {
-  background: #3B82F6;
+  background: #0EA5E9;
   color: white;
-  border-color: #3B82F6;
+  border-color: #0EA5E9;
 }
 
-/* ── Doctor Pet Detail extras ──────────────────────────── */
+/* â”€â”€ Doctor Pet Detail extras â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .doc-pet-detail-panel {
   max-width: 620px !important;
 }
 
 .doc-pet-detail-header {
-  background: linear-gradient(135deg, #0A1628, #1D4ED8) !important;
+  background: linear-gradient(135deg, #082F49, #0284C7) !important;
 }
 
 .doc-readonly-pill {
@@ -373,8 +373,8 @@
 }
 
 .doc-owner-info-card {
-  background: rgba(59, 130, 246, 0.07);
-  border: 1.5px solid rgba(59, 130, 246, 0.2);
+  background: rgba(14, 165, 233, 0.07);
+  border: 1.5px solid rgba(14, 165, 233, 0.2);
   border-radius: 12px;
   padding: 14px 18px;
   margin-bottom: 20px;
@@ -386,7 +386,7 @@
 .doc-owner-info-label {
   font-size: 0.72rem;
   font-weight: 700;
-  color: #2563EB;
+  color: #0284C7;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -402,7 +402,7 @@
   color: var(--color-text-light);
 }
 
-/* ── Medical Section ───────────────────────────────────── */
+/* â”€â”€ Medical Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .doc-medical-section {
   background: rgba(255, 255, 255, 0.5);
   border: 1.5px solid rgba(0, 0, 0, 0.06);
@@ -449,7 +449,7 @@
   opacity: 0.7;
 }
 
-/* ── Add Record button (disabled/coming soon) ──────────── */
+/* â”€â”€ Add Record button (disabled/coming soon) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .doc-add-record-btn {
   background: rgba(59, 130, 246, 0.1) !important;
   color: #2563EB !important;
@@ -458,8 +458,9 @@
   cursor: not-allowed !important;
 }
 
-/* ── Responsive ────────────────────────────────────────── */
+/* â”€â”€ Responsive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @media (max-width: 900px) {
+
   .doc-stats-grid,
   .doc-action-cards {
     grid-template-columns: repeat(2, 1fr);
@@ -479,6 +480,7 @@
 }
 
 @media (max-width: 600px) {
+
   .doc-stats-grid,
   .doc-action-cards {
     grid-template-columns: 1fr 1fr;

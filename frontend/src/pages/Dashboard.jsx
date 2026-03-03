@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Sidebar from '../components/Sidebar';
-import MyPets from '../components/MyPets';
+import OwnerSidebar from '../components/owner/OwnerSidebar';
+import MyPets from '../components/owner/MyPets';
 import '../styles/Dashboard.css';
 import useCurrentUser from '../hooks/useCurrentUser';
 
@@ -63,7 +63,7 @@ const Dashboard = () => {
 
     return (
         <div className="dashboard-layout">
-            <Sidebar activeTab={activeTab} onTabChange={setActiveTab} user={user} />
+            <OwnerSidebar activeTab={activeTab} onTabChange={setActiveTab} user={user} />
 
             <div className="dashboard-main">
                 {/* Top Bar */}

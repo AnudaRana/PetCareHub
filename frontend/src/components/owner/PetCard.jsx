@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { API_BASE_URL } from '../services/petService';
-import '../styles/PetCard.css';
+import { API_BASE_URL } from '../../services/petService';
+import '../../styles/PetCard.css';
 
 const SPECIES_EMOJI = {
     Dog: '🐕',
@@ -44,7 +44,6 @@ const PetCard = ({ pet, onSelect }) => {
                         <h3 className="pet-card-title">{pet.name}</h3>
                         <p className="pet-card-subtitle">{pet.breed || 'Mixed breed'}</p>
                     </div>
-                    {/* Status pills removed as per instructions */}
                 </div>
             </div>
 

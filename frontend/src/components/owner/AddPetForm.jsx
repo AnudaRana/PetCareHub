@@ -1,23 +1,25 @@
 
 import React, { useState } from 'react';
-import { updatePet } from '../services/petService';
-import '../styles/AddPetForm.css'; // Reusing the same styles as AddPetForm
+import { registerPet } from '../../services/petService';
+import '../../styles/AddPetForm.css';
 
-const EditPetForm = ({ pet, onClose, onUpdateSuccess, userId }) => {
-    const [form, setForm] = useState({
-        name: pet.name || '',
-        species: pet.species || '',
-        breed: pet.breed || '',
-        gender: pet.gender || '',
-        dateOfBirth: pet.dateOfBirth || '',
-        weight: pet.weight || '',
-        knownIllnesses: pet.knownIllnesses || '',
-    });
+const INITIAL_FORM = {
+    name: '',
+    species: '',
+    breed: '',
+    gender: '',
+    dateOfBirth: '',
+    weight: '',
+    knownIllnesses: '',
+};
+
+const AddPetForm = ({ onClose, onSuccess, userId }) => {
+    const [form, setForm] = useState(INITIAL_FORM);
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState(null);
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
-    const [alert, setAlert] = useState(null);
+    const [alert, setAlert] = useState(null); // { type: 'success'|'error', message }
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -53,7 +55,7 @@ const EditPetForm = ({ pet, onClose, onUpdateSuccess, userId }) => {
 
         try {
             const data = new FormData();
-            data.append('ownerId', userId);
+            data.append('ownerId', userId); // Pass the manual userId
             data.append('name', form.name.trim());
             data.append('species', form.species.trim());
             if (form.breed) data.append('breed', form.breed.trim());
@@ -63,16 +65,16 @@ const EditPetForm = ({ pet, onClose, onUpdateSuccess, userId }) => {
             if (form.knownIllnesses) data.append('knownIllnesses', form.knownIllnesses.trim());
             if (image) data.append('image', image);
 
-            const response = await updatePet(pet.petId, data);
+            const response = await registerPet(data);
 
             if (response.success) {
-                setAlert({ type: 'success', message: '🎉 Pet profile updated successfully!' });
+                setAlert({ type: 'success', message: '🎉 Pet registered successfully!' });
                 setTimeout(() => {
-                    if (onUpdateSuccess) onUpdateSuccess();
+                    onSuccess();
                     onClose();
                 }, 1200);
             } else {
-                setAlert({ type: 'error', message: response.message || 'Failed to update pet profile.' });
+                setAlert({ type: 'error', message: response.message || 'Failed to register pet.' });
             }
         } catch (err) {
             const msg = err.response?.data?.message || 'Something went wrong. Please try again.';
@@ -83,49 +85,50 @@ const EditPetForm = ({ pet, onClose, onUpdateSuccess, userId }) => {
     };
 
     return (
-        <div className="pet-detail-overlay">
-            <div className="pet-detail-panel" onClick={(e) => e.stopPropagation()} style={{ padding: '32px' }}>
-                <div className="modal-header" style={{ marginBottom: '24px' }}>
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>✏️ Edit {pet.name}'s Profile</h2>
-                    <button className="pet-detail-back-btn" onClick={onClose} aria-label="Close" style={{ position: 'static' }}>✕</button>
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                    <h2>🐾 Register New Pet</h2>
+                    <button className="modal-close-btn" onClick={onClose} aria-label="Close">✕</button>
                 </div>
 
                 <form className="pet-form" onSubmit={handleSubmit} noValidate>
                     {alert && (
-                        <div className={`form-alert ${alert.type}`} style={{ marginBottom: '16px' }}>
+                        <div className={`form-alert ${alert.type}`}>
                             {alert.message}
                         </div>
                     )}
 
                     <div className="form-row">
                         <div className="form-group">
-                            <label className="form-label" htmlFor="edit-pet-name">
+                            <label className="form-label" htmlFor="pet-name">
                                 Pet Name <span className="required">*</span>
                             </label>
                             <input
-                                id="edit-pet-name"
+                                id="pet-name"
                                 className={`form-input ${errors.name ? 'error' : ''}`}
                                 type="text"
                                 name="name"
                                 value={form.name}
                                 onChange={handleChange}
                                 placeholder="e.g. Buddy"
+                                autoComplete="off"
                             />
                             {errors.name && <span className="form-error-msg">⚠ {errors.name}</span>}
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label" htmlFor="edit-pet-species">
+                            <label className="form-label" htmlFor="pet-species">
                                 Species <span className="required">*</span>
                             </label>
                             <input
-                                id="edit-pet-species"
+                                id="pet-species"
                                 className={`form-input ${errors.species ? 'error' : ''}`}
                                 type="text"
                                 name="species"
                                 value={form.species}
                                 onChange={handleChange}
-                                placeholder="e.g. Dog"
+                                placeholder="e.g. Dog, Cat, Bird"
                             />
                             {errors.species && <span className="form-error-msg">⚠ {errors.species}</span>}
                         </div>
@@ -133,9 +136,9 @@ const EditPetForm = ({ pet, onClose, onUpdateSuccess, userId }) => {
 
                     <div className="form-row">
                         <div className="form-group">
-                            <label className="form-label" htmlFor="edit-pet-breed">Breed</label>
+                            <label className="form-label" htmlFor="pet-breed">Breed</label>
                             <input
-                                id="edit-pet-breed"
+                                id="pet-breed"
                                 className="form-input"
                                 type="text"
                                 name="breed"
@@ -146,9 +149,9 @@ const EditPetForm = ({ pet, onClose, onUpdateSuccess, userId }) => {
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label" htmlFor="edit-pet-gender">Gender</label>
+                            <label className="form-label" htmlFor="pet-gender">Gender</label>
                             <select
-                                id="edit-pet-gender"
+                                id="pet-gender"
                                 className="form-select"
                                 name="gender"
                                 value={form.gender}
@@ -164,11 +167,11 @@ const EditPetForm = ({ pet, onClose, onUpdateSuccess, userId }) => {
 
                     <div className="form-row">
                         <div className="form-group">
-                            <label className="form-label" htmlFor="edit-pet-dob">
+                            <label className="form-label" htmlFor="pet-dob">
                                 Date of Birth <span className="required">*</span>
                             </label>
                             <input
-                                id="edit-pet-dob"
+                                id="pet-dob"
                                 className={`form-input ${errors.dateOfBirth ? 'error' : ''}`}
                                 type="date"
                                 name="dateOfBirth"
@@ -180,14 +183,15 @@ const EditPetForm = ({ pet, onClose, onUpdateSuccess, userId }) => {
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label" htmlFor="edit-pet-weight">Weight (kg)</label>
+                            <label className="form-label" htmlFor="pet-weight">Weight (kg)</label>
                             <input
-                                id="edit-pet-weight"
+                                id="pet-weight"
                                 className="form-input"
                                 type="number"
                                 name="weight"
                                 value={form.weight}
                                 onChange={handleChange}
+                                placeholder="e.g. 12.5"
                                 min="0"
                                 step="0.1"
                             />
@@ -195,28 +199,32 @@ const EditPetForm = ({ pet, onClose, onUpdateSuccess, userId }) => {
                     </div>
 
                     <div className="form-group">
-                        <label className="form-label" htmlFor="edit-pet-illnesses">Known Illnesses / Conditions</label>
+                        <label className="form-label" htmlFor="pet-illnesses">Known Illnesses / Conditions</label>
                         <textarea
-                            id="edit-pet-illnesses"
+                            id="pet-illnesses"
                             className="form-textarea"
                             name="knownIllnesses"
                             value={form.knownIllnesses}
                             onChange={handleChange}
+                            placeholder="e.g. Allergies, Diabetes, None"
                             rows={3}
                         />
                     </div>
 
                     <div className="form-group">
-                        <label className="form-label">Update Pet Photo (Optional)</label>
+                        <label className="form-label">Pet Photo</label>
                         <div className="image-upload-area">
                             <input
                                 type="file"
                                 accept="image/*"
                                 onChange={handleImageChange}
-                                id="edit-pet-image"
+                                id="pet-image-upload"
                             />
                             <span className="image-upload-icon">📷</span>
-                            <p className="image-upload-text"><strong>Click to change</strong></p>
+                            <p className="image-upload-text">
+                                <strong>Click to upload</strong> or drag and drop<br />
+                                <small>PNG, JPG, GIF up to 10MB</small>
+                            </p>
                         </div>
                         {preview && (
                             <div className="image-preview">
@@ -226,12 +234,12 @@ const EditPetForm = ({ pet, onClose, onUpdateSuccess, userId }) => {
                         )}
                     </div>
 
-                    <div className="form-actions" style={{ marginTop: '32px' }}>
+                    <div className="form-actions">
                         <button type="button" className="btn-cancel" onClick={onClose}>
                             Cancel
                         </button>
                         <button type="submit" className="btn-submit" disabled={submitting}>
-                            {submitting ? '⏳ Updating...' : '✓ Save Changes'}
+                            {submitting ? '⏳ Saving...' : '✓ Register Pet'}
                         </button>
                     </div>
                 </form>
@@ -240,4 +248,4 @@ const EditPetForm = ({ pet, onClose, onUpdateSuccess, userId }) => {
     );
 };
 
-export default EditPetForm;
+export default AddPetForm;

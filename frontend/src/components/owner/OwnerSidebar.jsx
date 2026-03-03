@@ -1,7 +1,7 @@
-// File: src/components/Sidebar.jsx
+// File: src/components/owner/OwnerSidebar.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/Sidebar.css';
+import '../../styles/Sidebar.css';
 
 /* ── SVG Icon Components ─────────────────────────────── */
 const HomeIcon = () => (
@@ -78,7 +78,6 @@ const SignOutIcon = () => (
 );
 
 /* ── Navigation Items ─────────────────────────────────── */
-// Only 'my-pets' is enabled; all others are locked (clickable: false)
 const NAV_ITEMS = [
     { key: 'home', icon: <HomeIcon />, label: 'Home', clickable: false },
     { key: 'my-profile', icon: <ProfileIcon />, label: 'My Profile', clickable: false },
@@ -91,21 +90,25 @@ const NAV_ITEMS = [
 ];
 
 /* ── Component ────────────────────────────────────────── */
-const Sidebar = ({ activeTab, onTabChange, user = {} }) => {
+const OwnerSidebar = ({ activeTab, onTabChange, user = {} }) => {
     const navigate = useNavigate();
     const displayName = user.fullName || 'User';
     const displayEmail = user.email || 'user@petcarehub.com';
     const displayInitials = user.initials || 'U';
 
     const handleSignOut = () => {
-        sessionStorage.clear();
         localStorage.removeItem('token');
-        navigate('/login');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('username');
+        localStorage.removeItem('role');
+        localStorage.removeItem('email');
+        localStorage.removeItem('fullName');
+        navigate('/login', { replace: true });
     };
 
     return (
         <aside className="sidebar">
-            {/* Decorative circles from inspired design */}
+            {/* Decorative circles */}
             <div className="sidebar-decor-tr" />
             <div className="sidebar-decor-bl" />
 
@@ -163,4 +166,4 @@ const Sidebar = ({ activeTab, onTabChange, user = {} }) => {
     );
 };
 
-export default Sidebar;
+export default OwnerSidebar;

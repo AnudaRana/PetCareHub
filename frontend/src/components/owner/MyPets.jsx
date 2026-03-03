@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { getPetsByOwner, searchPetsByOwner } from '../services/petService';
+import { getPetsByOwner, searchPetsByOwner } from '../../services/petService';
 import PetCard from './PetCard';
 import PetDetail from './PetDetail';
 import AddPetForm from './AddPetForm';
-import '../styles/MyPets.css';
-import useCurrentUser from '../hooks/useCurrentUser';
+import '../../styles/MyPets.css';
+import useCurrentUser from '../../hooks/useCurrentUser';
 
 const MyPets = () => {
     // ─── User State ──────────────────────────────────────────────
@@ -89,7 +89,7 @@ const MyPets = () => {
                 </button>
             </div>
 
-            {/* Stats row (Reduced to just the one requested by user) */}
+            {/* Stats row */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
                 <div style={{
                     background: 'var(--color-white)',
@@ -177,7 +177,7 @@ const MyPets = () => {
                                 />
                             ))}
 
-                            {/* Add pet card empty state (from inspiration) */}
+                            {/* Add pet card */}
                             {!searchQuery && (
                                 <div style={{
                                     borderRadius: 18, border: `2px dashed rgba(188,190,192,0.5)`,

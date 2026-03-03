@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/Sidebar.css';
-import '../../styles/DoctorDashboard.css';
+import '../../styles/StaffDashboard.css';
 
 const HomeIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -29,16 +29,24 @@ const CalendarIcon = () => (
   </svg>
 );
 
-const ClipboardIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-    <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-  </svg>
-);
-
 const ShieldIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+  </svg>
+);
+
+const BoxIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="21 8 21 21 3 21 3 8" />
+    <rect x="1" y="3" width="22" height="5" />
+    <line x1="10" y1="12" x2="14" y2="12" />
+  </svg>
+);
+
+const SettingsIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
   </svg>
 );
 
@@ -51,18 +59,20 @@ const SignOutIcon = () => (
 );
 
 const NAV_ITEMS = [
-  { key: 'home', icon: <HomeIcon />, label: 'Home', clickable: true },
-  { key: 'all-pets', icon: <PawIcon />, label: 'All Pets', clickable: true },
-  { key: 'my-schedule', icon: <CalendarIcon />, label: 'My Schedule', clickable: false },
-  { key: 'appointments', icon: <ClipboardIcon />, label: 'Appointments', clickable: false },
-  { key: 'vaccinations-scheduled', icon: <ShieldIcon />, label: 'Vaccinations Scheduled', clickable: false },
+  { key: 'home',         icon: <HomeIcon />,     label: 'Home',         clickable: true  },
+  { key: 'all-pets',     icon: <PawIcon />,      label: 'All Pets',     clickable: true  },
+  { key: 'appointments', icon: <CalendarIcon />, label: 'Appointments', clickable: false },
+  { key: 'vaccinations', icon: <ShieldIcon />,   label: 'Vaccinations', clickable: false },
+  { key: 'orders',       icon: <BoxIcon />,      label: 'Orders',       clickable: false },
+  { key: 'settings',     icon: <SettingsIcon />, label: 'Settings',     clickable: false },
 ];
 
-const DoctorSidebar = ({ activeTab, onTabChange, doctor = {} }) => {
+const StaffSidebar = ({ activeTab, onTabChange, staff = {} }) => {
   const navigate = useNavigate();
-  const displayName = doctor.fullName || 'Doctor';
-  const displayEmail = doctor.email || 'doctor@petcarehub.com';
-  const displayInitials = doctor.initials || 'DR';
+
+  const displayName    = staff.fullName || 'Staff';
+  const displayEmail   = staff.email    || 'staff@petcarehub.com';
+  const displayInitials = staff.initials || 'ST';
 
   const handleSignOut = () => {
     localStorage.removeItem('token');
@@ -73,10 +83,11 @@ const DoctorSidebar = ({ activeTab, onTabChange, doctor = {} }) => {
   };
 
   return (
-    <aside className="sidebar doc-sidebar">
+    <aside className="sidebar staff-sidebar">
       <div className="sidebar-decor-tr" />
       <div className="sidebar-decor-bl" />
 
+      {/* Brand */}
       <div className="sidebar-logo">
         <img
           src="/images/logo/Logo.jpeg"
@@ -86,16 +97,17 @@ const DoctorSidebar = ({ activeTab, onTabChange, doctor = {} }) => {
         />
         <div className="sidebar-logo-text">
           <h2 style={{ fontFamily: "'Playfair Display', serif" }}>PetCareHub</h2>
-          <p>Doctor Portal</p>
+          <p>Staff Portal</p>
         </div>
       </div>
 
-      {/* Doctor badge */}
-      <div className="doc-sidebar-role-badge">
-        <span className="doc-sidebar-role-icon">🩺</span>
-        <span>Veterinarian</span>
+      {/* Staff role badge */}
+      <div className="staff-sidebar-role-badge">
+        <span>🏥</span>
+        <span>Clinic Staff</span>
       </div>
 
+      {/* Navigation */}
       <nav className="sidebar-nav">
         {NAV_ITEMS.map((item) => (
           <button
@@ -114,11 +126,12 @@ const DoctorSidebar = ({ activeTab, onTabChange, doctor = {} }) => {
         ))}
       </nav>
 
+      {/* Footer */}
       <div className="sidebar-footer">
         <div className="sidebar-user-card">
-          <div className="sidebar-user-avatar doc-user-avatar">{displayInitials}</div>
+          <div className="sidebar-user-avatar staff-user-avatar">{displayInitials}</div>
           <div className="sidebar-user-text">
-            <p className="sidebar-user-name" title={`Dr. ${displayName}`}>Dr. {displayName}</p>
+            <p className="sidebar-user-name" title={displayName}>{displayName}</p>
             <p className="sidebar-user-email" title={displayEmail}>{displayEmail}</p>
           </div>
         </div>
@@ -131,4 +144,4 @@ const DoctorSidebar = ({ activeTab, onTabChange, doctor = {} }) => {
   );
 };
 
-export default DoctorSidebar;
+export default StaffSidebar;

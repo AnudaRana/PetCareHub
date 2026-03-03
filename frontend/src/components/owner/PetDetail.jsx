@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { API_BASE_URL } from '../services/petService';
-import '../styles/PetDetail.css';
+import { API_BASE_URL } from '../../services/petService';
+import '../../styles/PetDetail.css';
 import EditPetForm from './EditPetForm';
 
 const SPECIES_EMOJI = { Dog: '🐕', Cat: '🐈', Bird: '🐦', Rabbit: '🐇', Fish: '🐟' };
