@@ -8,8 +8,6 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
 import HealingOutlinedIcon from '@mui/icons-material/HealingOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import LocalHospitalOutlinedIcon from '@mui/icons-material/LocalHospitalOutlined';
-import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 
 const VetDashboard = () => {
   const { user, loading } = useAuth();
@@ -19,8 +17,6 @@ const VetDashboard = () => {
     { name: 'My Profile', icon: PersonOutlineOutlinedIcon, path: '/dashboard/profile' },
     { name: 'My Appointments', icon: EventNoteOutlinedIcon, path: '/dashboard/appointments' },
     { name: 'Patient Records', icon: HealingOutlinedIcon, path: '/dashboard/patients' },
-    { name: 'Prescriptions', icon: LocalHospitalOutlinedIcon, path: '/dashboard/prescriptions' },
-    { name: 'Messages', icon: ChatOutlinedIcon, path: '/dashboard/messages' },
     { name: 'Settings', icon: SettingsOutlinedIcon, path: '/dashboard/settings' }
   ];
 

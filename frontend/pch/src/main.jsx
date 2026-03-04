@@ -9,6 +9,6 @@ import './index.css'
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <App />
-    <ToastContainer />
+    <ToastContainer autoClose={3000} />
   </React.StrictMode>,
 );

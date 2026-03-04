@@ -4,11 +4,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import Navbar from './components/navbar/Navbar';
 import Footer from './components/footer/Footer';
 import Home from './pages/home/Home.jsx';
-import Login from './pages/loginSignup/Login';
-import SignUp from './pages/loginSignup/SignUp';
-import ResetPassword from './pages/loginSignup/ResetPassword';
-import ForgotPasswordEmail from './pages/loginSignup/ForgotPasswordEmail';
-import ForgotPasswordOtp from './pages/loginSignup/ForgotPasswordOtp';
+import Login from './pages/loginSignup/access/Login';
+import SignUp from './pages/loginSignup/access/SignUp';
+import ResetPassword from './pages/loginSignup/passwordreset/ResetPassword';
+import ForgotPasswordEmail from './pages/loginSignup/passwordreset/ForgotPasswordEmail';
+import ForgotPasswordOtp from './pages/loginSignup/passwordreset/ForgotPasswordOtp';
 import OwnerDashboard from './pages/dashboard/OwnerDashboard';
 import VetDashboard from './pages/dashboard/VetDashboard';
 import StaffDashboard from './pages/dashboard/StaffDashboard';

@@ -113,11 +113,16 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true, roles };
     } catch (err) {
-      const message =
+      let message =
         err.response?.data?.message ||
+        err.response?.data?.error ||
         err.response?.data ||
         err.message ||
         'Login failed. Please check your credentials.';
+
+      if (typeof message === 'object') {
+        message = Object.values(message).join(', ');
+      }
       console.error('Login error:', message);
       throw new Error(message);
     }
@@ -131,11 +136,16 @@ export const AuthProvider = ({ children }) => {
       console.log('Registration successful:', res.data);
       return { success: true };
     } catch (err) {
-      const message =
+      let message =
         err.response?.data?.message ||
+        err.response?.data?.error ||
         err.response?.data ||
         err.message ||
         'Registration failed';
+
+      if (typeof message === 'object') {
+        message = Object.values(message).join(', ');
+      }
       console.error('Registration error:', err.response?.status, message);
       throw new Error(message);
     }

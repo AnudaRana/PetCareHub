@@ -1,6 +1,8 @@
 .dashboard-container {
   display: flex;
   min-height: 100vh;
+  background: #0a0f23;
+  
 }
 
 .dashboard-content {
@@ -20,6 +22,7 @@
   height: 100vh;
   top: 0;
 }
+
 
 .sidebar ul li {
   position: relative;
@@ -42,7 +45,6 @@
 
 .sidebar ul li.active {
   background: rgba(2, 237, 254, 0.1);
-  /* Transparent Teal Box */
   color: #02edfe;
   opacity: 1;
 }
@@ -52,7 +54,6 @@
   opacity: 1;
 }
 
-/* The Teal Dot Icon */
 .sidebar ul li .active-dot {
   display: none;
   position: absolute;
@@ -127,7 +128,6 @@
   min-width: 40px;
   height: 40px;
   background: #02edfe;
-  /* Teal box */
   color: #0a0f23;
   display: flex;
   align-items: center;
@@ -157,8 +157,8 @@
 }
 
 .logout-container {
-  margin-top: 15px;
   padding: 0 12px;
+  margin-top: auto;
 }
 
 .logout-btn {
@@ -205,6 +205,10 @@
   z-index: 998;
 }
 
+.mobile-menu-btn {
+    display: none !important;
+}
+
 /* RESPONSIVE DESIGN */
 @media (max-width: 1000px) {
   .sidebar {
@@ -215,27 +219,34 @@
     transition: transform 0.3s ease-in-out;
   }
 
+  .sidebar-header {
+    padding: 25px 15px; 
+  }
+
   .sidebar.mobile-open {
     transform: translateX(0);
   }
 
   .dashboard-content {
     padding-top: 70px;
-    /* Make room for the mobile menu button */
   }
 
   .mobile-menu-btn {
-    display: flex;
+    display: block !important;
     align-items: center;
     justify-content: center;
+    left: 5px;
+    right: auto;
+    top: 5px;
+    z-index: 1001;
   }
 
   .sidebar-overlay.mobile-open {
     display: block;
+    padding-top: 60px;
   }
 }
 
-/* Common Dashboard Elements (Headers & Cards) */
 .dashboard-header-banner {
   background: white;
   padding: 25px;

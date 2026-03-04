@@ -306,7 +306,7 @@ const MyProfile = () => {
                         </div>
 
                         <div className="form-button-group">
-                            <button type="button" className="btn-cancel" onClick={() => setIsEditing(false)}>Cancel</button>
+                            <button className="btn btn-cancel" onClick={() => setIsEditing(false)}>Cancel</button>
                             <button type="submit" className="btn btn-teal">Save Changes</button>
                         </div>
                     </form>

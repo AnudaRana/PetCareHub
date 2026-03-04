@@ -13,12 +13,15 @@ const DashboardLayout = ({ children, menuItems }) => {
   const { user, logout } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const toggleMobileMenu = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/');
   };
-
-  // Extract initials if user exists
+  
   const getInitials = (email) => {
     if (!email) return 'U';
     return email.substring(0, 2).toUpperCase();
@@ -32,12 +35,10 @@ const DashboardLayout = ({ children, menuItems }) => {
   return (
     <div className="dashboard-container">
 
-      {/* Mobile Hamburger Button */}
-      <button className="mobile-menu-btn" onClick={() => setMobileOpen(true)}>
+      <button className="mobile-menu-btn" onClick={toggleMobileMenu}>
         <MenuIcon />
       </button>
 
-      {/* Mobile Overlay */}
       <div
         className={`sidebar-overlay ${mobileOpen ? 'mobile-open' : ''}`}
         onClick={() => setMobileOpen(false)}
@@ -117,7 +118,7 @@ const DashboardLayout = ({ children, menuItems }) => {
                 <span className="user-email">{user?.email || 'email@example.com'}</span>
               </div>
             </div>
-
+            
             <div className="logout-container">
               <button className="logout-btn" onClick={handleLogout}>
                 <LogoutIcon style={{ fontSize: '18px' }} />

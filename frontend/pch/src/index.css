@@ -1,28 +1,34 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 
+:root {
+    --toastify-color-success: #02edfe;
+    --toastify-icon-color-success: #02edfe;
+}
 
-*{
+* {
     margin: 0;
     padding: 0;
-    box-sizing: border-box; 
+    box-sizing: border-box;
     font-family: "Outfit", sans-serif;
 }
-body{
+
+body {
     background: #ffffff;
 }
-a{
+
+a {
     text-decoration: none;
     color: inherit;
     line-height: 1;
     cursor: pointer;
 }
 
-.container{
+.container {
     padding-left: 5%;
     padding-right: 5%;
 }
 
-.btn{
+.btn {
     padding: 14px 25px;
     font-size: 16px;
     border-radius: 30px;
@@ -35,24 +41,40 @@ a{
     opacity: 0.8;
 }
 
-.btn-teal{
+.btn-teal {
     background: #02edfe;
     color: #ffffff;
 }
 
-.btn-white{
+.btn-read {
+    background: #ff4d4f;
+    color: #ffffff;
+}
+
+.btn-white {
     background: #ffffff;
     color: #212121;
 }
 
-.btn-outline {
+.btn-white:hover {
     background: transparent;
-    color: #0a0f23;
+    border: 2px solid #0a0f23;
+}
+
+.btn-teal:hover {
+    background: #ffffff;
+    color: #000000;
+}
+
+.btn-outline {
+    background: #0a0f23;
+    color: #ffffff;
     border: 2px solid #0a0f23;
     opacity: 0.6;
 }
 
-.next-btn, .prev-btn{
+.next-btn,
+.prev-btn {
     width: 50px;
     position: absolute;
     top: 50%;
@@ -75,7 +97,8 @@ a{
 }
 
 
-.prev-btn:hover, .next-btn:hover {
+.prev-btn:hover,
+.next-btn:hover {
     background: #02edfe;
     color: #0a0f23;
     transform: translateY(-50%) scale(1.1);
@@ -83,12 +106,13 @@ a{
 
 
 /*Responsive Styles */
-@media (max-width: 1000px){
-    .container{
+@media (max-width: 1000px) {
+    .container {
         padding-left: 5%;
         padding-right: 5%;
     }
-    .btn{
+
+    .btn {
         padding: 14px 22px;
         font-size: 14px;
     }

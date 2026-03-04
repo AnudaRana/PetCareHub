@@ -54,7 +54,7 @@ public class ForgotPasswordController {
 
 
         fp.setOtp(otp);
-        fp.setExpirationTime(new Date(System.currentTimeMillis() + 120 * 1000));
+        fp.setExpirationTime(new Date(System.currentTimeMillis() + 300 * 1000));
         fp.setUser(user);
 
         forgotPasswordRepository.save(fp);

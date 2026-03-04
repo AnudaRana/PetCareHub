@@ -84,9 +84,6 @@ const Contact = () => {
     <div className="map">
       <iframe
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.250118661554!2d80.1236419!3d6.9797858999999995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae3ab59541ccf31%3A0xfdcc126324c81721!2sPugoda%20Animal%20Hospital!5e0!3m2!1sen!2slk!4v1772345265149!5m2!1sen!2slk"
-            width="100%"
-            height="300"
-            style={{ border: 0 }}
             allowFullScreen
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"

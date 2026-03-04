@@ -37,6 +37,7 @@ const Navbar = () => {
         <li>
           {user ? (
             <Link to='/dashboard' className="profile-pill-link">
+              <span>Hi, {user.fullName ? user.fullName.split(' ')[0] : (user.email ? user.email.split('@')[0] : 'User')}!</span>
               <button className="btn btn-teal navbar-profile-btn">
                 {user.profilePicture ? (
                   <img src={user.profilePicture} alt="Profile" className="profile-btn-avatar" />
@@ -44,7 +45,6 @@ const Navbar = () => {
                   <PersonIcon className="profile-btn-icon" />
                 )}
               </button>
-              <span>Hi, {user.fullName ? user.fullName.split(' ')[0] : (user.email ? user.email.split('@')[0] : 'User')}!</span>
             </Link>
           ) : (
             <Link to='/login'>

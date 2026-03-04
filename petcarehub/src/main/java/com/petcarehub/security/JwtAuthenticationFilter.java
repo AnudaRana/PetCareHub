@@ -27,8 +27,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
 
         // Get token from header
@@ -50,33 +50,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Authenticate user if token is valid and no one is logged in yet
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
-                System.out.println("=== JWT Authentication ===");
-                System.out.println("Username from token: " + username);
-
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                System.out.println("User loaded: " + userDetails.getUsername());
-                System.out.println("User authorities: " + userDetails.getAuthorities());
 
                 if (jwtUtil.validateToken(token, userDetails.getUsername())) {
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities()
-                            );
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities());
 
                     authToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request)
-                    );
+                            new WebAuthenticationDetailsSource().buildDetails(request));
 
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                    System.out.println("Authentication successful! Authorities: " + authToken.getAuthorities());
-                } else {
-                    System.err.println("Token validation failed!");
                 }
             } catch (Exception e) {
-                System.err.println("Error during authentication: " + e.getMessage());
-                e.printStackTrace();
+                // Token is invalid, expired, or user deleted. Request proceeds anonymously.
             }
         }
 
