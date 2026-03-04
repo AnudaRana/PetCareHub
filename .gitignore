@@ -1,0 +1,15 @@
+# Dependencies and IDEs
+node_modules/
+.idea/
+
+# Backend Build Files
+target/
+.mvn/
+
+# Environment and Secrets
+.env
+frontend/src/utils/devLogin.js
+
+# Frontend Build Files
+dist/
+build/
