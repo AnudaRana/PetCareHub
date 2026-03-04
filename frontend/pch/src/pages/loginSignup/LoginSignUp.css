@@ -42,17 +42,17 @@
     border-radius: 9px;
 }
 
-.inputs{
+.inputs {
     margin-top: 55px;
     display: flex;
     flex-direction: column;
     gap: 25px;
 }
 
-.input{
+.input {
     display: flex;
     align-items: center;
-    width:100%;
+    width: 100%;
     height: 50px;
     background: #edf7fd;
     border-radius: 6px;
@@ -61,7 +61,7 @@
     gap: 10px;
 }
 
-.login-icon{
+.login-icon {
     margin: 0px 15px;
     color: #0a0f23;
     opacity: 0.8;
@@ -71,17 +71,30 @@
     right: 15px;
 }
 
-.input input{
+.input input {
     flex: 1;
     background: transparent;
     border: none;
     outline: none;
     font-size: 16px;
-    padding-right: 40px;
+    padding: 10px;
     min-width: 0;
+    z-index: 2;
+    /* Ensure input sits above the container so it's always clickable */
+    width: 100%;
 }
 
-.forgot-password, .switch-auth span{
+.auth-error-text {
+    color: #ff4d4d;
+    font-size: 12px;
+    margin-top: -15px;
+    margin-bottom: 5px;
+    align-self: flex-start;
+    padding-left: 10px;
+}
+
+.forgot-password,
+.switch-auth span {
     color: #a8b6bb;
     font-size: 14px;
     cursor: pointer;
@@ -89,15 +102,15 @@
     align-self: flex-start;
 }
 
-.forgot-password:hover{
-    color: #0a0f23; 
-}
-
-.switch-auth span:hover{
+.forgot-password:hover {
     color: #0a0f23;
 }
 
-.submit-btn{
+.switch-auth span:hover {
+    color: #0a0f23;
+}
+
+.submit-btn {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -110,21 +123,21 @@
 }
 
 .password-toggle {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .password-toggle:hover {
-  opacity: 1;
-  color: #0ceaf4;            
+    opacity: 1;
+    color: #0ceaf4;
 }
 
 .switch-auth {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #a8b6bb;
-  text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #a8b6bb;
+    text-align: center;
 }
 
 .switch-auth span:hover {
-  color: #0a0f23;
+    color: #0a0f23;
 }

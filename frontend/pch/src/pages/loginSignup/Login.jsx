@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import EmailIcon from "@mui/icons-material/Email";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -15,15 +16,17 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
     try {
-        const roles = await login(email, password);
-        navigate('/dashboard');
+      const roles = await login(email, password);
+      toast.success("Login successful!");
+      navigate('/dashboard');
     } catch (err) {
-        setError(err.message);
+      setError(err.response?.data?.error || err.message || "Invalid credentials");
     }
   };
 
@@ -38,6 +41,7 @@ const Login = () => {
       </div>
 
       <div className="inputs">
+        {error && <div className="auth-error-text" style={{ textAlign: "center", marginBottom: "15px", marginTop: "0" }}>{error}</div>}
         <div className="input">
           <EmailIcon className="login-icon" />
           <input
@@ -69,7 +73,7 @@ const Login = () => {
           )}
         </div>
 
-        <div className="forgot-password">Forgot Password?</div>
+        <Link to="/forgot-password" className="forgot-password">Forgot Password?</Link>
 
         <button className="btn btn-teal submit-btn" onClick={handleLogin}>
           Login

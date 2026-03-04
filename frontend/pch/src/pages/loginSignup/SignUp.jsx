@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import EmailIcon from "@mui/icons-material/Email";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -8,31 +9,32 @@ import { useAuth } from "../../context/AuthContext"; // Import the custom hook
 import "./LoginSignUp.css";
 
 const Signup = () => {
-    const navigate = useNavigate();
-    const { register } = useAuth(); // Destructure register from context
+  const navigate = useNavigate();
+  const { register } = useAuth(); // Destructure register from context
 
-    // State management
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [mobileNumber, setMobileNumber] = useState('');
-    const [address, setAddress] = useState(''); // Added address state
-    const [showPassword, setShowPassword] = useState(false); // Fix: Added missing state
-    const [error, setError] = useState('');
+  // State management
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [address, setAddress] = useState(''); // Added address state
+  const [showPassword, setShowPassword] = useState(false); // Fix: Added missing state
+  const [error, setError] = useState('');
 
-    const handleSignUp = async (e) => {
-        e.preventDefault();
-        setError(''); 
-        try {
-            // Match the object keys to what your Java Backend (User entity) expects
-            await register({ firstName, lastName, email, password, mobileNumber, address });
-            navigate('/login');
-        } catch (err) {
-            setError(err.message);
-        }
-    };
-  
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    setError('');
+    try {
+      // Match the object keys to what your Java Backend (User entity) expects
+      await register({ firstName, lastName, email, password, mobileNumber, address });
+      toast.success("Registration successful! Please login.");
+      navigate('/login');
+    } catch (err) {
+      setError(err.response?.data?.error || err.message || "Registration failed");
+    }
+  };
+
   return (
     <AuthLayout
       title="Join Us!"
@@ -44,51 +46,51 @@ const Signup = () => {
       </div>
 
       <div className="inputs">
-        {error && <div className="error-message" style={{color: 'red', textAlign: 'center'}}>{error}</div>}
+        {error && <div className="auth-error-text" style={{ textAlign: "center", marginBottom: "15px", marginTop: "0" }}>{error}</div>}
 
         <div className="input">
-          <input 
-            type="text" 
-            placeholder="First Name" 
-            value={firstName} 
-            onChange={(e) => setFirstName(e.target.value)} 
+          <input
+            type="text"
+            placeholder="First Name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
           />
         </div>
 
         <div className="input">
-          <input 
-            type="text" 
-            placeholder="Last Name" 
-            value={lastName} 
-            onChange={(e) => setLastName(e.target.value)} 
+          <input
+            type="text"
+            placeholder="Last Name"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
           />
         </div>
 
         <div className="input">
           <EmailIcon className="login-icon" />
-          <input 
-            type="email" 
-            placeholder="Email" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
 
         <div className="input">
-          <input 
-            type="tel" 
-            placeholder="Phone Number" 
-            value={mobileNumber} 
-            onChange={(e) => setMobileNumber(e.target.value)} 
+          <input
+            type="tel"
+            placeholder="Phone Number"
+            value={mobileNumber}
+            onChange={(e) => setMobileNumber(e.target.value)}
           />
         </div>
 
         <div className="input">
-          <input 
-            type="text" 
-            placeholder="Address" 
-            value={address} 
-            onChange={(e) => setAddress(e.target.value)} 
+          <input
+            type="text"
+            placeholder="Address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
           />
         </div>
 
@@ -113,7 +115,7 @@ const Signup = () => {
         </div>
 
         <button className="btn btn-teal submit-btn" onClick={handleSignUp}>
-           Sign Up
+          Sign Up
         </button>
 
         <div className="switch-auth">

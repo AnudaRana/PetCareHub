@@ -5,8 +5,39 @@ import { jwtDecode } from 'jwt-decode';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(() => {
+    const storedToken = localStorage.getItem('token');
+    if (!storedToken) return null;
+    try {
+      const decoded = jwtDecode(storedToken);
+      if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+        localStorage.removeItem('token');
+        return null;
+      }
+      return storedToken;
+    } catch {
+      localStorage.removeItem('token');
+      return null;
+    }
+  });
+
+  const [user, setUser] = useState(() => {
+    const storedToken = localStorage.getItem('token');
+    if (!storedToken) return null;
+    try {
+      const decoded = jwtDecode(storedToken);
+      if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+        return null;
+      }
+      return {
+        email: decoded.sub,
+        roles: decoded.roles || [],
+        userId: decoded.userId || null
+      };
+    } catch (err) {
+      return null;
+    }
+  });
 
   useEffect(() => {
     const requestInterceptor = axios.interceptors.request.use(
@@ -19,21 +50,50 @@ export const AuthProvider = ({ children }) => {
       (error) => Promise.reject(error)
     );
 
+    const responseInterceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          localStorage.removeItem('token');
+          setToken(null);
+          setUser(null);
+        }
+        return Promise.reject(error);
+      }
+    );
+
     return () => {
       axios.interceptors.request.eject(requestInterceptor);
+      axios.interceptors.response.eject(responseInterceptor);
     };
   }, [token]);
 
-  // Restore user from token on mount / token change
+
   useEffect(() => {
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        setUser({
+        const baseUser = {
           email: decoded.sub,
-          roles: decoded.roles || [],           // already array from your JwtUtil
+          roles: decoded.roles || [],
           userId: decoded.userId || null
-        });
+        };
+        setUser(baseUser);
+
+        // Fetch full profile data async
+        axios.get('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+          .then(res => {
+            let pfp = res.data.profilePicture;
+            if (pfp && !pfp.startsWith('data:image')) {
+              pfp = `data:image/jpeg;base64,${pfp}`;
+            }
+
+            setUser(prev => ({
+              ...prev,
+              profilePicture: pfp,
+              fullName: res.data.fullName
+            }));
+          }).catch(err => console.error("Could not fetch full profile for context:", err));
       } catch (err) {
         console.error('Invalid token', err);
         logout();
@@ -59,14 +119,13 @@ export const AuthProvider = ({ children }) => {
         err.message ||
         'Login failed. Please check your credentials.';
       console.error('Login error:', message);
-      throw new Error(message); // now throws → easier to handle in UI
+      throw new Error(message);
     }
   };
 
   const register = async (userData) => {
     try {
-      // IMPORTANT: do NOT send roles – backend sets ROLE_OWNER by default
-      // Remove { ...userData, roles: ['ROLE_OWNER'] }
+
       const res = await axios.post('/api/auth/register', userData);
 
       console.log('Registration successful:', res.data);
@@ -90,8 +149,12 @@ export const AuthProvider = ({ children }) => {
 
   const hasRole = (role) => user?.roles?.includes(`ROLE_${role}`) || false;
 
+  const updateContextProfile = (updates) => {
+    setUser(prev => ({ ...prev, ...updates }));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, hasRole, token }}>
+    <AuthContext.Provider value={{ user, login, register, logout, hasRole, token, updateContextProfile }}>
       {children}
     </AuthContext.Provider>
   );

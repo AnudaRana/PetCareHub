@@ -1,19 +1,19 @@
 // src/pages/loginSignup/ResetPassword.jsx
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import AuthLayout from '../../components/auth/AuthLayout.jsx';
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import "./LoginSignUp.css";
 
 const ResetPassword = () => {
-  const [password, setPassword]       = useState('');
+  const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm]   = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError]     = useState('');
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [tokenValid, setTokenValid] = useState(true);
 
@@ -31,7 +31,6 @@ const ResetPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage('');
     setError('');
 
     if (password !== confirmPassword) {
@@ -47,21 +46,16 @@ const ResetPassword = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/auth/reset-password', {
-        password,
-        confirmPassword // optional – backend may ignore it
-      }, {
-        params: { token }  // send token as query param
-      });
+      // Send the token as a query param, matching backend `request.get("password")` + `@RequestParam token`
+      await axios.post('http://localhost:8080/api/auth/reset-password',
+        { password },
+        { params: { token } }
+      );
 
-      setMessage(response.data || 'Password has been reset successfully!');
-      
-      setTimeout(() => {
-        navigate('/login');
-      }, 3000);
+      toast.success('Password has been reset successfully!');
+      setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
-      const errMsg = err.response?.data?.message 
-        || 'Failed to reset password. The link may be invalid or expired.';
+      const errMsg = err.response?.data?.error || err.response?.data || 'Failed to reset password. The session may have expired.';
       setError(errMsg);
     } finally {
       setLoading(false);
@@ -80,12 +74,13 @@ const ResetPassword = () => {
 
       <div className="inputs">
         {!tokenValid || error ? (
-          <div className="error-message" style={{ color: 'red', textAlign: 'center', marginBottom: '20px' }}>
+          <div className="auth-error-text" style={{ textAlign: "center", marginBottom: "15px", marginTop: "0" }}>
             {error || 'Invalid reset link. Please request a new one.'}
           </div>
-        ) : (
+        ) : null}
+
+        {tokenValid && (
           <>
-            {message && <div style={{ color: 'green', textAlign: 'center', marginBottom: '20px' }}>{message}</div>}
 
             <div className="input">
               <input
@@ -115,8 +110,8 @@ const ResetPassword = () => {
               )}
             </div>
 
-            <button 
-              className="btn btn-teal submit-btn" 
+            <button
+              className="btn btn-teal submit-btn"
               onClick={handleSubmit}
               disabled={loading || !password || !confirmPassword || password !== confirmPassword}
             >
@@ -126,7 +121,7 @@ const ResetPassword = () => {
         )}
 
         <div className="switch-auth">
-          <a href="/login">Back to Login</a>
+          <Link to="/login"><span>Back to Login</span></Link>
         </div>
       </div>
     </AuthLayout>

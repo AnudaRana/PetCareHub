@@ -1,4 +1,4 @@
-nav{
+nav {
     width: 100%;
     color: #fff;
     padding: 4px 0;
@@ -11,11 +11,11 @@ nav{
     z-index: 1000;
 }
 
-.logo{
+.logo {
     width: 120px
 }
 
-nav ul li{
+nav ul li {
     display: inline-block;
     list-style: none;
     margin: 5px 20px;
@@ -23,32 +23,52 @@ nav ul li{
     cursor: pointer;
 }
 
-.dark-nav{
+.dark-nav {
     background: #0a0f23;
     box-shadow: 0 2px 4px #0000001A;
     transition: 0.5s ease;
 }
 
-.menu-icon{
+.menu-icon {
     display: none !important;
 }
 
+/* Profile Button */
+.navbar-profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.profile-btn-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-btn-icon {
+    font-size: 18px;
+}
+
 /* Responsive Styles */
-@media (max-width: 1000px){
-    .logo{
+@media (max-width: 1000px) {
+    .logo {
         width: 80px;
     }
-    nav ul li{
+
+    nav ul li {
         margin: 10px 15px;
         font-size: 14px;
     }
 }
 
-@media (max-width: 780px){
-    nav{
-        padding: 15px 0;  
+@media (max-width: 930px) {
+    nav {
+        padding: 15px 0;
     }
-    nav ul{
+
+    nav ul {
         position: fixed;
         top: 0;
         right: 0;
@@ -60,20 +80,20 @@ nav ul li{
         transition: 0.5s ease;
     }
 
-    nav ul li{
+    nav ul li {
         display: block;
         margin: 25px 40px;
         font-size: 18px;
     }
 
-    .menu-icon{
+    .menu-icon {
         display: block !important;
         color: #ffffff;
         font-size: 30px;
         cursor: pointer;
     }
 
-    .hide-mobile-menu{
+    .hide-mobile-menu {
         right: -200px;
     }
 }
