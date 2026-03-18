@@ -1,4 +1,4 @@
 package com.petcarehub.medicalRecords.service;
 
-public class MedicalReportService {
+public class MedicalTreatmentService {
 }

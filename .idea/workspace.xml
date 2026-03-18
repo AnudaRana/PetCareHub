@@ -5,12 +5,32 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d3311585-dba4-4328-8c82-4a6a53eee889" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/petcarehub/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/petcarehub/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/medicalRecords/dto/MedicalTreatmentDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/medicalRecords/entity/MedicalTreatment.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/medicalRecords/entity/Vaccination.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/medicalRecords/enums/UserRole.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/medicalRecords/repository/MedicalTreatmentRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/medicalRecords/repository/VaccinationRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/medicalRecords/service/MedicalTreatmentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/medicalRecords/controller/MedicalReportController.java" beforeDir="false" afterPath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/medicalRecords/controller/MedicalRecordController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/medicalRecords/dto/MedicalReportDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/medicalRecords/dto/VaccinationDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/medicalRecords/entity/MedicalRecords.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/medicalRecords/repository/MedicalReportRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/medicalRecords/service/MedicalReportService.java" beforeDir="false" afterPath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/medicalRecords/service/VaccinationService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -35,7 +55,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "feature/PET-9-user-management",
+    "git-widget-placeholder": "feature/PET-11-medical-report-management",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/Petcarehub/PetCareHub",
     "node.js.detected.package.eslint": "true",
@@ -77,6 +97,7 @@
       <updated>1772626697161</updated>
       <workItem from="1772782970718" duration="7000" />
       <workItem from="1772783349026" duration="5069000" />
+      <workItem from="1773854605800" duration="908000" />
     </task>
     <servers />
   </component>
