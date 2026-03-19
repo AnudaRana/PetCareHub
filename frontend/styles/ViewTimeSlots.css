@@ -1,0 +1,206 @@
+ .view-slots-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f3f6fb;
+}
+
+.view-slots-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.view-slots-main {
+  flex: 1;
+  padding: 24px 28px;
+  box-sizing: border-box;
+}
+
+.view-slots-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(14, 165, 233, 0.08);
+}
+
+.view-slots-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  margin: 0;
+  color: #0f1f52;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.my-appointments-btn,
+.confirm-btn {
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.my-appointments-btn {
+  background: linear-gradient(135deg, #0ea5e9, #22d3ee);
+  color: #06263a;
+  padding: 14px 24px;
+  min-width: 220px;
+}
+
+.confirm-btn {
+  background: linear-gradient(135deg, #0ea5e9, #22d3ee);
+  color: #06263a;
+  padding: 14px 24px;
+  min-width: 220px;
+}
+
+.my-appointments-btn:hover,
+.confirm-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.form-row label {
+  font-weight: 600;
+  color: #334155;
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+  width: 100%;
+  border: 1px solid #dbe4ee;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  background: #fff;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.form-row textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.slot-section {
+  margin: 24px 0;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(14, 165, 233, 0.06);
+  border: 1px solid rgba(14, 165, 233, 0.12);
+}
+
+.slot-section h3 {
+  margin-top: 0;
+  margin-bottom: 14px;
+  color: #0f1f52;
+}
+
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.slot-card {
+  background: #fff;
+  border: 1px solid #dbe4ee;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 8px 18px rgba(14, 165, 233, 0.06);
+}
+
+.slot-time {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f1f52;
+  margin-bottom: 6px;
+}
+
+.slot-doctor {
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.notes-row {
+  align-items: start;
+}
+
+.bottom-actions {
+  margin-top: 26px;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 18px;
+}
+
+.price-field {
+  flex: 1;
+}
+
+.price-field label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.price-field input {
+  width: 100%;
+  border: 1px solid #dbe4ee;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1100px) {
+  .slot-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .view-slots-layout {
+    flex-direction: column;
+  }
+
+  .view-slots-sidebar {
+    width: 100%;
+  }
+
+  .view-slots-main {
+    padding: 18px;
+  }
+
+  .view-slots-card-header,
+  .bottom-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .my-appointments-btn,
+  .confirm-btn {
+    width: 100%;
+  }
+}
