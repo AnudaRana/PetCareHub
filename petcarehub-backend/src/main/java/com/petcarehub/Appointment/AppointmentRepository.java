@@ -1,4 +1,9 @@
-package com.petcarehub.Appointment;
+package com.petcarehub.appointment;
 
-public class AppointmentRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
+
 }
