@@ -1,0 +1,15 @@
+.title{
+    
+    font-weight: 600;
+    color: #000000;
+    text-align: center;
+    opacity: 0.8; 
+    margin: 70px 0 30px;
+}
+
+.title p{
+    font-size: 25px;
+    color: #0a0f23;
+    opacity: 0.9;
+    margin-top: 5px;
+}

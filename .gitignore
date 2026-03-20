@@ -1,0 +1,29 @@
+# ======================
+# FRONTEND
+# ======================
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# ======================
+# BACKEND
+# ======================
+petcarehub/target/
+
+# ======================
+# ENV / SECRETS
+# ======================
+.env
+frontend/src/utils/devLogin.js
+
+# ======================
+# IDEs
+# ======================
+.idea/
+.vscode/
+
+# ======================
+# OS
+# ======================
+.DS_Store
+Thumbs.db
