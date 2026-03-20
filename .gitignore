@@ -1,15 +1,29 @@
-# Dependencies and IDEs
-node_modules/
-.idea/
+# ======================
+# FRONTEND
+# ======================
+frontend/node_modules/
+frontend/dist/
+frontend/build/
 
-# Backend Build Files
-target/
-.mvn/
+# ======================
+# BACKEND
+# ======================
+petcarehub/target/
 
-# Environment and Secrets
+# ======================
+# ENV / SECRETS
+# ======================
 .env
 frontend/src/utils/devLogin.js
 
-# Frontend Build Files
-dist/
-build/
+# ======================
+# IDEs
+# ======================
+.idea/
+.vscode/
+
+# ======================
+# OS
+# ======================
+.DS_Store
+Thumbs.db
