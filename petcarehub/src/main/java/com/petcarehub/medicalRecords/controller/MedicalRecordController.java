@@ -40,4 +40,4 @@ public class MedicalRecordController {
     public ResponseEntity<VaccinationDTO> addVaccination(@PathVariable Long petId, @RequestBody VaccinationDTO dto) {
         return ResponseEntity.ok(vaccinationService.addVaccination(petId, dto));
     }
-}
+}

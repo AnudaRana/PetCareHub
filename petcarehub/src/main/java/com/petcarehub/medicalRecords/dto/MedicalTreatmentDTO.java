@@ -9,6 +9,7 @@ public class MedicalTreatmentDTO {
     private String diagnosis;
     private String doctorName;
     private String doctorId;
+    private String treatmentNotes;
     private String prescriptions;
     private String physicalObservation;
     private Long petId;
@@ -26,6 +27,8 @@ public class MedicalTreatmentDTO {
 
     public String getDoctorId() { return doctorId; }
 
+    public String getTreatmentNotes() { return treatmentNotes; }
+
     public String getPrescriptions() { return prescriptions; }
 
     public String getPhysicalObservation() { return physicalObservation; }
@@ -42,6 +45,8 @@ public class MedicalTreatmentDTO {
     public void setDoctorName(String doctorName) { this.doctorName = doctorName; }
 
     public void setDoctorId(String doctorId) { this.doctorId = doctorId; }
+
+    public void setTreatmentNotes(String treatmentNotes) { this.treatmentNotes = treatmentNotes; }
 
     public void setPrescriptions(String prescriptions) { this.prescriptions = prescriptions; }
 

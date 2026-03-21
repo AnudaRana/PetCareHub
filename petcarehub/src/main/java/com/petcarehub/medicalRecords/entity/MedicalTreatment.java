@@ -25,6 +25,9 @@ public class MedicalTreatment {
     @Column(name = "doctor_id", nullable = false)
     private String doctorId;
 
+    @Column(name = "treatment_notes", columnDefinition = "TEXT")
+    private String treatmentNotes;
+
     @Column(columnDefinition = "TEXT")
     private String prescriptions;
 
@@ -59,6 +62,9 @@ public class MedicalTreatment {
 
     public String getDoctorId() { return doctorId; }
     public void setDoctorId(String doctorId) { this.doctorId = doctorId; }
+
+    public String getTreatmentNotes() { return treatmentNotes; }
+    public void setTreatmentNotes(String treatmentNotes) { this.treatmentNotes = treatmentNotes; }
 
     public String getPrescriptions() { return prescriptions; }
     public void setPrescriptions(String prescriptions) { this.prescriptions = prescriptions; }
