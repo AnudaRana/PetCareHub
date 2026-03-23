@@ -1,6 +1,8 @@
-package com.petcarehub.appointment;
+ package com.petcarehub.petcarehub.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "appointments")
@@ -10,30 +12,29 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String petType;
+     @ManyToOne(fetch = FetchType.EAGER)
+@JoinColumn(name = "user_id", nullable = false)
+@JsonIgnoreProperties({"password", "roles"})
+private User user;
+
+@ManyToOne(fetch = FetchType.EAGER)
+@JoinColumn(name = "pet_id", nullable = false)
+@JsonIgnoreProperties({"owner"})
+private Pet pet;
+
     private String appointmentType;
     private String doctor;
     private String date;
     private String timeSlot;
     private double price;
-    private String userEmail;
     private String notes;
+
+    @Column(nullable = false)
+    private String status = "UPCOMING";
 
     public Appointment() {
     }
 
-    public Appointment(String petType, String appointmentType, String doctor, 
-                       String date, String timeSlot, double price, String userEmail) {
-        this.petType = petType;
-        this.appointmentType = appointmentType;
-        this.doctor = doctor;
-        this.date = date;
-        this.timeSlot = timeSlot;
-        this.price = price;
-        this.userEmail = userEmail;
-    }
-
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -42,12 +43,20 @@ public class Appointment {
         this.id = id;
     }
 
-    public String getPetType() {
-        return petType;
+    public User getUser() {
+        return user;
     }
 
-    public void setPetType(String petType) {
-        this.petType = petType;
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Pet getPet() {
+        return pet;
+    }
+
+    public void setPet(Pet pet) {
+        this.pet = pet;
     }
 
     public String getAppointmentType() {
@@ -90,19 +99,19 @@ public class Appointment {
         this.price = price;
     }
 
-    public String getUserEmail() {
-        return userEmail;
-    }
-
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
-    }
-
     public String getNotes() {
         return notes;
     }
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
