@@ -21,6 +21,14 @@ public class Appointment {
     @JsonIgnoreProperties({"owner"})
     private Pet pet;
 
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
+
+    @ManyToOne
+    @JoinColumn(name = "vet_id")
+    private User vet;
+
     private String appointmentType;
     private String doctor;
     private String date;
@@ -124,4 +132,20 @@ public class Appointment {
     public void setUpdated(boolean updated) {
         this.updated = updated;
     }
+
+    public User getOwner() {
+    return owner;
+}
+
+public void setOwner(User owner) {
+    this.owner = owner;
+}
+
+public User getVet() {
+    return vet;
+}
+
+public void setVet(User vet) {
+    this.vet = vet;
+}
 }

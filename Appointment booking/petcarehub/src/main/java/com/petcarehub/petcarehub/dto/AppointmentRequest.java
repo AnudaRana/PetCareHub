@@ -9,6 +9,8 @@ public class AppointmentRequest {
     private String timeSlot;
     private double price;
     private String notes;
+    private Long vetId;
+    
 
     public AppointmentRequest() {
     }
@@ -76,4 +78,14 @@ public class AppointmentRequest {
     public void setNotes(String notes) {
         this.notes = notes;
     }
+
+public Long getVetId() {
+    return vetId;
+}
+
+public void setVetId(Long vetId) {
+    this.vetId = vetId;
+}
+
+ 
 }

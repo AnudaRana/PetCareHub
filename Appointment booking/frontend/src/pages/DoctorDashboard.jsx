@@ -6,6 +6,8 @@ import DoctorAllPets from '../components/doctor/DoctorAllPets';
 import '../styles/Dashboard.css';
 import '../styles/DoctorDashboard.css';
 import useCurrentUser from '../hooks/useCurrentUser';
+import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const TAB_META = {
   home: { label: 'Home' },
@@ -14,6 +16,8 @@ const TAB_META = {
   appointments: { label: 'Appointments' },
   'vaccinations-scheduled': { label: 'Vaccinations Scheduled' },
 };
+
+
 
 const ComingSoon = ({ tabKey }) => {
   const meta = TAB_META[tabKey] || { label: tabKey };
@@ -35,7 +39,7 @@ const ComingSoon = ({ tabKey }) => {
 };
 
 const DoctorDashboard = () => {
-  const [activeTab, setActiveTab] = useState('home');
+   const [activeTab, setActiveTab] = useState(location.state?.tab || 'home');
   const doctor = useCurrentUser();
 
   const renderContent = () => {
@@ -84,19 +88,38 @@ const DoctorDashboard = () => {
 
 // ── Doctor Home Tab ──────────────────────────────────────────
 const DoctorHome = ({ doctor, onNavigate }) => {
-  const [stats, setStats] = useState({ totalPets: 0 });
+  const navigate = useNavigate();
+  const [stats, setStats] = useState({ totalPets: 0, todaysAppointments: 0 });
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const { data } = await axios.get(`${API_BASE_URL}/api/pets/all`);
-        if (data?.success) setStats({ totalPets: data.data?.length || 0 });
+        const [{ data: petsData }, appointmentsRes] = await Promise.all([
+          axios.get(`${API_BASE_URL}/api/pets/all`),
+          doctor?.userId
+            ? axios.get(`http://localhost:8083/api/appointments/vet/${doctor.userId}`)
+            : Promise.resolve({ data: [] }),
+        ]);
+
+        const today = new Date().toISOString().split('T')[0];
+
+        const todaysAppointments = (appointmentsRes.data || []).filter(
+          (appointment) =>
+            appointment.date === today &&
+            appointment.status !== 'CANCELLED'
+        ).length;
+
+        setStats({
+          totalPets: petsData?.success ? petsData.data?.length || 0 : 0,
+          todaysAppointments,
+        });
       } catch {
         // silently ignore
       }
     };
+
     fetchStats();
-  }, []);
+  }, [doctor?.userId]);
 
   return (
     <div className="doc-home">
@@ -113,7 +136,7 @@ const DoctorHome = ({ doctor, onNavigate }) => {
       <div className="doc-stats-grid">
         {[
           { icon: '🐾', label: 'Total Pets', value: stats.totalPets, sub: 'registered in system', color: '#3B82F6' },
-          { icon: '📅', label: "Today's Appointments", value: '—', sub: 'coming soon', color: '#8B5CF6' },
+          { icon: '📅', label: "Today's Appointments", value: stats.todaysAppointments, sub: 'assigned to you today', color: '#8B5CF6' },
           { icon: '💉', label: 'Vaccinations Due', value: '—', sub: 'coming soon', color: '#10B981' },
           { icon: '📋', label: 'Pending Records', value: '—', sub: 'coming soon', color: '#F59E0B' },
         ].map((stat, i) => (
@@ -139,7 +162,7 @@ const DoctorHome = ({ doctor, onNavigate }) => {
             <span className="doc-action-label">My Schedule</span>
             <span className="doc-action-arrow">→</span>
           </button>
-          <button className="doc-action-card" onClick={() => onNavigate('appointments')}>
+          <button className="doc-action-card" onClick={() => navigate('/vet-appointments')}>
             <span className="doc-action-icon">📋</span>
             <span className="doc-action-label">Appointments</span>
             <span className="doc-action-arrow">→</span>

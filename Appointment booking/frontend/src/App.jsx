@@ -6,6 +6,8 @@ import StaffDashboard from './pages/StaffDashboard';
 import MyAppointments from './pages/MyAppointments';
 import DoctorChanneling from './pages/DoctorChanneling';
 import MyPetsPage from './pages/MyPets';
+import VetAppointments from './pages/VetAppointments';
+
 
 const RoleBasedRedirect = () => {
   const role = localStorage.getItem('role');
@@ -28,6 +30,7 @@ const App = () => (
       <Route path="/my-pets" element={<MyPetsPage />} />
       <Route path="/my-appointments" element={<MyAppointments />} />
       <Route path="/doctor-channeling" element={<DoctorChanneling />} />
+      <Route path="/vet-appointments" element={<VetAppointments />} />
 
       <Route path="/login" element={<RoleBasedRedirect />} />
       <Route path="/" element={<RoleBasedRedirect />} />

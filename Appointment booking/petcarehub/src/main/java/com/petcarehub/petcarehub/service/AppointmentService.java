@@ -42,11 +42,16 @@ public class AppointmentService {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        User vet = userRepository.findById(request.getVetId())
+                .orElseThrow(() -> new IllegalArgumentException("Vet not found"));
+
         Pet pet = petRepository.findById(request.getPetId())
                 .orElseThrow(() -> new IllegalArgumentException("Pet not found"));
 
         Appointment appointment = new Appointment();
         appointment.setUser(user);
+        appointment.setOwner(user);
+        appointment.setVet(vet);
         appointment.setPet(pet);
         appointment.setAppointmentType(request.getAppointmentType());
         appointment.setDoctor(request.getDoctor());
@@ -83,9 +88,13 @@ public class AppointmentService {
             throw new IllegalStateException("The selected time slot is already booked for this doctor.");
         }
 
+        User vet = userRepository.findById(request.getVetId())
+                .orElseThrow(() -> new IllegalArgumentException("Vet not found"));
+
         Pet pet = petRepository.findById(request.getPetId())
                 .orElseThrow(() -> new IllegalArgumentException("Pet not found"));
 
+        appointment.setVet(vet);
         appointment.setPet(pet);
         appointment.setAppointmentType(request.getAppointmentType());
         appointment.setDoctor(request.getDoctor());
@@ -125,6 +134,10 @@ public class AppointmentService {
         return appointmentRepository.findByUser_UserId(userId);
     }
 
+       public List<Appointment> getAppointmentsByVet(Long vetId) {
+     return appointmentRepository.findByVet_UserId(vetId);
+}
+
     public List<Map<String, String>> getBookedSlots(String date) {
         return appointmentRepository.findByDate(date)
                 .stream()
@@ -132,4 +145,6 @@ public class AppointmentService {
                 .map(a -> Map.of("timeSlot", a.getTimeSlot(), "doctor", a.getDoctor()))
                 .toList();
     }
+
+ 
 }
