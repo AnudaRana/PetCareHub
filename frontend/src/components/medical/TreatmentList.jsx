@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import TreatmentCard from './TreatmentCard';
 
 const TreatmentList = ({ treatments, isDoctor, onEdit }) => (

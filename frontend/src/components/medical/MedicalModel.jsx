@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 const MedicalModal = ({ title, isOpen, onClose, onSave, children, disabled }) => {
   if (!isOpen) return null;

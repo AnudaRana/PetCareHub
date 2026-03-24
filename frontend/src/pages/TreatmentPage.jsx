@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import '../styles/medical.css';
 import '../styles/Dashboard.css';
-import TreatmentList from '../components/medical/TreatmentList';
+import TreatmentList from '../components/Medical/TreatmentList';
 import OwnerSidebar from '../components/owner/OwnerSidebar';
 import DoctorSidebar from '../components/doctor/DoctorSidebar';
 import StaffSidebar from '../components/staff/StaffSidebar';

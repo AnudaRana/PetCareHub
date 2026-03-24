@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react';
+﻿import React, { useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/medical.css';
 import '../styles/Dashboard.css';
-import MedicalModal from '../components/medical/MedicalModel';
-import TreatmentList from '../components/medical/TreatmentList';
-import VaccinationList from '../components/medical/VaccinationList';
+import MedicalModal from '../components/Medical/MedicalModel';
+import TreatmentList from '../components/Medical/TreatmentList';
+import VaccinationList from '../components/Medical/VaccinationList';
 import OwnerSidebar from '../components/owner/OwnerSidebar';
 import DoctorSidebar from '../components/doctor/DoctorSidebar';
 import StaffSidebar from '../components/staff/StaffSidebar';
