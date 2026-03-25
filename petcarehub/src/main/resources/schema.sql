@@ -45,3 +45,35 @@ CREATE TABLE IF NOT EXISTS pets (
     CONSTRAINT fk_pets_owner FOREIGN KEY (owner_id)
         REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
+-- MEDICAL_RECORDS TABLE
+-- ============================================================
+CREATE TABLE IF NOT EXISTS medical_records (
+    medical_record_id BIGINT NOT NULL AUTO_INCREMENT,
+    pet_id BIGINT NOT NULL,
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (medical_record_id),
+    CONSTRAINT fk_medical_records_pet FOREIGN KEY (pet_id)
+        REFERENCES pets(pet_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
+-- MEDICAL_TREATMENTS TABLE
+-- ============================================================
+CREATE TABLE IF NOT EXISTS medical_treatments (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    treatment_date DATE NOT NULL,
+    diagnosis TEXT,
+    doctor_name VARCHAR(255) NOT NULL,
+    doctor_id VARCHAR(255) NOT NULL,
+    treatment_notes TEXT,
+    prescriptions TEXT,
+    physical_observation TEXT,
+    pet_id BIGINT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_medical_treatments_pet FOREIGN KEY (pet_id)
+        REFERENCES pets(pet_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

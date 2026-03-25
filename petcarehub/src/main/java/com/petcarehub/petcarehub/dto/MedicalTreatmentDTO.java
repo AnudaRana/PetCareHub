@@ -1,4 +1,4 @@
-package com.petcarehub.medicalRecords.dto;
+package com.petcarehub.petcarehub.dto;
 
 import java.time.LocalDate;
 

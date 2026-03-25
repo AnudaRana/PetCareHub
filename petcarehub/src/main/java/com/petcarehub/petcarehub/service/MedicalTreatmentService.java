@@ -1,8 +1,8 @@
-package com.petcarehub.medicalRecords.service;
+package com.petcarehub.petcarehub.service;
 
-import com.petcarehub.medicalRecords.dto.MedicalTreatmentDTO;
-import com.petcarehub.medicalRecords.entity.MedicalTreatment;
-import com.petcarehub.medicalRecords.repository.MedicalTreatmentRepository;
+import com.petcarehub.petcarehub.dto.MedicalTreatmentDTO;
+import com.petcarehub.petcarehub.entity.MedicalTreatment;
+import com.petcarehub.petcarehub.repository.MedicalTreatmentRepository;
 import com.petcarehub.petcarehub.entity.Pet;
 import com.petcarehub.petcarehub.repository.PetRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
-package com.petcarehub.medicalRecords.repository;
+package com.petcarehub.petcarehub.repository;
 
-import com.petcarehub.medicalRecords.entity.MedicalTreatment;
+import com.petcarehub.petcarehub.entity.MedicalTreatment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,6 +1,6 @@
-package com.petcarehub.medicalRecords.entity;
+package com.petcarehub.petcarehub.entity;
 
-import com.petcarehub.petcarehub.entity.Pet;
+//import com.petcarehub.petcarehub.entity.Pet;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

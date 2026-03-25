@@ -1,7 +1,7 @@
-package com.petcarehub.medicalRecords.controller;
+package com.petcarehub.petcarehub.controller;
 
-import com.petcarehub.medicalRecords.dto.MedicalTreatmentDTO;
-import com.petcarehub.medicalRecords.service.MedicalTreatmentService;
+import com.petcarehub.petcarehub.dto.MedicalTreatmentDTO;
+import com.petcarehub.petcarehub.service.MedicalTreatmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
