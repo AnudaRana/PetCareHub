@@ -1,0 +1,117 @@
+.pet-card-container {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
+}
+
+.pet-card-container:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(0, 240, 255, 0.3);
+    /* Subtle cyan glow border */
+}
+
+.pet-card-banner {
+    height: 70px;
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+/* For actual uploaded images */
+.pet-card-avatar-img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 3px solid var(--color-white);
+    object-fit: cover;
+    position: absolute;
+    bottom: -32px;
+    box-shadow: 0 4px 12px rgba(10, 15, 36, 0.15);
+    background: var(--color-white);
+    transition: var(--transition);
+}
+
+.pet-card-container:hover .pet-card-avatar-img {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-glow);
+}
+
+/* For fallback emoji placeholders */
+.pet-card-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--color-white);
+    border: 3px solid var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    bottom: -32px;
+    box-shadow: 0 4px 12px rgba(10, 15, 36, 0.15);
+    transition: var(--transition);
+}
+
+.pet-card-container:hover .pet-card-avatar {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-glow);
+}
+
+.pet-card-content {
+    padding: 46px 20px 16px;
+    flex: 1;
+}
+
+.pet-card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 4px;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: -0.01em;
+}
+
+.pet-card-subtitle {
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+    margin: 0;
+    font-weight: 500;
+}
+
+.pet-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    background: rgba(10, 15, 36, 0.02);
+    /* Barely visible dark tint for contrast */
+    border-top: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.pet-card-gender {
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+    font-weight: 600;
+}
+
+.pet-card-species {
+    font-size: 0.7rem;
+    background: rgba(0, 240, 255, 0.1);
+    /* Cyan tint pill */
+    color: var(--color-primary);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
