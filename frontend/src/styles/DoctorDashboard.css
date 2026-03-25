@@ -449,6 +449,62 @@
   opacity: 0.7;
 }
 
+.doc-medical-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.doc-latest-treatment {
+  background: rgba(0, 240, 255, 0.05);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.doc-treatment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-accent-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.doc-treatment-date {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+  font-weight: 500;
+}
+
+.doc-treatment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+.doc-treatment-details div {
+  line-height: 1.4;
+}
+
+.doc-view-full-link {
+  display: flex;
+  justify-content: center;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  margin-top: 12px;
+}
+
+.doc-view-full-link .pet-detail-btn.small {
+  font-size: 0.8rem;
+  padding: 6px 12px;
+}
+
 /* â”€â”€ Add Record button (disabled/coming soon) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .doc-add-record-btn {
   background: rgba(0, 240, 255, 0.1) !important;

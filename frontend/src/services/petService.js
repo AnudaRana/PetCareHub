@@ -60,6 +60,16 @@ export const searchPetsByOwner = async (ownerId, name) => {
 };
 
 /**
+ * Get all pets in the system (staff/doctor view)
+ */
+export const getAllPets = async () => {
+    const response = await axios.get(`${API_BASE_URL}${API_BASE}/all`, {
+        headers: getAuthHeaders()
+    });
+    return response.data;
+};
+
+/**
  * Update an existing pet profile
  */
 export const updatePet = async (petId, formData) => {

@@ -1,23 +1,43 @@
-﻿import React, { useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import '../styles/medical.css';
 import '../styles/Dashboard.css';
-import TreatmentList from '../components/Medical/TreatmentList';
+import TreatmentList from '../components/medical/TreatmentList';
 import OwnerSidebar from '../components/owner/OwnerSidebar';
 import DoctorSidebar from '../components/doctor/DoctorSidebar';
 import StaffSidebar from '../components/staff/StaffSidebar';
 import useCurrentUser from '../hooks/useCurrentUser';
-
-const initialTreatments = [
-  { id: 1, date: '2026-03-14', diagnosis: 'Ear infection', notes: 'Cleaned ears, prescribed drops', prescription: 'Ear drops', observation: 'No fever', doctorName: 'Dr. Smith', doctorId: 'D-001' },
-  { id: 2, date: '2026-02-25', diagnosis: 'Allergy', notes: 'Antihistamine for 7 days', prescription: 'Antihistamine', observation: 'Mild rash', doctorName: 'Dr. Adams', doctorId: 'D-002' },
-  { id: 3, date: '2026-01-10', diagnosis: 'Sprained paw', notes: 'Rest and ice pack', prescription: 'None', observation: 'Limping improves', doctorName: 'Dr. Lane', doctorId: 'D-003' },
-  { id: 4, date: '2025-11-30', diagnosis: 'Upset stomach', notes: 'Diet change', prescription: 'Probiotic', observation: 'Loose stool', doctorName: 'Dr. Eris', doctorId: 'D-004' },
-];
+import { useLocation } from 'react-router-dom';
+import { getTreatmentsByPetId } from '../services/medicalApi';
 
 const sortByDateDesc = (items) => [...items].sort((a, b) => new Date(b.date) - new Date(a.date));
 
 const TreatmentPage = () => {
-  const [treatments] = useState(initialTreatments);
+  const [treatments, setTreatments] = useState([]);
+  const location = useLocation();
+  const pet = location.state?.pet;
+
+  useEffect(() => {
+    const load = async () => {
+      if (!pet?.petId) return;
+      try {
+        const apiTreatments = await getTreatmentsByPetId(pet.petId);
+        setTreatments(apiTreatments.map((t) => ({
+          id: t.id,
+          date: t.treatmentDate,
+          diagnosis: t.diagnosis || '',
+          notes: t.treatmentNotes || '',
+          prescription: t.prescriptions || '',
+          observation: t.physicalObservation || '',
+          doctorName: t.doctorName || '',
+          doctorId: t.doctorId || '',
+        })));
+      } catch (err) {
+        console.error('Failed to load treatments:', err);
+      }
+    };
+    load();
+  }, [pet]);
+
   const sorted = useMemo(() => sortByDateDesc(treatments), [treatments]);
   const role = localStorage.getItem('role') || 'ROLE_OWNER';
   const isDoctor = role === 'ROLE_VET';

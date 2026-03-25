@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import StaffSidebar from '../components/staff/StaffSidebar';
 import StaffAllPets from '../components/staff/StaffAllPets';
 import useCurrentUser from '../hooks/useCurrentUser';
-import { API_BASE_URL } from '../services/petService';
+import { API_BASE_URL, getAllPets } from '../services/petService';
 import '../styles/Dashboard.css';
 import '../styles/StaffDashboard.css';
 
@@ -11,7 +10,6 @@ const TAB_META = {
   home:         { label: 'Home' },
   'all-pets':   { label: 'All Pets' },
   appointments: { label: 'Appointments' },
-  vaccinations: { label: 'Vaccinations' },
   orders:       { label: 'Orders' },
   settings:     { label: 'Settings' },
 };
@@ -96,9 +94,9 @@ const StaffHome = ({ staff, onNavigate }) => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const { data } = await axios.get(`${API_BASE_URL}/api/pets/all`);
-        const list = data?.data || data || [];
-        setTotalPets(Array.isArray(list) ? list.length : 0);
+        const response = await getAllPets();
+        const petList = response?.data || response || [];
+        setTotalPets(Array.isArray(petList) ? petList.length : 0);
       } catch {
         setTotalPets(0);
       }
@@ -122,8 +120,7 @@ const StaffHome = ({ staff, onNavigate }) => {
         {[
           { icon: '🐾', label: 'Registered Pets', value: totalPets !== null ? totalPets : '...', sub: 'in system',    color: '#10B981' },
           { icon: '📅', label: 'Appointments',    value: '—',                                    sub: 'coming soon', color: '#F59E0B' },
-          { icon: '💉', label: 'Vaccinations',    value: '—',                                    sub: 'coming soon', color: '#3B82F6' },
-          { icon: '📦', label: 'Orders',          value: '—',                                    sub: 'coming soon', color: '#8B5CF6' },
+          { icon: '', label: 'Orders',          value: '—',                                    sub: 'coming soon', color: '#8B5CF6' },
         ].map((stat, i) => (
           <div className="staff-stat-card" key={i} style={{ '--accent': stat.color }}>
             <div className="staff-stat-icon">{stat.icon}</div>
@@ -140,8 +137,7 @@ const StaffHome = ({ staff, onNavigate }) => {
           {[
             { icon: '🐾', label: 'View All Pets',  tab: 'all-pets'    },
             { icon: '📅', label: 'Appointments',   tab: 'appointments' },
-            { icon: '💉', label: 'Vaccinations',   tab: 'vaccinations' },
-            { icon: '📦', label: 'Orders',         tab: 'orders'      },
+            { icon: '', label: 'Orders',         tab: 'orders'      },
           ].map((action, i) => (
             <button key={i} className="staff-action-card" onClick={() => onNavigate(action.tab)}>
               <span className="staff-action-icon">{action.icon}</span>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../../services/petService';
 import '../../styles/PetDetail.css';
 import '../../styles/StaffDashboard.css';
@@ -16,6 +17,8 @@ const calcAge = (dob) => {
 };
 
 const StaffPetDetail = ({ pet, onClose }) => {
+  const navigate = useNavigate();
+
   if (!pet) return null;
   const emoji = SPECIES_EMOJI[pet.species] || '🐾';
 
@@ -102,6 +105,12 @@ const StaffPetDetail = ({ pet, onClose }) => {
           <div className="pet-detail-actions">
             <button className="pet-detail-btn secondary" onClick={onClose}>
               Close
+            </button>
+            <button 
+              className="pet-detail-btn primary"
+              onClick={() => navigate('/pet-medical-record', { state: { pet } })}
+            >
+              View Medical Records
             </button>
             <button className="pet-detail-btn staff-book-btn" disabled title="Coming soon">
               + Book Appointment

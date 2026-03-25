@@ -11,7 +11,6 @@ const TAB_META = {
     'my-pets': { label: 'My Pets' },
     'store': { label: 'Store' },
     'my-appointments': { label: 'My Appointments' },
-    'my-vaccinations': { label: 'My Vaccinations' },
     'doctor-channeling': { label: 'Doctor Channeling' },
     'settings': { label: 'Settings' },
 };

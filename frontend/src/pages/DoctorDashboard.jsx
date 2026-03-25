@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { API_BASE_URL } from '../services/petService';
+import { API_BASE_URL, getAllPets } from '../services/petService';
 import DoctorSidebar from '../components/doctor/DoctorSidebar';
 import DoctorAllPets from '../components/doctor/DoctorAllPets';
 import '../styles/Dashboard.css';
@@ -12,7 +11,6 @@ const TAB_META = {
   'all-pets': { label: 'All Pets' },
   'my-schedule': { label: 'My Schedule' },
   appointments: { label: 'Appointments' },
-  'vaccinations-scheduled': { label: 'Vaccinations Scheduled' },
 };
 
 const ComingSoon = ({ tabKey }) => {
@@ -89,8 +87,9 @@ const DoctorHome = ({ doctor, onNavigate }) => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const { data } = await axios.get(`${API_BASE_URL}/api/pets/all`);
-        if (data?.success) setStats({ totalPets: data.data?.length || 0 });
+        const response = await getAllPets();
+        const petList = response?.data || response || [];
+        setStats({ totalPets: Array.isArray(petList) ? petList.length : 0 });
       } catch {
         // silently ignore
       }
@@ -114,8 +113,7 @@ const DoctorHome = ({ doctor, onNavigate }) => {
         {[
           { icon: '🐾', label: 'Total Pets', value: stats.totalPets, sub: 'registered in system', color: '#3B82F6' },
           { icon: '📅', label: "Today's Appointments", value: '—', sub: 'coming soon', color: '#8B5CF6' },
-          { icon: '💉', label: 'Vaccinations Due', value: '—', sub: 'coming soon', color: '#10B981' },
-          { icon: '📋', label: 'Pending Records', value: '—', sub: 'coming soon', color: '#F59E0B' },
+          { icon: '', label: 'Pending Records', value: '—', sub: 'coming soon', color: '#F59E0B' },
         ].map((stat, i) => (
           <div className="doc-stat-card" key={i} style={{ '--accent': stat.color }}>
             <div className="doc-stat-icon">{stat.icon}</div>
@@ -142,11 +140,6 @@ const DoctorHome = ({ doctor, onNavigate }) => {
           <button className="doc-action-card" onClick={() => onNavigate('appointments')}>
             <span className="doc-action-icon">📋</span>
             <span className="doc-action-label">Appointments</span>
-            <span className="doc-action-arrow">→</span>
-          </button>
-          <button className="doc-action-card" onClick={() => onNavigate('vaccinations-scheduled')}>
-            <span className="doc-action-icon">💉</span>
-            <span className="doc-action-label">Vaccinations</span>
             <span className="doc-action-arrow">→</span>
           </button>
         </div>

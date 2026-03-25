@@ -237,30 +237,8 @@
     box-shadow: var(--shadow-glow);
 }
 
-/* Upcoming Vaccinations Section */
-.upcoming-vax-section {
-    margin-top: 24px;
-    padding: 16px;
-    background: rgba(0, 240, 255, 0.05);
-    /* Cyber aqua tint */
-    border-left: 4px solid var(--color-primary);
-    border-radius: var(--radius-sm);
-}
-
-.vax-title {
+.pet-detail-btn.small {
+    flex: none;
+    padding: 8px 16px;
     font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--color-primary-dark);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.vax-info {
-    font-size: 0.9rem;
-    color: var(--color-text);
-    font-style: italic;
 }

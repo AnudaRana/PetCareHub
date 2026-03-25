@@ -55,7 +55,6 @@ const NAV_ITEMS = [
   { key: 'all-pets', icon: <PawIcon />, label: 'All Pets', clickable: true },
   { key: 'my-schedule', icon: <CalendarIcon />, label: 'My Schedule', clickable: false },
   { key: 'appointments', icon: <ClipboardIcon />, label: 'Appointments', clickable: false },
-  { key: 'vaccinations-scheduled', icon: <ShieldIcon />, label: 'Vaccinations Scheduled', clickable: false },
 ];
 
 const DoctorSidebar = ({ activeTab, onTabChange, doctor = {} }) => {

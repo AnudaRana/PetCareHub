@@ -62,7 +62,6 @@ const NAV_ITEMS = [
   { key: 'home',         icon: <HomeIcon />,     label: 'Home',         clickable: true  },
   { key: 'all-pets',     icon: <PawIcon />,      label: 'All Pets',     clickable: true  },
   { key: 'appointments', icon: <CalendarIcon />, label: 'Appointments', clickable: false },
-  { key: 'vaccinations', icon: <ShieldIcon />,   label: 'Vaccinations', clickable: false },
   { key: 'orders',       icon: <BoxIcon />,      label: 'Orders',       clickable: false },
   { key: 'settings',     icon: <SettingsIcon />, label: 'Settings',     clickable: false },
 ];

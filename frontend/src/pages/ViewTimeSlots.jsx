@@ -44,7 +44,6 @@ const ViewTimeSlots = () => {
   const handleAppointmentTypeChange = (value) => {
     setAppointmentType(value);
     const priceMap = {
-      Vaccination: 2500,
       Checkup: 2000,
       Operation: 12000,
       Grooming: 3000,
@@ -109,7 +108,6 @@ const ViewTimeSlots = () => {
         <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>Appointment type</label>
         <select value={appointmentType} onChange={(e) => handleAppointmentTypeChange(e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc' }}>
           <option value="">Select appointment type</option>
-          <option value="Vaccination">Vaccination</option>
           <option value="Checkup">Checkup</option>
           <option value="Operation">Operation</option>
           <option value="Grooming">Grooming</option>

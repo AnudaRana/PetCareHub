@@ -107,15 +107,6 @@ const PetDetail = ({ pet, onClose, onUpdateSuccess, userId }) => {
                         )}
                     </div>
 
-                    <div className="upcoming-vax-section">
-                        <div className="vax-title">
-                            Upcoming Vaccinations
-                        </div>
-                        <p className="vax-info">
-                            If you have any upcoming vaccinations they will be displayed here
-                        </p>
-                    </div>
-
                     <div className="pet-detail-actions">
                         <button
                             className="pet-detail-btn primary"
