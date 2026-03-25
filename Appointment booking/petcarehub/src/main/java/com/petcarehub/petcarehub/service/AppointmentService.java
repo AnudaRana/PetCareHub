@@ -163,6 +163,10 @@ public class AppointmentService {
         return cancelled;
     }
 
+    public List<Appointment> getAllAppointments() {
+        return appointmentRepository.findAll();
+    }
+
     public List<Appointment> getAppointmentsByUser(Long userId) {
         return appointmentRepository.findByUser_UserId(userId);
     }

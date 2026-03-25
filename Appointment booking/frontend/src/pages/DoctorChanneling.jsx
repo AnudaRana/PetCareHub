@@ -9,9 +9,9 @@ import useCurrentUser from '../hooks/useCurrentUser';
    Constants
 ----------------------------- */
 const SLOT_OPTIONS = [
-  { time: '09:00 AM', doctor: 'Dr. Silva' },
-  { time: '11:00 AM', doctor: 'Dr. Perera' },
-  { time: '02:00 PM', doctor: 'Dr. Fernando' },
+  { time: '09:00 AM', doctor: 'Dr. Silva', vetId: 6 },
+  { time: '11:00 AM', doctor: 'Dr. Nimal Perera', vetId: 5 },
+  { time: '02:00 PM', doctor: 'Dr. Fernando', vetId: 7 },
 ];
 
 const APPOINTMENT_PRICES = {
@@ -71,7 +71,7 @@ const DoctorChanneling = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDoctorFilter, setSelectedDoctorFilter] = useState('');
   const [priceSummary, setPriceSummary] = useState(0);
-  const [selectedSlot, setSelectedSlot] = useState('');
+  const [selectedSlot, setSelectedSlot] = useState(null);
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [notes, setNotes] = useState('');
   const [bookedSlots, setBookedSlots] = useState([]);
@@ -129,7 +129,7 @@ const DoctorChanneling = () => {
   const handleDoctorChange = (value) => {
     setSelectedDoctorFilter(value);
     setSelectedDoctor('');
-    setSelectedSlot('');
+    setSelectedSlot(null);
   };
 
   const isSlotBooked = (time, doctor) => {
@@ -144,12 +144,12 @@ const DoctorChanneling = () => {
   };
 
   const handleSlotSelect = (slot) => {
-    setSelectedSlot(slot.time);
+    setSelectedSlot(slot);
     setSelectedDoctor(slot.doctor);
   };
 
   const resetForm = () => {
-    setSelectedSlot('');
+    setSelectedSlot(null);
     setSelectedDoctor('');
     setSelectedDoctorFilter('');
     setNotes('');
@@ -180,7 +180,7 @@ const DoctorChanneling = () => {
       return;
     }
 
-    if (isPastTimeSlotToday(selectedSlot)) {
+    if (isPastTimeSlotToday(selectedSlot.time)) {
       alert('You cannot book a past time slot for today');
       return;
     }
@@ -188,11 +188,12 @@ const DoctorChanneling = () => {
     try {
       const appointmentData = {
         userId,
+        vetId: selectedSlot.vetId,
         petId: Number(selectedPet),
         appointmentType,
         date: selectedDate,
-        timeSlot: selectedSlot,
-        doctor: selectedDoctor,
+        timeSlot: selectedSlot.time,
+        doctor: selectedSlot.doctor,
         notes,
         price: Number(priceSummary),
       };
@@ -281,7 +282,7 @@ const DoctorChanneling = () => {
                 }
 
                 setSelectedDate(value);
-                setSelectedSlot('');
+                setSelectedSlot(null);
                 setSelectedDoctor('');
               }}
             />
@@ -312,7 +313,7 @@ const DoctorChanneling = () => {
                 const booked = isSlotBooked(slot.time, slot.doctor);
                 const pastTime = isPastTimeSlotToday(slot.time);
                 const selected =
-                  selectedSlot === slot.time && selectedDoctor === slot.doctor;
+                  selectedSlot?.time === slot.time && selectedDoctor === slot.doctor;
 
                 return (
                   <TimeSlotButton

@@ -1,4 +1,4 @@
- import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import useCurrentUser from "../hooks/useCurrentUser";
 import DoctorSidebar from "../components/doctor/DoctorSidebar";
@@ -13,6 +13,8 @@ const VetAppointments = () => {
 
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [cancelReason, setCancelReason] = useState("");
+  const [cancelError, setCancelError] = useState("");
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -42,29 +44,47 @@ const VetAppointments = () => {
     return "status-badge status-upcoming";
   };
 
+  const openCancelModal = (appointment) => {
+    setSelectedAppointment(appointment);
+    setCancelReason("");
+    setCancelError("");
+  };
+
+  const closeCancelModal = () => {
+    setSelectedAppointment(null);
+    setCancelReason("");
+    setCancelError("");
+    setIsCancelling(false);
+  };
+
   const handleCancel = async () => {
-    if (!cancelReason) {
-      alert("Please enter a cancellation reason");
+    const trimmedReason = cancelReason.trim();
+
+    if (!trimmedReason) {
+      setCancelError("Cancellation reason is required.");
       return;
     }
 
     try {
+      setIsCancelling(true);
+      setCancelError("");
+
       await axios.patch(
         `http://localhost:8083/api/appointments/${selectedAppointment.id}/cancel-by-vet`,
         {
           vetId: userId,
-          reason: cancelReason,
+          reason: trimmedReason,
         }
       );
 
       await refreshAppointments();
-
-      setSelectedAppointment(null);
-      setCancelReason("");
+      closeCancelModal();
     } catch (error) {
-      alert(
-        error.response?.data?.message || "Failed to cancel appointment"
+      setCancelError(
+        error.response?.data?.message || "Failed to cancel appointment."
       );
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -143,7 +163,6 @@ const VetAppointments = () => {
                       </span>
                     </p>
 
-                    {/* ✅ Show cancellation info */}
                     {a.status === "CANCELLED" && (
                       <>
                         <p>
@@ -157,11 +176,11 @@ const VetAppointments = () => {
                     )}
                   </div>
 
-                  {/* ✅ Cancel button */}
                   <button
                     className="confirm-btn"
                     disabled={a.status === "CANCELLED"}
-                    onClick={() => setSelectedAppointment(a)}
+                    onClick={() => openCancelModal(a)}
+                    type="button"
                   >
                     Cancel Appointment
                   </button>
@@ -172,33 +191,54 @@ const VetAppointments = () => {
         </div>
       </div>
 
-      {/* ✅ Cancel Modal */}
       {selectedAppointment && (
         <div className="success-modal-overlay">
-          <div className="success-modal">
+          <div className="success-modal vet-cancel-modal">
             <h3>Cancel Appointment</h3>
+            <p className="vet-cancel-modal-subtitle">
+              Please provide a reason for cancelling this appointment.
+            </p>
 
-            <textarea
-              placeholder="Enter cancellation reason"
-              value={cancelReason}
-              onChange={(e) => setCancelReason(e.target.value)}
-              style={{ width: "100%", marginBottom: "15px" }}
-            />
+            <div className="vet-cancel-form-group">
+              <label htmlFor="cancelReason" className="vet-cancel-label">
+                Cancellation Reason
+              </label>
+              <textarea
+                id="cancelReason"
+                className="vet-cancel-textarea"
+                placeholder="Enter the reason for cancellation"
+                value={cancelReason}
+                onChange={(e) => {
+                  setCancelReason(e.target.value);
+                  if (cancelError) setCancelError("");
+                }}
+                rows={5}
+              />
+            </div>
 
-            <button className="confirm-btn" onClick={handleCancel}>
-              Confirm Cancel
-            </button>
+            {cancelError && (
+              <div className="vet-cancel-error-message">{cancelError}</div>
+            )}
 
-            <button
-              className="confirm-btn"
-              style={{ marginTop: "10px", background: "#ccc", color: "#000" }}
-              onClick={() => {
-                setSelectedAppointment(null);
-                setCancelReason("");
-              }}
-            >
-              Close
-            </button>
+            <div className="vet-cancel-modal-actions">
+              <button
+                className="confirm-btn vet-cancel-confirm-btn"
+                onClick={handleCancel}
+                type="button"
+                disabled={isCancelling}
+              >
+                {isCancelling ? "Cancelling..." : "Confirm Cancel"}
+              </button>
+
+              <button
+                className="vet-cancel-close-btn"
+                onClick={closeCancelModal}
+                type="button"
+                disabled={isCancelling}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

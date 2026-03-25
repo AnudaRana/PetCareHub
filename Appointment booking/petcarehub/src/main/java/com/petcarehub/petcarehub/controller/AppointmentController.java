@@ -62,6 +62,16 @@ public class AppointmentController {
         }
     }
 
+    @GetMapping
+    public ResponseEntity<?> getAllAppointments() {
+        try {
+            List<Appointment> appointments = appointmentService.getAllAppointments();
+            return ResponseEntity.ok(appointments);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("message", e.getMessage()));
+        }
+    }
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getAppointmentsByUser(@PathVariable Long userId) {
         try {

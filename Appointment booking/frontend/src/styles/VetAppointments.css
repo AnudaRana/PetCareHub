@@ -125,6 +125,112 @@
   color: #d32f2f;
 }
 
+/* ---- cancel modal ---- */
+.vet-cancel-modal {
+  width: 100%;
+  max-width: 520px;
+  padding: 28px;
+  border-radius: 22px;
+}
+
+.vet-cancel-modal h3 {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
+  color: #0f1f52;
+}
+
+.vet-cancel-modal-subtitle {
+  margin: 0 0 18px;
+  color: #64748b;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.vet-cancel-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vet-cancel-label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #0f1f52;
+}
+
+.vet-cancel-textarea {
+  width: 100%;
+  min-height: 130px;
+  resize: vertical;
+  padding: 14px 16px;
+  border: 1px solid #dbe4ee;
+  border-radius: 14px;
+  background: #f8fbff;
+  color: #334155;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.vet-cancel-textarea:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.12);
+  background: #ffffff;
+}
+
+.vet-cancel-textarea::placeholder {
+  color: #94a3b8;
+}
+
+.vet-cancel-error-message {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.18);
+  color: #dc2626;
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.vet-cancel-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.vet-cancel-confirm-btn {
+  min-width: 150px;
+}
+
+.vet-cancel-close-btn {
+  min-width: 110px;
+  padding: 11px 18px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: #f3f4f6;
+  color: #111827;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vet-cancel-close-btn:hover {
+  background: #e5e7eb;
+}
+
+.vet-cancel-close-btn:disabled,
+.vet-cancel-confirm-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 /* ---- responsive ---- */
 @media (max-width: 1100px) {
   .vet-appointment-details {
@@ -141,5 +247,20 @@
   .vet-appointments-card-header {
     flex-direction: column;
     align-items: stretch;
+  }
+}
+
+@media (max-width: 640px) {
+  .vet-cancel-modal {
+    padding: 22px 18px;
+  }
+
+  .vet-cancel-modal-actions {
+    flex-direction: column;
+  }
+
+  .vet-cancel-confirm-btn,
+  .vet-cancel-close-btn {
+    width: 100%;
   }
 }
