@@ -29,15 +29,9 @@ const APPOINTMENT_PRICES = {
   Consultation: 2000,
 };
 
-const APPOINTMENT_TYPES = ["Checkup", "Vaccination", "Consultation", "Operation"];
-const DOCTORS = ["Dr. Silva", "Dr. Perera", "Dr. Fernando"];
+const APPOINTMENT_TYPES = ["Checkup", "Vaccination", "Operation"];
+const DOCTORS = ["Dr. Silva", "Dr. Nimal Perera", "Dr. Fernando"];
 const TIMES = ["09:00 AM", "11:00 AM", "02:00 PM"];
-
-const DOCTOR_TIME_MAP = {
-  "Dr. Silva": "09:00 AM",
-  "Dr. Perera": "11:00 AM",
-  "Dr. Fernando": "02:00 PM",
-};
 
 const buildUserData = (user) => ({
   fullName: user?.fullName || "User",
@@ -65,46 +59,60 @@ const matchesSearch = (appointment, keyword) => {
   );
 };
 
-const AppointmentDetails = ({ appointment, showUpdatedTag = false }) => (
-  <>
-    <p>
-      <strong>Pet:</strong> {appointment.pet?.name} ({appointment.pet?.species})
-    </p>
-    <p>
-      <strong>Type:</strong> {appointment.appointmentType || appointment.appointment_type}
-    </p>
-    <p>
-      <strong>Date:</strong> {appointment.date}
-    </p>
-    <p>
-      <strong>Time:</strong> {appointment.timeSlot || appointment.time_slot}
-    </p>
-    <p>
-      <strong>Doctor:</strong> {appointment.doctor}
-    </p>
-    <p>
-      <strong>Notes:</strong> {appointment.notes}
-    </p>
-    <p>
-      <strong>Status:</strong> {appointment.status}
-      {showUpdatedTag && appointment.updated && (
-        <span className="updated-tag">Updated</span>
-      )}
-    </p>
-  </>
-);
+const AppointmentDetails = ({ appointment, showUpdatedTag = false }) => {
+  const status = (appointment.status || "").toUpperCase();
+  const cancelledBy = (appointment.cancelledBy || "").toUpperCase();
 
-const InlineNotification = ({ type = "error", message, onClose }) => (
-  <div className={`inline-notification inline-notification--${type}`}>
-    <span className="inline-notification__icon">
-      {type === "error" ? "⚠" : "✓"}
-    </span>
-    <span className="inline-notification__message">{message}</span>
-    <button className="inline-notification__close" onClick={onClose} aria-label="Dismiss">
-      ×
-    </button>
-  </div>
-);
+  return (
+    <>
+      <p>
+        <strong>Pet:</strong> {appointment.pet?.name} ({appointment.pet?.species})
+      </p>
+      <p>
+        <strong>Type:</strong> {appointment.appointmentType || appointment.appointment_type}
+      </p>
+      <p>
+        <strong>Date:</strong> {appointment.date}
+      </p>
+      <p>
+        <strong>Time:</strong> {appointment.timeSlot || appointment.time_slot}
+      </p>
+      <p>
+        <strong>Doctor:</strong> {appointment.doctor}
+      </p>
+      <p>
+        <strong>Notes:</strong> {appointment.notes || "-"}
+      </p>
+      <p>
+        <strong>Status:</strong>{" "}
+        <span className={status === "CANCELLED" ? "status-cancelled" : ""}>
+          {appointment.status}
+        </span>
+        {showUpdatedTag && appointment.updated && (
+          <span className="updated-tag">Updated</span>
+        )}
+      </p>
+
+      {status === "CANCELLED" && (
+        <div className="cancel-info-box">
+          <p className="cancel-info-text">
+            {cancelledBy === "VET"
+              ? "This appointment was cancelled by the veterinarian."
+              : cancelledBy === "OWNER"
+              ? "You cancelled this appointment."
+              : "This appointment was cancelled."}
+          </p>
+
+          {appointment.cancellationReason && (
+            <p className="cancel-reason">
+              <strong>Reason:</strong> {appointment.cancellationReason}
+            </p>
+          )}
+        </div>
+      )}
+    </>
+  );
+};
 
 const SuccessModal = ({ onClose }) => (
   <div className="success-modal-overlay">
@@ -154,13 +162,7 @@ const MyAppointments = () => {
   const [loading, setLoading] = useState(true);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCancelSuccessModal, setShowCancelSuccessModal] = useState(false);
-  const [notification, setNotification] = useState(null);
-
-  const showNotification = (message, type = "error") => {
-    setNotification({ type, message });
-  };
-
-  const dismissNotification = () => setNotification(null);
+  const [cancelError, setCancelError] = useState("");
 
   const fetchAppointments = async () => {
     try {
@@ -173,7 +175,6 @@ const MyAppointments = () => {
       console.log("Appointments from API:", res.data);
 
       const mapped = Array.isArray(res.data) ? res.data : [];
-
       setAppointments(mapped);
     } catch (error) {
       console.error("Failed to fetch appointments:", error);
@@ -213,26 +214,18 @@ const MyAppointments = () => {
     upcomingAppointments.length > 0 ? upcomingAppointments[0] : null;
 
   const openUpdateModal = (appointment) => {
-    const doctorName = appointment.doctor || "";
-    const validTime =
-      DOCTOR_TIME_MAP[doctorName] ||
-      appointment.timeSlot ||
-      appointment.time_slot ||
-      "";
-
     setSelectedAppointment(appointment);
     setUpdateForm({
       petName: appointment.pet?.name || "",
       petType: appointment.pet?.species || "",
       appointmentType: appointment.appointmentType || appointment.appointment_type || "",
       date: appointment.date || "",
-      time: validTime,
-      doctor: doctorName,
+      time: appointment.timeSlot || appointment.time_slot || "",
+      doctor: appointment.doctor || "",
       notes: appointment.notes || "",
       petId: appointment.pet?.petId || appointment.pet?.id || "",
       price: appointment.price || 0,
     });
-    dismissNotification();
     setShowUpdateModal(true);
   };
 
@@ -240,7 +233,6 @@ const MyAppointments = () => {
     setShowUpdateModal(false);
     setSelectedAppointment(null);
     setUpdateForm(INITIAL_UPDATE_FORM);
-    dismissNotification();
   };
 
   const handleUpdateInputChange = (e) => {
@@ -253,10 +245,6 @@ const MyAppointments = () => {
         next.price = APPOINTMENT_PRICES[value] || 0;
       }
 
-      if (name === "doctor") {
-        next.time = DOCTOR_TIME_MAP[value] || "";
-      }
-
       return next;
     });
   };
@@ -266,12 +254,7 @@ const MyAppointments = () => {
     if (!selectedAppointment) return;
 
     if (updateForm.date < today) {
-      showNotification("You cannot update an appointment to a past date.");
-      return;
-    }
-
-    if (updateForm.time !== DOCTOR_TIME_MAP[updateForm.doctor]) {
-      showNotification("Selected doctor is only available at their assigned time slot.");
+      alert("You cannot update an appointment to a past date.");
       return;
     }
 
@@ -294,14 +277,14 @@ const MyAppointments = () => {
 
       setAppointments((prev) =>
         prev.map((appt) =>
-          appt.id === selectedAppointment.id ? { ...res.data } : appt
+          appt.id === selectedAppointment.id ? res.data : appt
         )
       );
 
       closeUpdateModal();
       setShowSuccessModal(true);
     } catch (error) {
-      showNotification(
+      alert(
         "Update failed: " + (error.response?.data?.message || "Please try again.")
       );
     }
@@ -312,13 +295,14 @@ const MyAppointments = () => {
       appointmentId: upcomingAppointments.length > 0 ? upcomingAppointments[0].id : "",
       reason: "",
     });
+    setCancelError("");
     setShowCancelModal(true);
   };
 
   const closeCancelModal = () => {
     setShowCancelModal(false);
     setCancelForm(INITIAL_CANCEL_FORM);
-    dismissNotification();
+    setCancelError("");
   };
 
   const handleCancelInputChange = (e) => {
@@ -327,6 +311,7 @@ const MyAppointments = () => {
       ...prev,
       [name]: value,
     }));
+    setCancelError("");
   };
 
   const confirmCancel = async (e) => {
@@ -344,15 +329,15 @@ const MyAppointments = () => {
 
       setAppointments((prev) =>
         prev.map((appt) =>
-          appt.id === appointmentId ? { ...res.data } : appt
+          appt.id === appointmentId ? res.data : appt
         )
       );
 
       closeCancelModal();
       setShowCancelSuccessModal(true);
     } catch (error) {
-      showNotification(
-        "Cancel failed: " + (error.response?.data?.message || "Please try again.")
+      setCancelError(
+        error.response?.data?.message || "Cancellation failed. Please try again."
       );
     }
   };
@@ -470,13 +455,6 @@ const MyAppointments = () => {
                   ×
                 </button>
               </div>
-              {notification && (
-                <InlineNotification
-                  type={notification.type}
-                  message={notification.message}
-                  onClose={dismissNotification}
-                />
-              )}
 
               <form className="update-form" onSubmit={confirmUpdate}>
                 <div className="form-row">
@@ -533,7 +511,7 @@ const MyAppointments = () => {
                       min={today}
                       onChange={(e) => {
                         if (e.target.value < today) {
-                          showNotification("You cannot select a past date.");
+                          alert("You cannot select a past date.");
                           return;
                         }
                         handleUpdateInputChange(e);
@@ -543,10 +521,16 @@ const MyAppointments = () => {
 
                   <div className="form-group">
                     <label>Time</label>
-                    <select name="time" value={updateForm.time} disabled>
-                      <option value={DOCTOR_TIME_MAP[updateForm.doctor] || ""}>
-                        {DOCTOR_TIME_MAP[updateForm.doctor] || "Select doctor first"}
-                      </option>
+                    <select
+                      name="time"
+                      value={updateForm.time}
+                      onChange={handleUpdateInputChange}
+                    >
+                      {TIMES.map((time) => (
+                        <option key={time} value={time}>
+                          {time}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -587,13 +571,6 @@ const MyAppointments = () => {
                   ×
                 </button>
               </div>
-              {notification && (
-                <InlineNotification
-                  type={notification.type}
-                  message={notification.message}
-                  onClose={dismissNotification}
-                />
-              )}
 
               <form className="update-form" onSubmit={confirmCancel}>
                 <div className="form-group full-width">
@@ -628,6 +605,12 @@ const MyAppointments = () => {
                     placeholder="Enter cancellation reason"
                   />
                 </div>
+
+                {cancelError && (
+                  <div className="error-box">
+                    {cancelError}
+                  </div>
+                )}
 
                 <div className="modal-actions">
                   <button

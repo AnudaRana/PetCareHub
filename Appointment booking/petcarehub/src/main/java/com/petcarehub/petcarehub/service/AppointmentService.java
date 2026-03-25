@@ -1,4 +1,4 @@
- package com.petcarehub.petcarehub.service;
+package com.petcarehub.petcarehub.service;
 
 import com.petcarehub.petcarehub.dto.AppointmentRequest;
 import com.petcarehub.petcarehub.entity.Appointment;
@@ -108,23 +108,56 @@ public class AppointmentService {
         Appointment updated = appointmentRepository.save(appointment);
 
         User user = appointment.getUser();
-        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+        if (user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
             emailService.sendAppointmentUpdateEmail(user.getEmail(), updated);
         }
 
         return updated;
     }
 
-    public Appointment cancelAppointment(Long appointmentId) {
+    public Appointment cancelAppointment(Long appointmentId, String reason) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
 
+        if (reason == null || reason.isBlank()) {
+            throw new IllegalArgumentException("Cancellation reason is required");
+        }
+
         appointment.setStatus("CANCELLED");
+        appointment.setCancellationReason(reason);
+        appointment.setCancelledBy("OWNER");
+
         Appointment cancelled = appointmentRepository.save(appointment);
 
-        User user = appointment.getUser();
-        if (user.getEmail() != null && !user.getEmail().isBlank()) {
-            emailService.sendAppointmentCancelEmail(user.getEmail(), cancelled);
+        User vet = appointment.getVet();
+        if (vet != null && vet.getEmail() != null && !vet.getEmail().isBlank()) {
+            emailService.sendAppointmentCancelEmail(vet.getEmail(), cancelled);
+        }
+
+        return cancelled;
+    }
+
+    public Appointment cancelAppointmentByVet(Long appointmentId, Long vetId, String reason) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
+
+        if (!appointment.getVet().getUserId().equals(vetId)) {
+            throw new IllegalStateException("You can only cancel your own appointments");
+        }
+
+        if (reason == null || reason.isBlank()) {
+            throw new IllegalArgumentException("Cancellation reason is required");
+        }
+
+        appointment.setStatus("CANCELLED");
+        appointment.setCancellationReason(reason);
+        appointment.setCancelledBy("VET");
+
+        Appointment cancelled = appointmentRepository.save(appointment);
+
+        User owner = appointment.getOwner();
+        if (owner != null && owner.getEmail() != null && !owner.getEmail().isBlank()) {
+            emailService.sendAppointmentCancelEmail(owner.getEmail(), cancelled);
         }
 
         return cancelled;
@@ -134,9 +167,9 @@ public class AppointmentService {
         return appointmentRepository.findByUser_UserId(userId);
     }
 
-       public List<Appointment> getAppointmentsByVet(Long vetId) {
-     return appointmentRepository.findByVet_UserId(vetId);
-}
+    public List<Appointment> getAppointmentsByVet(Long vetId) {
+        return appointmentRepository.findByVet_UserId(vetId);
+    }
 
     public List<Map<String, String>> getBookedSlots(String date) {
         return appointmentRepository.findByDate(date)
@@ -145,6 +178,4 @@ public class AppointmentService {
                 .map(a -> Map.of("timeSlot", a.getTimeSlot(), "doctor", a.getDoctor()))
                 .toList();
     }
-
- 
 }

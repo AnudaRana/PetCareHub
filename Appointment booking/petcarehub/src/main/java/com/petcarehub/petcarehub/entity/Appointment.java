@@ -29,6 +29,7 @@ public class Appointment {
     @JoinColumn(name = "vet_id")
     private User vet;
 
+
     private String appointmentType;
     private String doctor;
     private String date;
@@ -41,6 +42,13 @@ public class Appointment {
 
     @Column(nullable = false)
     private boolean updated = false;
+
+    @Column(name = "cancellation_reason")
+    private String cancellationReason;
+
+    @Column(name = "cancelled_by")
+    private String cancelledBy;
+
 
     public Appointment() {
     }
@@ -147,5 +155,21 @@ public User getVet() {
 
 public void setVet(User vet) {
     this.vet = vet;
+}
+
+public String getCancellationReason() {
+    return cancellationReason;
+}
+
+public void setCancellationReason(String cancellationReason) {
+    this.cancellationReason = cancellationReason;
+}
+
+public String getCancelledBy() {
+    return cancelledBy;
+}
+
+public void setCancelledBy(String cancelledBy) {
+    this.cancelledBy = cancelledBy;
 }
 }

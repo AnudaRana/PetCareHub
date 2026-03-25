@@ -1,4 +1,4 @@
- package com.petcarehub.petcarehub.controller;
+package com.petcarehub.petcarehub.controller;
 
 import com.petcarehub.petcarehub.dto.AppointmentRequest;
 import com.petcarehub.petcarehub.entity.Appointment;
@@ -47,9 +47,13 @@ public class AppointmentController {
     }
 
     @PatchMapping("/{id}/cancel")
-    public ResponseEntity<?> cancelAppointment(@PathVariable Long id) {
+    public ResponseEntity<?> cancelAppointment(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body
+    ) {
         try {
-            Appointment cancelled = appointmentService.cancelAppointment(id);
+            String reason = body.get("reason");
+            Appointment cancelled = appointmentService.cancelAppointment(id, reason);
             return ResponseEntity.ok(cancelled);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
@@ -72,5 +76,32 @@ public class AppointmentController {
     public ResponseEntity<List<Map<String, String>>> getBookedSlots(@RequestParam String date) {
         List<Map<String, String>> bookedSlots = appointmentService.getBookedSlots(date);
         return ResponseEntity.ok(bookedSlots);
+    }
+
+    @GetMapping("/vet/{vetId}")
+    public ResponseEntity<?> getAppointmentsByVet(@PathVariable Long vetId) {
+        try {
+            List<Appointment> appointments = appointmentService.getAppointmentsByVet(vetId);
+            return ResponseEntity.ok(appointments);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PatchMapping("/{id}/cancel-by-vet")
+    public ResponseEntity<?> cancelByVet(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body
+    ) {
+        try {
+            Long vetId = Long.parseLong(body.get("vetId"));
+            String reason = body.get("reason");
+
+            Appointment cancelled = appointmentService.cancelAppointmentByVet(id, vetId, reason);
+            return ResponseEntity.ok(cancelled);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
     }
 }
