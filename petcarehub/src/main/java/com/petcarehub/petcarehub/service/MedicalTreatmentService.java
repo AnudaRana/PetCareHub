@@ -26,6 +26,15 @@ public class MedicalTreatmentService {
     }
 
     public MedicalTreatmentDTO addTreatment(Long petId, MedicalTreatmentDTO dto) {
+        if (dto.getTreatmentDate() == null) {
+            throw new IllegalArgumentException("treatmentDate is required and cannot be null or empty.");
+        }
+        if (dto.getDoctorName() == null || dto.getDoctorName().isBlank()) {
+            throw new IllegalArgumentException("doctorName is required.");
+        }
+        if (dto.getDoctorId() == null || dto.getDoctorId().isBlank()) {
+            throw new IllegalArgumentException("doctorId is required.");
+        }
         Pet pet = petRepository.findById(petId).orElseThrow(() -> new RuntimeException("Pet not found"));
         MedicalTreatment treatment = new MedicalTreatment();
         treatment.setTreatmentDate(dto.getTreatmentDate());

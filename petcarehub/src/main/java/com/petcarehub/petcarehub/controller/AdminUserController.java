@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/users")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"})
 public class AdminUserController {
 
     private final UserRepository userRepository;
@@ -36,7 +36,7 @@ public class AdminUserController {
             map.put("firstName", user.getFirstName());
             map.put("lastName", user.getLastName());
             map.put("email", user.getEmail());
-            map.put("roles", user.getRoles());   // <-- ADD THIS
+            map.put("roles", user.getRoles());
             return map;
         }).collect(Collectors.toList());
     }

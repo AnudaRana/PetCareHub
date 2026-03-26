@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/medical.css';
 import '../styles/Dashboard.css';
@@ -63,7 +63,7 @@ const PetMedicalRecordPage = () => {
   };
 
   const doSaveTreatment = async () => {
-    if (!newTreatment.doctorName.trim() || !newTreatment.doctorId.trim()) return;
+    if (!newTreatment.date || !newTreatment.doctorName.trim() || !newTreatment.doctorId.trim()) return;
 
     if (editingTreatmentId) {
       setTreatments((old) => old.map((t) => (t.id === editingTreatmentId ? { ...t, ...newTreatment, id: editingTreatmentId } : t)));
@@ -199,7 +199,7 @@ const PetMedicalRecordPage = () => {
         isOpen={isTreatmentModalOpen}
         onClose={() => { setTreatmentModalOpen(false); setEditingTreatmentId(null); }}
         onSave={handleSaveRequest}
-        disabled={!newTreatment.doctorName.trim() || !newTreatment.doctorId.trim()}
+        disabled={!newTreatment.date || !newTreatment.doctorName.trim() || !newTreatment.doctorId.trim()}
       >
         <label>Date<input type="date" value={newTreatment.date} onChange={(e) => setNewTreatment({ ...newTreatment, date: e.target.value })} /></label>
         <label>Diagnosis<input value={newTreatment.diagnosis} onChange={(e) => setNewTreatment({ ...newTreatment, diagnosis: e.target.value })} /></label>

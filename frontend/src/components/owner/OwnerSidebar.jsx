@@ -1,4 +1,4 @@
-// File: src/components/owner/OwnerSidebar.jsx
+    // File: src/components/owner/OwnerSidebar.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/Sidebar.css';
@@ -83,13 +83,14 @@ const NAV_ITEMS = [
     { key: 'my-profile', icon: <ProfileIcon />, label: 'My Profile', clickable: false },
     { key: 'my-pets', icon: <PawIcon />, label: 'My Pets', clickable: true },
     { key: 'store', icon: <StoreIcon />, label: 'Store', clickable: false },
-    { key: 'my-appointments', icon: <CalendarIcon />, label: 'My Appointments', clickable: false },
+    { key: 'my-appointments', icon: <CalendarIcon />, label: 'My Appointments', clickable: true },
+    { key: 'my-vaccinations', icon: <ShieldIcon />, label: 'My Vaccinations', clickable: false },
     { key: 'doctor-channeling', icon: <StethoscopeIcon />, label: 'Doctor Channeling', clickable: true },
     { key: 'settings', icon: <SettingsIcon />, label: 'Settings', clickable: false },
 ];
 
 /* ── Component ────────────────────────────────────────── */
-const OwnerSidebar = ({ activeTab, onTabChange, user = {} }) => {
+const OwnerSidebar = ({ activeTab, user = {} }) => {
     const navigate = useNavigate();
     const displayName = user.fullName || 'User';
     const displayEmail = user.email || 'user@petcarehub.com';
@@ -105,13 +106,23 @@ const OwnerSidebar = ({ activeTab, onTabChange, user = {} }) => {
         navigate('/login', { replace: true });
     };
 
+    const handleNavClick = (itemKey, clickable) => {
+        if (!clickable) return;
+
+        if (itemKey === 'my-pets') {
+            navigate('/my-pets');
+        } else if (itemKey === 'my-appointments') {
+            navigate('/my-appointments');
+        } else if (itemKey === 'doctor-channeling') {
+            navigate('/dashboard', { state: { activeTab: 'doctor-channeling' } });
+        }
+    };
+
     return (
         <aside className="sidebar">
-            {/* Decorative circles */}
             <div className="sidebar-decor-tr" />
             <div className="sidebar-decor-bl" />
 
-            {/* Brand / Logo */}
             <div className="sidebar-logo">
                 <img
                     src="/images/logo/Logo.jpeg"
@@ -125,14 +136,14 @@ const OwnerSidebar = ({ activeTab, onTabChange, user = {} }) => {
                 </div>
             </div>
 
-            {/* Navigation */}
             <nav className="sidebar-nav">
                 <div className="nav-section-label">Navigation</div>
+
                 {NAV_ITEMS.map((item) => (
                     <button
                         key={item.key}
                         className={`nav-item${activeTab === item.key ? ' active' : ''}${!item.clickable ? ' nav-item--disabled' : ''}`}
-                        onClick={() => item.clickable && onTabChange(item.key)}
+                        onClick={() => handleNavClick(item.key, item.clickable)}
                         aria-current={activeTab === item.key ? 'page' : undefined}
                         tabIndex={item.clickable ? 0 : -1}
                         aria-disabled={!item.clickable}
@@ -140,14 +151,11 @@ const OwnerSidebar = ({ activeTab, onTabChange, user = {} }) => {
                         <span className="nav-item-icon">{item.icon}</span>
                         <span className="nav-item-text">{item.label}</span>
                         {activeTab === item.key && <span className="nav-indicator-dot" />}
-                        {!item.clickable && (
-                            <span className="nav-item-soon">Soon</span>
-                        )}
+                        {!item.clickable && <span className="nav-item-soon">Soon</span>}
                     </button>
                 ))}
             </nav>
 
-            {/* Footer: user info + sign out */}
             <div className="sidebar-footer">
                 <div className="sidebar-user-card">
                     <div className="sidebar-user-avatar">{displayInitials}</div>
@@ -156,11 +164,11 @@ const OwnerSidebar = ({ activeTab, onTabChange, user = {} }) => {
                         <p className="sidebar-user-email" title={displayEmail}>{displayEmail}</p>
                     </div>
                 </div>
+
                 <button className="sidebar-signout" onClick={handleSignOut}>
                     <SignOutIcon />
                     <span>Sign Out</span>
                 </button>
-
             </div>
         </aside>
     );

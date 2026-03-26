@@ -59,9 +59,10 @@ const SignOutIcon = () => (
 );
 
 const NAV_ITEMS = [
-  { key: 'home',         icon: <HomeIcon />,     label: 'Home',         clickable: true  },
-  { key: 'all-pets',     icon: <PawIcon />,      label: 'All Pets',     clickable: true  },
-  { key: 'appointments', icon: <CalendarIcon />, label: 'Appointments', clickable: false },
+  { key: 'home',         icon: <HomeIcon />,     label: 'Home',         clickable: true },
+  { key: 'all-pets',     icon: <PawIcon />,      label: 'All Pets',     clickable: true },
+  { key: 'appointments', icon: <CalendarIcon />, label: 'Appointments', clickable: true },
+  { key: 'vaccinations', icon: <ShieldIcon />,   label: 'Vaccinations', clickable: false },
   { key: 'orders',       icon: <BoxIcon />,      label: 'Orders',       clickable: false },
   { key: 'settings',     icon: <SettingsIcon />, label: 'Settings',     clickable: false },
 ];
@@ -69,8 +70,8 @@ const NAV_ITEMS = [
 const StaffSidebar = ({ activeTab, onTabChange, staff = {} }) => {
   const navigate = useNavigate();
 
-  const displayName    = staff.fullName || 'Staff';
-  const displayEmail   = staff.email    || 'staff@petcarehub.com';
+  const displayName = staff.fullName || 'Staff';
+  const displayEmail = staff.email || 'staff@petcarehub.com';
   const displayInitials = staff.initials || 'ST';
 
   const handleSignOut = () => {
@@ -86,7 +87,6 @@ const StaffSidebar = ({ activeTab, onTabChange, staff = {} }) => {
       <div className="sidebar-decor-tr" />
       <div className="sidebar-decor-bl" />
 
-      {/* Brand */}
       <div className="sidebar-logo">
         <img
           src="/images/logo/Logo.jpeg"
@@ -100,13 +100,11 @@ const StaffSidebar = ({ activeTab, onTabChange, staff = {} }) => {
         </div>
       </div>
 
-      {/* Staff role badge */}
       <div className="staff-sidebar-role-badge">
         <span>🏥</span>
         <span>Clinic Staff</span>
       </div>
 
-      {/* Navigation */}
       <nav className="sidebar-nav">
         {NAV_ITEMS.map((item) => (
           <button
@@ -116,6 +114,7 @@ const StaffSidebar = ({ activeTab, onTabChange, staff = {} }) => {
             aria-current={activeTab === item.key ? 'page' : undefined}
             tabIndex={item.clickable ? 0 : -1}
             aria-disabled={!item.clickable}
+            type="button"
           >
             <span className="nav-item-icon">{item.icon}</span>
             <span className="nav-item-text">{item.label}</span>
@@ -125,7 +124,6 @@ const StaffSidebar = ({ activeTab, onTabChange, staff = {} }) => {
         ))}
       </nav>
 
-      {/* Footer */}
       <div className="sidebar-footer">
         <div className="sidebar-user-card">
           <div className="sidebar-user-avatar staff-user-avatar">{displayInitials}</div>
@@ -134,7 +132,8 @@ const StaffSidebar = ({ activeTab, onTabChange, staff = {} }) => {
             <p className="sidebar-user-email" title={displayEmail}>{displayEmail}</p>
           </div>
         </div>
-        <button className="sidebar-signout" onClick={handleSignOut}>
+
+        <button className="sidebar-signout" onClick={handleSignOut} type="button">
           <SignOutIcon />
           <span>Sign Out</span>
         </button>

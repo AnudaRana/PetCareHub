@@ -1,13 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import axios from 'axios';
 import { API_BASE_URL } from '../../services/petService';
-import { getTreatmentsByPetId, addTreatmentToPet } from '../../services/medicalApi';
-import MedicalModal from '../medical/MedicalModel';
-import ConfirmationModal from '../medical/ConfirmationModal';
-import useCurrentUser from '../../hooks/useCurrentUser';
 import '../../styles/PetDetail.css';
 import '../../styles/DoctorDashboard.css';
-import '../../styles/medical.css';
 
 const SPECIES_EMOJI = { Dog: '🐕', Cat: '🐈', Bird: '🐦', Rabbit: '🐇', Fish: '🐟' };
 
@@ -21,97 +16,87 @@ const calcAge = (dob) => {
   return `${years} year${years > 1 ? 's' : ''}`;
 };
 
+const INITIAL_RECORD_FORM = {
+  treatmentDate: '',
+  diagnosis: '',
+  doctorName: '',
+  doctorId: '',
+  treatmentNotes: '',
+  prescriptions: '',
+  physicalObservation: '',
+};
+
 const DoctorPetDetail = ({ pet, onClose }) => {
-  const navigate = useNavigate();
-  const user = useCurrentUser();
-  const [treatments, setTreatments] = useState([]);
-  const [isMedicalModalOpen, setMedicalModalOpen] = useState(false);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [successTitle, setSuccessTitle] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  const [newTreatment, setNewTreatment] = useState({ date: '', diagnosis: '', notes: '', prescription: '', observation: '', doctorName: '', doctorId: '' });
-  
-  useEffect(() => {
-    const loadTreatments = async () => {
-      if (!pet?.petId) return;
-      try {
-        const apiTreatments = await getTreatmentsByPetId(pet.petId);
-        const mappedTreatments = apiTreatments.map((t) => ({
-          id: t.id,
-          date: t.treatmentDate,
-          diagnosis: t.diagnosis || '',
-          notes: t.treatmentNotes || '',
-          prescription: t.prescriptions || '',
-          observation: t.physicalObservation || '',
-          doctorName: t.doctorName || '',
-          doctorId: t.doctorId || '',
-        })).sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date desc
-        setTreatments(mappedTreatments);
-      } catch (err) {
-        console.error('Failed to load treatments:', err);
-      }
-    };
-    loadTreatments();
-  }, [pet?.petId]);
-  
+  const [showRecordModal, setShowRecordModal] = useState(false);
+  const [recordForm, setRecordForm] = useState(INITIAL_RECORD_FORM);
+  const [recordError, setRecordError] = useState('');
+  const [recordSuccess, setRecordSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
   if (!pet) return null;
   const emoji = SPECIES_EMOJI[pet.species] || '🐾';
 
-  const doSaveTreatment = async () => {
-    if (!newTreatment.doctorName.trim() || !newTreatment.doctorId.trim()) return;
+  const openRecordModal = () => {
+    setRecordForm(INITIAL_RECORD_FORM);
+    setRecordError('');
+    setRecordSuccess(false);
+    setShowRecordModal(true);
+  };
 
-    if (!pet?.petId) {
-      console.error('No pet selected for treatment.');
+  const closeRecordModal = () => {
+    setShowRecordModal(false);
+    setRecordForm(INITIAL_RECORD_FORM);
+    setRecordError('');
+    setRecordSuccess(false);
+  };
+
+  const handleRecordChange = (e) => {
+    const { name, value } = e.target;
+    setRecordForm((prev) => ({ ...prev, [name]: value }));
+    setRecordError('');
+  };
+
+  const submitRecord = async (e) => {
+    e.preventDefault();
+    if (!recordForm.treatmentDate) {
+      setRecordError('Visit date is required.');
+      return;
+    }
+    if (!recordForm.diagnosis.trim()) {
+      setRecordError('Diagnosis is required.');
+      return;
+    }
+    if (!recordForm.doctorName.trim()) {
+      setRecordError('Doctor name is required.');
+      return;
+    }
+    if (!recordForm.doctorId.trim()) {
+      setRecordError('Doctor ID is required.');
       return;
     }
 
+    setSubmitting(true);
+    setRecordError('');
+
     try {
-      const dto = {
-        treatmentDate: newTreatment.date,
-        diagnosis: newTreatment.diagnosis,
-        treatmentNotes: newTreatment.notes,
-        prescriptions: newTreatment.prescription,
-        physicalObservation: newTreatment.observation,
-        doctorName: newTreatment.doctorName,
-        doctorId: newTreatment.doctorId,
-      };
-
-      const saved = await addTreatmentToPet(pet.petId, dto);
-      const savedTreatment = {
-        id: saved.id,
-        date: saved.treatmentDate,
-        diagnosis: saved.diagnosis || '',
-        notes: saved.treatmentNotes || '',
-        prescription: saved.prescriptions || '',
-        observation: saved.physicalObservation || '',
-        doctorName: saved.doctorName || '',
-        doctorId: saved.doctorId || '',
-      };
-
-      setTreatments((old) => [savedTreatment, ...old]);
-      setMedicalModalOpen(false);
-      setSuccessTitle('Medical Record Added!');
-      setSuccessMessage('The medical treatment record has been successfully added. Thank you for using our services!');
-      setShowSuccessModal(true);
+      await axios.post(
+        `${API_BASE_URL}/api/medical-records/treatments/pet/${pet.petId}`,
+        {
+          treatmentDate: recordForm.treatmentDate,
+          diagnosis: recordForm.diagnosis,
+          doctorName: recordForm.doctorName,
+          doctorId: recordForm.doctorId,
+          treatmentNotes: recordForm.treatmentNotes,
+          prescriptions: recordForm.prescriptions,
+          physicalObservation: recordForm.physicalObservation,
+        }
+      );
+      setRecordSuccess(true);
     } catch (err) {
-      console.error('Failed to save treatment:', err);
+      setRecordError(err.response?.data?.message || 'Failed to save record. Please try again.');
     } finally {
-      setNewTreatment({ date: '', diagnosis: '', notes: '', prescription: '', observation: '', doctorName: '', doctorId: '' });
+      setSubmitting(false);
     }
-  };
-
-  const handleSaveRequest = () => {
-    setShowConfirmModal(true);
-  };
-
-  const handleConfirmSave = async () => {
-    setShowConfirmModal(false);
-    await doSaveTreatment();
-  };
-
-  const handleCancelSave = () => {
-    setShowConfirmModal(false);
   };
 
   return (
@@ -189,50 +174,27 @@ const DoctorPetDetail = ({ pet, onClose }) => {
           {/* Medical History Section */}
           <div className="doc-medical-section">
             <div className="doc-medical-title">
-              <span>📋</span> Medical History & Treatment Records
+              <span>📋</span> Medical History &amp; Treatment Records
             </div>
-            {treatments.length > 0 ? (
-              <div className="doc-medical-content">
-                <div className="doc-latest-treatment">
-                  <div className="doc-treatment-header">
-                    <span>🩺 Latest Treatment</span>
-                    <span className="doc-treatment-date">{new Date(treatments[0].date).toLocaleDateString('en-GB')}</span>
-                  </div>
-                  <div className="doc-treatment-details">
-                    <div><strong>Diagnosis:</strong> {treatments[0].diagnosis}</div>
-                    <div><strong>Notes:</strong> {treatments[0].notes}</div>
-                    {treatments[0].prescription && <div><strong>Prescription:</strong> {treatments[0].prescription}</div>}
-                    {treatments[0].observation && <div><strong>Observation:</strong> {treatments[0].observation}</div>}
-                    <div><strong>Doctor:</strong> {treatments[0].doctorName}</div>
-                  </div>
-                </div>
-                <div className="doc-view-full-link">
-                  <button 
-                    className="pet-detail-btn secondary small"
-                    onClick={() => navigate('/pet-medical-record', { state: { pet } })}
-                  >
-                    View Full Medical Records ({treatments.length})
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="doc-medical-empty">
-                <span>🩺</span>
-                <p>No medical records available yet.</p>
-                <small>Medical history will appear here once records are added.</small>
-              </div>
-            )}
+            <div className="doc-medical-empty">
+              <span>🩺</span>
+              <p>No medical records available yet.</p>
+              <small>Medical history will appear here once records are added.</small>
+            </div>
           </div>
 
-          {/* Actions — doctor can add medical records */}
+          {/* Upcoming Vaccinations */}
+          <div className="upcoming-vax-section">
+            <div className="vax-title">💉 Upcoming Vaccinations</div>
+            <p className="vax-info">No upcoming vaccinations scheduled for this pet.</p>
+          </div>
+
+          {/* Actions */}
           <div className="pet-detail-actions">
             <button className="pet-detail-btn secondary" onClick={onClose}>
               Close
             </button>
-            <button 
-              className="pet-detail-btn primary" 
-              onClick={() => setMedicalModalOpen(true)}
-            >
+            <button className="pet-detail-btn doc-add-record-btn" onClick={openRecordModal}>
               + Add Medical Record
             </button>
           </div>
@@ -243,40 +205,127 @@ const DoctorPetDetail = ({ pet, onClose }) => {
         </div>
       </div>
 
-      <MedicalModal
-        title="Add Treatment"
-        isOpen={isMedicalModalOpen}
-        onClose={() => { setMedicalModalOpen(false); setNewTreatment({ date: '', diagnosis: '', notes: '', prescription: '', observation: '', doctorName: '', doctorId: '' }); }}
-        onSave={handleSaveRequest}
-        disabled={!newTreatment.doctorName.trim() || !newTreatment.doctorId.trim()}
-      >
-        <label>Date<input type="date" value={newTreatment.date} onChange={(e) => setNewTreatment({ ...newTreatment, date: e.target.value })} /></label>
-        <label>Diagnosis<input value={newTreatment.diagnosis} onChange={(e) => setNewTreatment({ ...newTreatment, diagnosis: e.target.value })} /></label>
-        <label>Treatment notes<textarea value={newTreatment.notes} onChange={(e) => setNewTreatment({ ...newTreatment, notes: e.target.value })} /></label>
-        <label>Prescription<input value={newTreatment.prescription} onChange={(e) => setNewTreatment({ ...newTreatment, prescription: e.target.value })} /></label>
-        <label>Physical observation<textarea value={newTreatment.observation} onChange={(e) => setNewTreatment({ ...newTreatment, observation: e.target.value })} /></label>
-        <label>Doctor name<input required value={newTreatment.doctorName} onChange={(e) => setNewTreatment({ ...newTreatment, doctorName: e.target.value })} /></label>
-        <label>Doctor ID<input required value={newTreatment.doctorId} onChange={(e) => setNewTreatment({ ...newTreatment, doctorId: e.target.value })} /></label>
-      </MedicalModal>
-
-      {showConfirmModal && (
-        <div className="confirm-backdrop" role="dialog" aria-modal="true">
-          <div className="confirm-box">
-            <p>Confirm changes and save medical treatment?</p>
-            <div className="confirm-actions" style={{ justifyContent: 'flex-end' }}>
-              <button className="btn btn-cancel" onClick={handleCancelSave}>Cancel</button>
-              <button className="btn btn-save" onClick={handleConfirmSave}>Confirm</button>
+      {/* Add Medical Record Modal */}
+      {showRecordModal && (
+        <div className="modal-overlay" onClick={closeRecordModal}>
+          <div className="update-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Add Medical Record</h2>
+              <button className="close-btn" onClick={closeRecordModal}>×</button>
             </div>
+
+            {recordSuccess ? (
+              <div style={{ padding: '2rem', textAlign: 'center' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>✓</div>
+                <h3 style={{ marginBottom: '0.5rem' }}>Record Saved!</h3>
+                <p style={{ color: 'var(--text-muted, #888)', marginBottom: '1.5rem' }}>
+                  Medical record has been added for <strong>{pet.name}</strong>.
+                </p>
+                <button className="primary-btn" onClick={closeRecordModal}>Done</button>
+              </div>
+            ) : (
+              <form className="update-form" onSubmit={submitRecord}>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Visit Date <span style={{ color: 'red' }}>*</span></label>
+                    <input
+                      type="date"
+                      name="treatmentDate"
+                      value={recordForm.treatmentDate}
+                      onChange={handleRecordChange}
+                      max={new Date().toISOString().split('T')[0]}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Pet</label>
+                    <input type="text" value={`${pet.name} (${pet.species})`} readOnly />
+                  </div>
+                </div>
+
+                <div className="form-group full-width">
+                  <label>Diagnosis <span style={{ color: 'red' }}>*</span></label>
+                  <input
+                    type="text"
+                    name="diagnosis"
+                    value={recordForm.diagnosis}
+                    onChange={handleRecordChange}
+                    placeholder="e.g. Mild fever, Ear infection"
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Doctor Name <span style={{ color: 'red' }}>*</span></label>
+                    <input
+                      type="text"
+                      name="doctorName"
+                      value={recordForm.doctorName}
+                      onChange={handleRecordChange}
+                      placeholder="e.g. Dr. Perera"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Doctor ID <span style={{ color: 'red' }}>*</span></label>
+                    <input
+                      type="text"
+                      name="doctorId"
+                      value={recordForm.doctorId}
+                      onChange={handleRecordChange}
+                      placeholder="e.g. VET-001"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group full-width">
+                  <label>Treatment Notes</label>
+                  <textarea
+                    name="treatmentNotes"
+                    rows="2"
+                    value={recordForm.treatmentNotes}
+                    onChange={handleRecordChange}
+                    placeholder="e.g. Antibiotics prescribed for 5 days"
+                  />
+                </div>
+
+                <div className="form-group full-width">
+                  <label>Prescriptions</label>
+                  <textarea
+                    name="prescriptions"
+                    rows="2"
+                    value={recordForm.prescriptions}
+                    onChange={handleRecordChange}
+                    placeholder="e.g. Amoxicillin 250mg twice daily"
+                  />
+                </div>
+
+                <div className="form-group full-width">
+                  <label>Physical Observation</label>
+                  <textarea
+                    name="physicalObservation"
+                    rows="2"
+                    value={recordForm.physicalObservation}
+                    onChange={handleRecordChange}
+                    placeholder="e.g. Temperature 39.2°C, mild lethargy"
+                  />
+                </div>
+
+                {recordError && (
+                  <div className="error-box">{recordError}</div>
+                )}
+
+                <div className="modal-actions">
+                  <button type="button" className="secondary-btn" onClick={closeRecordModal}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="primary-btn" disabled={submitting}>
+                    {submitting ? 'Saving...' : 'Save Record'}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}
-
-      <ConfirmationModal
-        isOpen={showSuccessModal}
-        title={successTitle}
-        message={successMessage}
-        onDone={() => setShowSuccessModal(false)}
-      />
     </div>
   );
 };

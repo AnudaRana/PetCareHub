@@ -38,10 +38,32 @@ const useCurrentUser = () => {
         const token = localStorage.getItem('token');
 
         if (token && !token.startsWith('fake-')) {
-
           const payload = decodeJWT(token);
+          console.log('[useCurrentUser] JWT payload:', payload);
+
           if (payload) {
-            userId = payload.userId || payload.sub || null;
+            // Try numeric userId from the JWT payload first (some backends embed it)
+            userId = payload.userId || payload.user_id || null;
+
+            // If the JWT doesn't include a numeric userId, check localStorage —
+            // the login developer always stores userId there after login.
+            if (!userId) {
+              const storedId = localStorage.getItem('userId');
+              if (storedId) {
+                userId = storedId;
+                console.log('[useCurrentUser] JWT had no userId field — using localStorage userId:', userId);
+              }
+            }
+
+            // Last resort: use sub (usually email/username). This may only work
+            // if the backend accepts usernames in the /api/admin/users/{id} path.
+            if (!userId) {
+              userId = payload.sub || null;
+              if (userId) {
+                console.warn('[useCurrentUser] Falling back to JWT sub as userId:', userId,
+                  '— this may be an email string, not a numeric ID!');
+              }
+            }
 
             if (!role && Array.isArray(payload.roles)) {
               role = payload.roles[0] || null;
@@ -52,10 +74,15 @@ const useCurrentUser = () => {
           userId = localStorage.getItem('userId');
         }
 
+        console.log('[useCurrentUser] Resolved userId:', userId);
 
         if (!userId) {
-          console.warn('useCurrentUser: No userId found, falling back to userId 1');
-          userId = 1;
+          console.warn(
+            'useCurrentUser: No userId found in token or localStorage. ' +
+            'Cannot load user profile. Please log in again.'
+          );
+          setUser(prev => ({ ...prev, loading: false, error: 'No user ID found. Please log in.' }));
+          return;
         }
 
         const { data } = await axios.get(`${API_BASE_URL}/api/admin/users/${userId}`);

@@ -53,8 +53,9 @@ const SignOutIcon = () => (
 const NAV_ITEMS = [
   { key: 'home', icon: <HomeIcon />, label: 'Home', clickable: true },
   { key: 'all-pets', icon: <PawIcon />, label: 'All Pets', clickable: true },
-  { key: 'my-schedule', icon: <CalendarIcon />, label: 'My Schedule', clickable: false },
-  { key: 'appointments', icon: <ClipboardIcon />, label: 'Appointments', clickable: false },
+  { key: 'my-schedule', icon: <CalendarIcon />, label: 'My Schedule', clickable: true },
+  { key: 'appointments', icon: <ClipboardIcon />, label: 'Appointments', clickable:true },
+  { key: 'vaccinations-scheduled', icon: <ShieldIcon />, label: 'Vaccinations Scheduled', clickable: false },
 ];
 
 const DoctorSidebar = ({ activeTab, onTabChange, doctor = {} }) => {
@@ -100,7 +101,16 @@ const DoctorSidebar = ({ activeTab, onTabChange, doctor = {} }) => {
           <button
             key={item.key}
             className={`nav-item${activeTab === item.key ? ' active' : ''}${!item.clickable ? ' nav-item--disabled' : ''}`}
-            onClick={() => item.clickable && onTabChange(item.key)}
+         
+            onClick={() => {
+  if (!item.clickable) return;
+
+  if (item.key === 'appointments') {
+    navigate('/vet-appointments');
+  } else {
+    onTabChange(item.key);
+  }
+}}
             aria-current={activeTab === item.key ? 'page' : undefined}
             tabIndex={item.clickable ? 0 : -1}
             aria-disabled={!item.clickable}

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import OwnerSidebar from '../components/owner/OwnerSidebar';
 import MyPets from '../components/owner/MyPets';
-import ViewTimeSlots from './ViewTimeSlots';
+import DoctorChanneling from './DoctorChanneling';
 import '../styles/Dashboard.css';
 import useCurrentUser from '../hooks/useCurrentUser';
 
@@ -11,6 +12,7 @@ const TAB_META = {
     'my-pets': { label: 'My Pets' },
     'store': { label: 'Store' },
     'my-appointments': { label: 'My Appointments' },
+    'my-vaccinations': { label: 'My Vaccinations' },
     'doctor-channeling': { label: 'Doctor Channeling' },
     'settings': { label: 'Settings' },
 };
@@ -50,12 +52,21 @@ const ComingSoon = ({ tabKey }) => {
 };
 
 const Dashboard = () => {
-    const [activeTab, setActiveTab] = useState('my-pets');
+    const location = useLocation();
+    const initialTab = location.state?.activeTab || 'my-pets';
+
+    const [activeTab, setActiveTab] = useState(initialTab);
     const user = useCurrentUser();
+
+    useEffect(() => {
+        if (location.state?.activeTab) {
+            setActiveTab(location.state.activeTab);
+        }
+    }, [location.state]);
 
     const renderContent = () => {
         if (activeTab === 'my-pets') return <MyPets />;
-        if (activeTab === 'doctor-channeling') return <ViewTimeSlots />;
+        if (activeTab === 'doctor-channeling') return <DoctorChanneling />;
         return <ComingSoon tabKey={activeTab} />;
     };
 
@@ -63,10 +74,9 @@ const Dashboard = () => {
 
     return (
         <div className="dashboard-layout">
-            <OwnerSidebar activeTab={activeTab} onTabChange={setActiveTab} user={user} />
+            <OwnerSidebar activeTab={activeTab} user={user} />
 
             <div className="dashboard-main">
-                {/* Top Bar */}
                 <header className="dashboard-topbar">
                     <div className="topbar-breadcrumb">
                         <span className="breadcrumb-home">Dashboard</span>
@@ -86,7 +96,6 @@ const Dashboard = () => {
                     </div>
                 </header>
 
-                {/* Content */}
                 <main className="dashboard-content">
                     {renderContent()}
                 </main>

@@ -192,9 +192,6 @@
     gap: 12px;
 }
 
-/* Sidebar toggle and collapse functionality removed */
-
-
 /* ── User Card ───────────────────────────────────────── */
 .sidebar-user-card {
     display: flex;

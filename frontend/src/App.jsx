@@ -5,6 +5,8 @@ import DoctorDashboard from './pages/DoctorDashboard';
 import StaffDashboard from './pages/StaffDashboard';
 import PetMedicalRecordPage from './pages/PetMedicalRecordPage';
 import TreatmentPage from './pages/TreatmentPage';
+import MyAppointments from './pages/MyAppointments';
+import VetAppointments from './pages/VetAppointments';
 
 const RoleBasedRedirect = () => {
   // The login developer stores the full ROLE_XXX string from the JWT response
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/staff-dashboard" element={<StaffDashboard />} />
           <Route path="/pet-medical-record" element={<PetMedicalRecordPage />} />
           <Route path="/treatments" element={<TreatmentPage />} />
+          <Route path="/my-appointments" element={<MyAppointments />} />
+          <Route path="/vet-appointments" element={<VetAppointments />} />
           {/* /login is handled by the login developer's separate page/app */}
           {/* We still need this route so Navigate to="/login" doesn't 404 */}
           <Route path="/login" element={<RoleBasedRedirect />} />

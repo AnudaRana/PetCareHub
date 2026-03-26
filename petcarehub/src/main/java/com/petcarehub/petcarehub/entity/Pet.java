@@ -1,6 +1,7 @@
 package com.petcarehub.petcarehub.entity;
 
 import com.petcarehub.petcarehub.enums.PetGender;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,6 +45,7 @@ public class Pet {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
+    @JsonIgnoreProperties(value = {"password", "roles"}, allowSetters = true)
     private User owner;
 
     @Column(name = "created_at", updatable = false)
