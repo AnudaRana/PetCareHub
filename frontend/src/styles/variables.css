@@ -1,54 +1,8 @@
 :root {
-  /* Core Colors */
-  --color-primary-dark: #0A0F24;
-  /* Deep Navy Background */
-  --color-primary: #141B3D;
-  /* Slightly lighter Navy for cards/elements */
-  --color-primary-light: #212B58;
-  /* Hover states for navy */
+  --font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  --transition: 0.22s ease;
 
-  --color-accent: #00F0FF;
-  /* Electric Cyan */
-  --color-accent-dark: #00B8C4;
-  --color-accent-light: #5CE6FF;
-
-  /* Sidebar Specifics */
-  --color-sidebar-bg: var(--color-primary-dark);
-  --color-sidebar-text: rgba(255, 255, 255, 0.75);
-  --color-sidebar-active: #FFFFFF;
-  --color-sidebar-active-bg: rgba(0, 240, 255, 0.1);
-  /* Subtle cyan tint */
-  --color-sidebar-hover: rgba(255, 255, 255, 0.05);
-
-  /* Layout Background */
-  --color-bg: #F4F7FB;
-  /* Premium soft cool gray */
-  --color-white: #FFFFFF;
-
-  /* Text & Borders */
-  --color-border: rgba(0, 0, 0, 0.06);
-  --color-text: #1E2335;
-  /* Deep slate */
-  --color-text-light: #64748B;
-  /* Cool gray slate */
-
-  /* Status Colors */
-  --color-error: #FF3B30;
-  --color-success: #34C759;
-
-  /* Glassmorphism & Shadows */
-  --glass-bg: rgba(255, 255, 255, 0.75);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --shadow-sm: 0 4px 12px rgba(10, 15, 36, 0.04);
-  --shadow-md: 0 12px 32px rgba(10, 15, 36, 0.08);
-  --shadow-glow: 0 0 20px rgba(0, 240, 255, 0.3);
-
-  /* Structure */
-  --radius-sm: 10px;
-  --radius-md: 18px;
-  --radius-lg: 24px;
-  --font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
-  --transition: 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  /* Silky smooth easing */
-  --sidebar-width: 260px;
+  --color-primary: #36b8b7;
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.10);
 }
