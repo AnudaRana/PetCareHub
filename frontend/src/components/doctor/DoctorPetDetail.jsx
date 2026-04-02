@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../../services/petService';
+import { getTreatmentsByPetId } from '../../services/medicalApi';
 import '../../styles/PetDetail.css';
 import '../../styles/DoctorDashboard.css';
 
@@ -27,11 +29,28 @@ const INITIAL_RECORD_FORM = {
 };
 
 const DoctorPetDetail = ({ pet, onClose }) => {
+  const navigate = useNavigate();
   const [showRecordModal, setShowRecordModal] = useState(false);
   const [recordForm, setRecordForm] = useState(INITIAL_RECORD_FORM);
   const [recordError, setRecordError] = useState('');
   const [recordSuccess, setRecordSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [medicalRecords, setMedicalRecords] = useState([]);
+
+  useEffect(() => {
+    if (!pet?.petId) return;
+    getTreatmentsByPetId(pet.petId)
+      .then((data) => {
+        const mapped = (Array.isArray(data) ? data : []).map((t) => ({
+          id: t.id,
+          date: t.treatmentDate || '',
+          diagnosis: t.diagnosis || '',
+          notes: t.treatmentNotes || '',
+        }));
+        setMedicalRecords(mapped);
+      })
+      .catch((err) => console.error('Failed to load medical records:', err));
+  }, [pet]);
 
   if (!pet) return null;
   const emoji = SPECIES_EMOJI[pet.species] || '🐾';
@@ -176,11 +195,23 @@ const DoctorPetDetail = ({ pet, onClose }) => {
             <div className="doc-medical-title">
               <span>📋</span> Medical History &amp; Treatment Records
             </div>
-            <div className="doc-medical-empty">
-              <span>🩺</span>
-              <p>No medical records available yet.</p>
-              <small>Medical history will appear here once records are added.</small>
-            </div>
+            {medicalRecords.length === 0 ? (
+              <div className="doc-medical-empty">
+                <span>🩺</span>
+                <p>No medical records available yet.</p>
+                <small>Medical history will appear here once records are added.</small>
+              </div>
+            ) : (
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {medicalRecords.map((record) => (
+                  <li key={record.id} style={{ marginBottom: '10px', padding: '10px', background: 'rgba(0,0,0,0.03)', borderRadius: '8px', borderLeft: '3px solid #7c6ef7' }}>
+                    <div className="pet-detail-field-label">{record.date ? new Date(record.date).toLocaleDateString('en-GB') : '—'}</div>
+                    {record.diagnosis && <div className="pet-detail-field-value"><strong>Diagnosis:</strong> {record.diagnosis}</div>}
+                    {record.notes && <div className="pet-detail-field-value"><strong>Notes:</strong> {record.notes}</div>}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           {/* Upcoming Vaccinations */}
@@ -197,6 +228,14 @@ const DoctorPetDetail = ({ pet, onClose }) => {
             <button className="pet-detail-btn doc-add-record-btn" onClick={openRecordModal}>
               + Add Medical Record
             </button>
+            {medicalRecords.length > 0 && (
+              <button
+                className="pet-detail-btn primary"
+                onClick={() => navigate('/pet-medical-record', { state: { pet } })}
+              >
+                View All Medical Records
+              </button>
+            )}
           </div>
 
           <p className="pet-detail-registered">

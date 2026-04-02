@@ -25,6 +25,7 @@ public class AppointmentService {
     private final UserRepository userRepository;
     private final PetRepository petRepository;
 
+    // Injects all required dependencies via constructor
     public AppointmentService(AppointmentRepository appointmentRepository,
                               EmailService emailService,
                               UserRepository userRepository,
@@ -35,6 +36,7 @@ public class AppointmentService {
         this.petRepository = petRepository;
     }
 
+    // Creates and saves a new appointment; sends confirmation email to the owner
     public Appointment createAppointment(AppointmentRequest request) {
         if (appointmentRepository.existsByDateAndDoctorAndTimeSlot(
                 request.getDate(),
@@ -76,6 +78,7 @@ public class AppointmentService {
         return saved;
     }
 
+    // Updates an existing appointment's details; sends update email to the owner
     public Appointment updateAppointment(Long appointmentId, AppointmentRequest request) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
@@ -120,6 +123,7 @@ public class AppointmentService {
         return updated;
     }
 
+    // Cancels an appointment by the owner and notifies the vet via email
     public Appointment cancelAppointment(Long appointmentId, String reason) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
@@ -142,6 +146,7 @@ public class AppointmentService {
         return cancelled;
     }
 
+    // Cancels an appointment by the vet and notifies the owner via email
     public Appointment cancelAppointmentByVet(Long appointmentId, Long vetId, String reason) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
@@ -168,10 +173,36 @@ public class AppointmentService {
         return cancelled;
     }
 
+    // Marks an appointment as COMPLETED; only allowed when status is UPCOMING
+    public AppointmentResponse completeAppointment(Long appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
+
+        String currentStatus = appointment.getStatus();
+
+        if ("CANCELLED".equalsIgnoreCase(currentStatus)) {
+            throw new IllegalStateException("Cannot complete a cancelled appointment.");
+        }
+
+        if ("COMPLETED".equalsIgnoreCase(currentStatus)) {
+            throw new IllegalStateException("Appointment is already marked as completed.");
+        }
+
+        if (!"UPCOMING".equalsIgnoreCase(currentStatus)) {
+            throw new IllegalStateException("Only UPCOMING appointments can be marked as completed.");
+        }
+
+        appointment.setStatus("COMPLETED");
+        Appointment saved = appointmentRepository.save(appointment);
+        return toDto(saved);
+    }
+
+    // Fetches all appointments and maps them to DTOs
     public List<AppointmentResponse> getAllAppointments() {
         return appointmentRepository.findAll().stream().map(this::toDto).toList();
     }
 
+    // Fetches all appointments for a specific owner by user ID
     public List<AppointmentResponse> getAppointmentsByUser(Long userId) {
         List<Appointment> results = appointmentRepository.findByOwnerUserId(userId);
         log.info("[getAppointmentsByUser] userId={} → {} appointment(s) found", userId, results.size());
@@ -180,6 +211,7 @@ public class AppointmentService {
 
     // ── Private mapper ───────────────────────────────────────────────────────
 
+    // Maps an Appointment entity to a flat AppointmentResponse DTO
     private AppointmentResponse toDto(Appointment a) {
         AppointmentResponse dto = new AppointmentResponse();
         dto.setId(a.getId());
@@ -218,10 +250,12 @@ public class AppointmentService {
         return dto;
     }
 
+    // Fetches all appointments assigned to a specific vet
     public List<Appointment> getAppointmentsByVet(Long vetId) {
         return appointmentRepository.findByVet_UserId(vetId);
     }
 
+    // Returns non-cancelled booked time slots and doctors for a given date
     public List<Map<String, String>> getBookedSlots(String date) {
         return appointmentRepository.findByDate(date)
                 .stream()

@@ -76,6 +76,7 @@ const DoctorChanneling = () => {
   const [notes, setNotes] = useState('');
   const [bookedSlots, setBookedSlots] = useState([]);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const doctors = [...new Set(SLOT_OPTIONS.map((slot) => slot.doctor))];
 
@@ -168,7 +169,7 @@ const DoctorChanneling = () => {
       !selectedSlot ||
       !selectedDoctor
     ) {
-      alert('Please fill all required fields');
+      setErrorMessage('Please fill in all required fields before confirming the appointment.');
       return;
     }
 
@@ -176,14 +177,16 @@ const DoctorChanneling = () => {
     const todayObj = new Date(`${today}T00:00:00`);
 
     if (selectedDateObj < todayObj) {
-      alert('You cannot book an appointment for a past date');
+      setErrorMessage('You cannot book an appointment for a past date.');
       return;
     }
 
     if (isPastTimeSlotToday(selectedSlot.time)) {
-      alert('You cannot book a past time slot for today');
+      setErrorMessage('You cannot book a past time slot for today.');
       return;
     }
+
+    setErrorMessage('');
 
     try {
       const appointmentData = {
@@ -208,7 +211,7 @@ const DoctorChanneling = () => {
       resetForm();
       setShowSuccessModal(true);
     } catch (error) {
-      alert(
+      setErrorMessage(
         'Booking failed: ' +
           (error.response?.data?.message ||
             'Double booking error or network issue.')
@@ -277,7 +280,7 @@ const DoctorChanneling = () => {
                 const value = e.target.value;
 
                 if (value < today) {
-                  alert('You cannot select a past date');
+                  setErrorMessage('You cannot select a past date.');
                   return;
                 }
 
@@ -361,6 +364,12 @@ const DoctorChanneling = () => {
               Confirm Appointment
             </button>
           </div>
+
+          {errorMessage && (
+            <div className="error-box" style={{ marginTop: '12px' }}>
+              {errorMessage}
+            </div>
+          )}
 
           {showSuccessModal && (
             <SuccessModal onClose={() => setShowSuccessModal(false)} />

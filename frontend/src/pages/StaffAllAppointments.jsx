@@ -3,9 +3,9 @@ import axios from 'axios';
 import { API_BASE_URL } from '../services/petService';
 import '../styles/StaffAllAppointments.css';
 
-const StaffAllAppointments = () => {
+const StaffAllAppointments = ({ petFilter = '' }) => {
   const [appointments, setAppointments] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(petFilter);
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -74,11 +74,11 @@ const StaffAllAppointments = () => {
     const fullNameFromParts = `${vetFirst} ${vetLast}`.trim();
 
     return (
+      appointment.doctor ||
+      appointment.doctorName ||
       appointment.vet?.fullName ||
       appointment.vet?.name ||
-      appointment.doctorName ||
       fullNameFromParts ||
-      appointment.doctor ||
       'N/A'
     );
   };

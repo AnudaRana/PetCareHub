@@ -541,11 +541,17 @@ const MyAppointments = () => {
                       value={updateForm.time}
                       onChange={handleUpdateInputChange}
                     >
-                      {TIMES.map((time) => (
-                        <option key={time} value={time}>
-                          {time}
+                      {updateForm.doctor && DOCTOR_TIME_MAP[updateForm.doctor] ? (
+                        <option value={DOCTOR_TIME_MAP[updateForm.doctor]}>
+                          {DOCTOR_TIME_MAP[updateForm.doctor]}
                         </option>
-                      ))}
+                      ) : (
+                        TIMES.map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))
+                      )}
                     </select>
                   </div>
                 </div>

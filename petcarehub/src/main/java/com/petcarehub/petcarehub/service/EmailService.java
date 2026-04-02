@@ -23,6 +23,7 @@ public class EmailService {
 
     // ---------------------------------------------------------------
 
+    // Sends a booking confirmation email to the owner
     public void sendAppointmentConfirmation(String to, Appointment appointment) {
         if (!isMailAvailable()) return;
 
@@ -42,6 +43,7 @@ public class EmailService {
         send(message);
     }
 
+    // Sends an update notification email when an appointment is modified
     public void sendAppointmentUpdateEmail(String to, Appointment appointment) {
         if (!isMailAvailable()) return;
 
@@ -61,6 +63,7 @@ public class EmailService {
         send(message);
     }
 
+    // Sends a cancellation notification email to the relevant party
     public void sendAppointmentCancelEmail(String to, Appointment appointment) {
         if (!isMailAvailable()) return;
 
@@ -82,6 +85,7 @@ public class EmailService {
 
     // ---------------------------------------------------------------
 
+    // Checks if the mail sender is configured; logs a warning if not
     private boolean isMailAvailable() {
         if (mailSender == null) {
             log.warn("JavaMailSender is not configured – skipping email send.");
@@ -90,6 +94,7 @@ public class EmailService {
         return true;
     }
 
+    // Attempts to send the email and logs any errors
     private void send(SimpleMailMessage message) {
         try {
             mailSender.send(message);

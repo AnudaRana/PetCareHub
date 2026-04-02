@@ -40,7 +40,8 @@ const VetAppointments = () => {
 
   const getStatusClass = (status) => {
     if (status === "CANCELLED") return "status-badge status-cancelled";
-    if (status === "UPDATED") return "status-badge status-updated";
+    if (status === "UPDATED")   return "status-badge status-updated";
+    if (status === "COMPLETED") return "status-badge status-completed";
     return "status-badge status-upcoming";
   };
 
@@ -85,6 +86,20 @@ const VetAppointments = () => {
       );
     } finally {
       setIsCancelling(false);
+    }
+  };
+
+  const handleComplete = async (appointment) => {
+    try {
+      const res = await axios.patch(
+        `http://localhost:8081/api/appointments/${appointment.id}/complete`
+      );
+      // Update the single appointment in the list immediately
+      setAppointments((prev) =>
+        prev.map((a) => (a.id === appointment.id ? res.data : a))
+      );
+    } catch (error) {
+      console.error("Failed to complete appointment:", error);
     }
   };
 
@@ -176,14 +191,26 @@ const VetAppointments = () => {
                     )}
                   </div>
 
-                  <button
-                    className="confirm-btn"
-                    disabled={a.status === "CANCELLED"}
-                    onClick={() => openCancelModal(a)}
-                    type="button"
-                  >
-                    Cancel Appointment
-                  </button>
+                  <div className="vet-appointment-actions">
+                    {a.status === "UPCOMING" && (
+                      <button
+                        className="confirm-btn vet-complete-btn"
+                        onClick={() => handleComplete(a)}
+                        type="button"
+                      >
+                        Complete Appointment
+                      </button>
+                    )}
+                    {a.status === "UPCOMING" && (
+                      <button
+                        className="confirm-btn"
+                        onClick={() => openCancelModal(a)}
+                        type="button"
+                      >
+                        Cancel Appointment
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

@@ -1,5 +1,6 @@
  import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 import StaffSidebar from '../components/staff/StaffSidebar';
 import StaffAllPets from '../components/staff/StaffAllPets';
 import StaffAllAppointments from './StaffAllAppointments';
@@ -46,19 +47,36 @@ const ComingSoon = ({ tabKey }) => {
 };
 
 const StaffDashboard = () => {
-  const [activeTab, setActiveTab] = useState('home');
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(location.state?.tab || 'home');
+  const [petFilter, setPetFilter] = useState(location.state?.petFilter || '');
   const { fullName, firstName, email, initials, loading } = useCurrentUser();
 
   const staff = { fullName, firstName, email, initials: initials || 'ST' };
+
+  // When navigating to this same route from StaffPetDetail, the component
+  // is already mounted so useState won't re-run — useEffect picks up the change.
+  useEffect(() => {
+    if (location.state?.tab) {
+      setActiveTab(location.state.tab);
+      setPetFilter(location.state.petFilter || '');
+    }
+  }, [location.state]);
+
+  // Clear petFilter after first use so navigating tabs later doesn't keep filtering
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setPetFilter('');
+  };
 
   const renderContent = () => {
     switch (activeTab) {
       case 'all-pets':
         return <StaffAllPets />;
       case 'appointments':
-        return <StaffAllAppointments />;
+        return <StaffAllAppointments petFilter={petFilter} />;
       case 'home':
-        return <StaffHome staff={staff} onNavigate={setActiveTab} />;
+        return <StaffHome staff={staff} onNavigate={handleTabChange} />;
       default:
         return <ComingSoon tabKey={activeTab} />;
     }
@@ -79,7 +97,7 @@ const StaffDashboard = () => {
     <div className="dashboard-layout">
       <StaffSidebar
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         staff={staff}
       />
 

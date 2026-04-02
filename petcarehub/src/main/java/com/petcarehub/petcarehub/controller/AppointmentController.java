@@ -17,10 +17,12 @@ public class AppointmentController {
 
     private final AppointmentService appointmentService;
 
+    // Injects the AppointmentService dependency via constructor
     public AppointmentController(AppointmentService appointmentService) {
         this.appointmentService = appointmentService;
     }
 
+    // Creates a new appointment from the request body
     @PostMapping
     public ResponseEntity<?> createAppointment(@RequestBody AppointmentRequest request) {
         try {
@@ -33,6 +35,7 @@ public class AppointmentController {
         }
     }
 
+    // Updates an existing appointment by its ID
     @PutMapping("/{id}")
     public ResponseEntity<?> updateAppointment(@PathVariable Long id, @RequestBody AppointmentRequest request) {
         try {
@@ -47,6 +50,7 @@ public class AppointmentController {
         }
     }
 
+    // Cancels an appointment by ID with an optional reason (owner-initiated)
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<?> cancelAppointment(
             @PathVariable Long id,
@@ -63,6 +67,7 @@ public class AppointmentController {
         }
     }
 
+    // Returns all appointments in the system
     @GetMapping
     public ResponseEntity<?> getAllAppointments() {
         try {
@@ -73,6 +78,7 @@ public class AppointmentController {
         }
     }
 
+    // Returns all appointments belonging to a specific user (owner)
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getAppointmentsByUser(@PathVariable Long userId) {
         try {
@@ -83,12 +89,14 @@ public class AppointmentController {
         }
     }
 
+    // Returns all booked time slots for a given date
     @GetMapping("/booked-slots")
     public ResponseEntity<List<Map<String, String>>> getBookedSlots(@RequestParam String date) {
         List<Map<String, String>> bookedSlots = appointmentService.getBookedSlots(date);
         return ResponseEntity.ok(bookedSlots);
     }
 
+    // Returns all appointments assigned to a specific vet
     @GetMapping("/vet/{vetId}")
     public ResponseEntity<?> getAppointmentsByVet(@PathVariable Long vetId) {
         try {
@@ -99,6 +107,7 @@ public class AppointmentController {
         }
     }
 
+    // Cancels an appointment on behalf of a vet, with a reason
     @PatchMapping("/{id}/cancel-by-vet")
     public ResponseEntity<?> cancelByVet(
             @PathVariable Long id,
@@ -113,6 +122,20 @@ public class AppointmentController {
 
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    // Marks an appointment as COMPLETED; only allowed when current status is UPCOMING
+    @PatchMapping("/{id}/complete")
+    public ResponseEntity<?> completeAppointment(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(appointmentService.completeAppointment(id));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("message", e.getMessage()));
         }
     }
 }

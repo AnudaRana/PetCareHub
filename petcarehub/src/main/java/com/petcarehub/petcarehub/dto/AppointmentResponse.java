@@ -33,10 +33,12 @@ public class AppointmentResponse {
     private String vetFirstName;
     private String vetLastName;
 
+    // Default no-args constructor
     public AppointmentResponse() {}
 
     // ── Getters ──────────────────────────────────────────────────────────────
 
+    // Getters — return each flat field of the appointment response
     public Long getId() { return id; }
     public String getAppointmentType() { return appointmentType; }
     public String getDoctor() { return doctor; }
@@ -60,6 +62,7 @@ public class AppointmentResponse {
 
     // ── Setters ──────────────────────────────────────────────────────────────
 
+    // Setters — set each flat field of the appointment response
     public void setId(Long id) { this.id = id; }
     public void setAppointmentType(String appointmentType) { this.appointmentType = appointmentType; }
     public void setDoctor(String doctor) { this.doctor = doctor; }
