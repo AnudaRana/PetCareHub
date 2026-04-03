@@ -1,0 +1,43 @@
+.owner-stats-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  align-items: stretch;
+}
+
+.secondary-stats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* Specific styling for the Order History card to make it look prominent */
+.order-history-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.order-history-card .order-history-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #666;
+  border: 2px dashed rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+@media (max-width: 1200px) {
+  .owner-stats-layout {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+}

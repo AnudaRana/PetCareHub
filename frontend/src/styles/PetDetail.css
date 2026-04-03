@@ -1,3 +1,5 @@
+@import './variables.css';
+
 .pet-detail-overlay {
     position: fixed;
     inset: 0;
@@ -30,7 +32,7 @@
     max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
     animation: slideUp 0.35s cubic-bezier(0.25, 1, 0.5, 1);
 }
 

@@ -498,3 +498,68 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* ── Upcoming Appointment Card ────────────────────────── */
+.staff-upcoming-appt-card {
+  background: var(--color-white);
+  border: 1.5px solid rgba(0, 240, 255, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(10, 15, 36, 0.04);
+}
+
+.staff-appt-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.staff-appt-type {
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--color-accent-dark);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.staff-appt-time {
+  font-size: 0.88rem;
+  color: var(--color-text);
+  text-align: right;
+}
+
+.staff-appt-time strong {
+  display: block;
+  font-size: 1rem;
+  color: var(--color-primary);
+}
+
+.staff-appt-doctor {
+  font-size: 0.82rem;
+  color: var(--color-text-light);
+  padding-top: 10px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.staff-appt-doctor::before {
+  content: '👨‍⚕️';
+  font-size: 0.9rem;
+}
+
+.staff-appointment-loading {
+  padding: 20px;
+  text-align: center;
+  color: var(--color-text-light);
+  font-size: 0.85rem;
+  font-style: italic;
+}

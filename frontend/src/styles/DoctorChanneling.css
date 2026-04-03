@@ -7,11 +7,12 @@
 
 .doctor-channeling-content {
   flex: 1;
-  padding: 32px 28px;
+  padding: 0;
   box-sizing: border-box;
 }
 
 .channeling-header {
+  margin-top: 0;
   margin-bottom: 24px;
 }
 
@@ -29,12 +30,13 @@
 
 /* ---- card ---- */
 .view-slots-card {
-  max-width: 800px;
-  margin: 0 auto;
-  background: #fff;
-  padding: 24px;
+  max-width: 850px;
+  margin: 0;
+  background: var(--color-white, #fff);
+  padding: 32px;
   border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--color-border, #e2e8f0);
 }
 
 /* ---- layout helpers ---- */
@@ -55,13 +57,7 @@
   box-sizing: border-box;
 }
 
-.view-slots-card {
-  background: var(--color-white);
-  border-radius: 24px;
-  padding: 28px;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
-  border: 1px solid rgba(14, 165, 233, 0.08);
-}
+
 
 .view-slots-card-header {
   display: flex;
@@ -78,35 +74,7 @@
   font-weight: 700;
 }
 
-.my-appointments-btn,
-.confirm-btn {
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.2s ease;
-}
 
-.my-appointments-btn {
-  background: var(--color-accent);
-  color: white;
-  padding: 14px 24px;
-  min-width: 220px;
-}
-
-.confirm-btn {
-  background: var(--color-accent);
-  color: white;
-  padding: 14px 24px;
-  min-width: 220px;
-}
-
-.my-appointments-btn:hover,
-.confirm-btn:hover {
-  background: var(--color-accent-dark);
-  transform: translateY(-1px);
-  opacity: 0.95;
-}
 
 .form-row {
   display: grid;
@@ -345,20 +313,7 @@
   margin: 0 0 24px;
 }
 
-.success-modal__btn {
-  background: var(--color-primary);
-  color: #fff;
-  border: none;
-  padding: 10px 32px;
-  border-radius: 30px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
 
-.success-modal__btn:hover {
-  opacity: 0.9;
-}
 
 /* ---- responsive ---- */
 @media (max-width: 1100px) {
@@ -394,8 +349,7 @@
     grid-template-columns: 1fr;
   }
 
-  .my-appointments-btn,
-  .confirm-btn {
+  .my-appointments-btn {
     width: 100%;
   }
 }

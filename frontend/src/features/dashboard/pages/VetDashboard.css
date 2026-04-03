@@ -1,0 +1,19 @@
+
+.vet-stats-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 800px;
+}
+
+.vet-stats-stack .stat-card {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Specific styling for Vet layout to ensure rows feel balanced */
+@media (max-width: 900px) {
+  .vet-stats-stack {
+    max-width: 100%;
+  }
+}

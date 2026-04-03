@@ -1,16 +1,16 @@
 // File: src/test/java/com/petcarehub/petcarehub/service/PetServiceImplTest.java
 package com.petcarehub.petcarehub.service;
 
-import com.petcarehub.petcarehub.dto.PetRequestDTO;
-import com.petcarehub.petcarehub.dto.PetResponseDTO;
-import com.petcarehub.petcarehub.entity.Pet;
-import com.petcarehub.petcarehub.entity.User;
-import com.petcarehub.petcarehub.enums.PetGender;
-import com.petcarehub.petcarehub.exception.PetNotFoundException;
-import com.petcarehub.petcarehub.exception.UnauthorizedAccessException;
-import com.petcarehub.petcarehub.repository.PetRepository;
-import com.petcarehub.petcarehub.repository.UserRepository;
-import com.petcarehub.petcarehub.service.impl.PetServiceImpl;
+import com.petcarehub.pet.dto.PetRequestDTO;
+import com.petcarehub.pet.dto.PetResponseDTO;
+import com.petcarehub.pet.entity.Pet;
+import com.petcarehub.user.entity.User;
+import com.petcarehub.pet.entity.PetGender;
+import com.petcarehub.exception.PetNotFoundException;
+import com.petcarehub.exception.UnauthorizedAccessException;
+import com.petcarehub.pet.repository.PetRepository;
+import com.petcarehub.user.repository.UserRepository;
+import com.petcarehub.pet.service.impl.PetServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

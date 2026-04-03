@@ -1,4 +1,4 @@
-﻿/* â”€â”€ Doctor Sidebar Extras â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* â”€â”€ Doctor Sidebar Extras â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .doc-sidebar {
   /* Slightly different Sky-blue tinted dark for doctor/vet context */
   background: linear-gradient(180deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
@@ -451,11 +451,18 @@
 
 /* â”€â”€ Add Record button (disabled/coming soon) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .doc-add-record-btn {
-  background: rgba(0, 240, 255, 0.1) !important;
-  color: var(--color-accent-dark) !important;
-  border: 1.5px solid rgba(0, 240, 255, 0.3) !important;
-  opacity: 0.5;
-  cursor: not-allowed !important;
+  background: var(--color-accent) !important;
+  color: white !important;
+  border: none !important;
+  opacity: 1;
+  cursor: pointer !important;
+  transition: all 0.2s ease;
+}
+
+.doc-add-record-btn:hover {
+  background: var(--color-accent-dark) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 240, 255, 0.3);
 }
 
 /* â”€â”€ Responsive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
@@ -485,4 +492,87 @@
   .doc-action-cards {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+/* Treatment List Styles */
+.doc-treatment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.doc-treatment-item {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.doc-treatment-item:hover {
+  border-color: var(--color-accent);
+  background: var(--color-white);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.doc-treatment-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.doc-treatment-date {
+  font-weight: 700;
+  color: var(--color-accent-dark);
+  background: rgba(0, 240, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.doc-treatment-doc {
+  color: var(--color-text-light);
+  font-style: italic;
+}
+
+.doc-treatment-main strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  margin-bottom: 2px;
+}
+
+.doc-treatment-main p {
+  font-size: 0.82rem;
+  color: var(--color-text-light);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.doc-view-all-link {
+  background: none;
+  border: none;
+  color: var(--color-accent-dark);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px 0;
+  text-align: left;
+  transition: color 0.2s;
+}
+
+.doc-view-all-link:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.doc-medical-loading {
+  padding: 20px;
+  text-align: center;
+  color: var(--color-text-light);
+  font-size: 0.85rem;
+  font-style: italic;
 }

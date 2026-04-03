@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-export const API_BASE_URL = 'http://localhost:8081';
+/** Empty string = same origin; Vite dev server proxies /api to backend (see vite.config.js). */
+export const API_BASE_URL = typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL != null
+    ? import.meta.env.VITE_API_BASE_URL
+    : '';
 
 const API_BASE = '/api/pets';
 

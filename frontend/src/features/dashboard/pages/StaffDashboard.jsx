@@ -1,0 +1,120 @@
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../../auth/contexts/AuthContext';
+import DashboardLayout from '../components/DashboardLayout';
+import { API_BASE_URL } from '../../../services/petService';
+
+import StaffAllPets from '../../pet/components/staff/StaffAllPets';
+import StaffAllAppointments from '../../appointment/pages/StaffAllAppointments';
+import MyProfile from './profile/MyProfile';
+import PetMedicalRecordPage from '../../medical/pages/PetMedicalRecordPage';
+
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import HealingOutlinedIcon from '@mui/icons-material/HealingOutlined';
+import ContentPasteSearchOutlinedIcon from '@mui/icons-material/ContentPasteSearchOutlined';
+import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import EventNoteIcon from '@mui/icons-material/EventNote';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+
+import '../components/Dashboard.css';
+
+const StaffDashboard = () => {
+  const { user, loading: authLoading } = useAuth();
+  const [stats, setStats] = useState({
+    upcomingCount: 0,
+    loading: true
+  });
+
+  useEffect(() => {
+    const fetchClinicalStats = async () => {
+      try {
+        setStats(prev => ({ ...prev, loading: true }));
+
+        const response = await axios.get(`${API_BASE_URL}/api/appointments`);
+        const data = response.data?.data || response.data || [];
+        const appointments = Array.isArray(data) ? data : [];
+        
+        const upcoming = appointments.filter(a => (a.status || '').toUpperCase() === 'UPCOMING');
+
+        setStats({
+          upcomingCount: upcoming.length,
+          loading: false
+        });
+      } catch (error) {
+        console.error("Failed to fetch staff stats:", error);
+        setStats(prev => ({ ...prev, loading: false }));
+      }
+    };
+
+    fetchClinicalStats();
+  }, []);
+
+  const staffMenu = [
+    { name: 'Home', icon: HomeOutlinedIcon, path: '/' },
+    { name: 'My Dashboard', icon: DashboardIcon, path: '/dashboard' },
+    { name: 'My Profile', icon: PersonOutlineOutlinedIcon, path: '/dashboard/profile' },
+    { name: 'Patient Records', icon: HealingOutlinedIcon, path: '/dashboard/staff-patients' },
+    { name: 'Manage Appointments', icon: ContentPasteSearchOutlinedIcon, path: '/dashboard/staff-appointments' },
+    { name: 'Store Management', icon: StoreOutlinedIcon, path: '/dashboard/store' },
+    { name: 'Settings', icon: SettingsOutlinedIcon, path: '/dashboard/settings' }
+  ];
+
+  if (authLoading) return <div className="loading-state">Loading Staff Dashboard...</div>;
+
+  return (
+    <DashboardLayout menuItems={staffMenu}>
+      <Routes>
+
+        <Route index element={
+          <>
+            <div className="dashboard-header-banner">
+              <h2>Welcome back, {user?.firstName}!</h2>
+              <p>Manage clinic schedule and shop inventory.</p>
+            </div>
+
+            <div className="dashboard-stats-grid">
+              <div className="stat-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div>
+                    <h3>Upcoming Appointments</h3>
+                    <p>{stats.loading ? '...' : `${stats.upcomingCount} clinical sessions`}</p>
+                  </div>
+                  <EventNoteIcon style={{ color: '#2dd4bf', opacity: 0.8, fontSize: '32px' }} />
+                </div>
+              </div>
+
+              <div className="stat-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div>
+                    <h3>Current Orders</h3>
+                    <p style={{ fontSize: '14px', color: 'var(--color-text-light)', fontWeight: 500 }}>Coming Soon</p>
+                  </div>
+                  <ShoppingCartIcon style={{ color: '#f59e0b', opacity: 0.8, fontSize: '32px' }} />
+                </div>
+              </div>
+            </div>
+          </>
+        } />
+
+        {/* --- NESTED ROUTES --- */}
+        {/* This renders the All Pets searchable table inside the dashboard */}
+        <Route path="staff-patients" element={<StaffAllPets />} />
+
+        <Route path="profile" element={<MyProfile />} />
+
+        {/* Placeholder for Appointments */}
+        <Route path="staff-appointments" element={<StaffAllAppointments />} />
+        <Route path="pet-medical-record" element={<PetMedicalRecordPage />} />
+
+        {/* Catch-all to redirect back to main dashboard if path is wrong */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </DashboardLayout>
+  );
+};
+
+export default StaffDashboard;
