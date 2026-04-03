@@ -36,9 +36,12 @@ VALUES
 (2, 'Premium Dog Food', 'Premium dog food - Beef',    300.00, 200, NULL, NULL);
 
 -- ============================================================
--- CART (seed: user 1 has 2 items)
+-- CART (seed: user 1 and user 2 have items)
 -- ============================================================
-INSERT IGNORE INTO cart (cart_id, user_id, product_id, quantity)
+DELETE FROM cart WHERE user_id IN (1, 2);
+INSERT INTO cart (cart_id, user_id, product_id, quantity)
 VALUES
 (1, 1, 1, 1),
-(2, 1, 2, 1);
+(2, 1, 2, 1),
+(3, 2, 1, 2),
+(4, 2, 2, 1);

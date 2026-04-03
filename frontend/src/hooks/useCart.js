@@ -13,8 +13,10 @@ export function useCart() {
     setError("");
     try {
       const data = await cartService.getCart(userId);
+      console.log("Cart data received:", data);
       setCart(data);
-    } catch {
+    } catch (err) {
+      console.error("Cart fetch error:", err);
       setError("Failed to load cart. Make sure backend is running.");
     } finally {
       setLoading(false);
