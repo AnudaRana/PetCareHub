@@ -75,7 +75,7 @@ const OwnerDashboard = () => {
     { name: 'My Pets', icon: PetsOutlinedIcon, path: '/dashboard/pets' },
     { name: 'My Appointments', icon: CalendarTodayIcon, path: '/dashboard/appointments' },
     { name: 'Doctor Channeling', icon: BookOnlineOutlinedIcon, path: '/dashboard/doctor-channeling' },
-    { name: 'Shop', icon: StoreIcon, path: '/dashboard/shop' },
+    { name: 'Shop', icon: StoreIcon, path: '/store' },
   ];
 
   if (!user) return <div>Loading...</div>;

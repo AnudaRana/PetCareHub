@@ -8,7 +8,7 @@ import ForgotPasswordEmail from './features/auth/pages/ForgotPasswordEmail';
 import ForgotPasswordOtp from './features/auth/pages/ForgotPasswordOtp';
 import ResetPassword from './features/auth/pages/ResetPassword';
 import RoleDashboard from './features/dashboard/pages/RoleDashboard';
-
+import PetStorePage from './features/store/pages/PetStorePage';
 
 const Protected = ({ children }) => {
   const { token, loading } = useAuth();
@@ -30,6 +30,7 @@ const App = () => (
       <Route path="/forgot-password" element={<ForgotPasswordEmail />} />
       <Route path="/verify-otp" element={<ForgotPasswordOtp />} />
       <Route path="/reset" element={<ResetPassword />} />
+      <Route path="/store" element={<PetStorePage />} />
 
       <Route
         path="/dashboard/*"

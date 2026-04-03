@@ -33,7 +33,7 @@ const Navbar = () => {
         <li><SLink to='services' smooth={true} offset={-290} duration={500}>Services</SLink></li>
         <li><SLink to='testimonials' smooth={true} offset={-260} duration={500}>Testimonials</SLink></li>
         <li><SLink to='contact' smooth={true} offset={-260} duration={500}>Contact Us</SLink></li>
-        <li>Shop</li>
+        <li>Store</li><li><Link to='/store'>Store</Link></li>
         <li>
           {user ? (
             <Link to='/dashboard' className="profile-pill-link">
