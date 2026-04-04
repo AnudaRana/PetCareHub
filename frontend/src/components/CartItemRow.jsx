@@ -1,5 +1,5 @@
 import React from "react";
-const formatRs = (val) => `Rs ${Number(val || 0).toFixed(0)}`;
+import { formatCurrency } from "../utils/formatters";
 
 export default function CartItemRow({ item, onInc, onDec, onRemove }) {
   return (
@@ -18,7 +18,7 @@ export default function CartItemRow({ item, onInc, onDec, onRemove }) {
 
       <div className="cart-item-info">
         <div className="cart-item-name">{item.name}</div>
-        <div className="cart-item-price">{formatRs(item.price)}</div>
+        <div className="cart-item-price">{formatCurrency(item.price)}</div>
         <button className="cart-remove" onClick={() => onRemove(item.productId)}>Remove</button>
       </div>
 

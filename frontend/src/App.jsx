@@ -1,6 +1,8 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Cart from "./pages/Cart.jsx";
+import OrderDetails from "./pages/OrderDetails.jsx";
+import PaymentInformation from "./pages/PaymentInformation.jsx";
 
 export default function App() {
   return (
@@ -8,8 +10,10 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/cart" replace />} />
         <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout/order-details" element={<OrderDetails />} />
+        <Route path="/checkout/payment/:orderId" element={<PaymentInformation />} />
         <Route path="/dashboard" element={<div style={{ padding: 40 }}>Dashboard Placeholder</div>} />
-        <Route path="/checkout" element={<div style={{ padding: 40 }}>Checkout Placeholder</div>} />
+        <Route path="*" element={<Navigate to="/cart" replace />} />
       </Routes>
     </BrowserRouter>
   );

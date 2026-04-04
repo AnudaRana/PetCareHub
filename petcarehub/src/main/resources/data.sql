@@ -28,6 +28,16 @@ VALUES
 INSERT IGNORE INTO user_roles (user_id, role) VALUES (6, 'STAFF');
 
 -- ============================================================
+-- PETS (seed so owners can select only their registered pets)
+-- ============================================================
+INSERT IGNORE INTO pets (pet_id, name, species, breed, gender, date_of_birth, weight, known_illnesses, pet_image_path, owner_id)
+VALUES
+(1, 'Rocky', 'Dog', 'Golden Retriever', 'MALE', '2021-05-12', 28.4, NULL, NULL, 1),
+(2, 'Luna', 'Cat', 'Persian', 'FEMALE', '2022-01-08', 4.6, NULL, NULL, 1),
+(3, 'Max', 'Dog', 'Beagle', 'MALE', '2020-09-17', 11.8, NULL, NULL, 2),
+(4, 'Milo', 'Cat', 'British Shorthair', 'MALE', '2021-11-02', 5.1, NULL, NULL, 3);
+
+-- ============================================================
 -- PRODUCTS (seed so cart can display without product page)
 -- ============================================================
 INSERT IGNORE INTO product (product_id, name, description, price, stock_quantity, image, image_content_type)

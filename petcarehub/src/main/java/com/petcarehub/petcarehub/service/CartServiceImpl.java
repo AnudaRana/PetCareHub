@@ -34,10 +34,6 @@ public class CartServiceImpl implements CartService {
         }
 
         List<Cart> rows = cartRepository.findByUser_UserId(userId);
-        System.out.println("DEBUG: Found " + rows.size() + " cart rows for user " + userId);
-        for (Cart row : rows) {
-            System.out.println("DEBUG: Cart row - cartId=" + row.getCartId() + ", quantity=" + row.getQuantity());
-        }
 
         Map<Long, Integer> qtyMap = new LinkedHashMap<>();
         Map<Long, Product> productMap = new LinkedHashMap<>();

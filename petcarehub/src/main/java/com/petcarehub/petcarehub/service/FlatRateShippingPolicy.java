@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 
 @Component
 public class FlatRateShippingPolicy implements ShippingPolicy {
-    private static final BigDecimal SHIPPING = BigDecimal.valueOf(600);
+    private static final BigDecimal SHIPPING = BigDecimal.ZERO;
 
     @Override
     public BigDecimal calculate(BigDecimal subTotal) {

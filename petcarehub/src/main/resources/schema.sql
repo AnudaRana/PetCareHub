@@ -98,3 +98,52 @@ CREATE TABLE IF NOT EXISTS cart (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES product(product_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ==============================
+-- ORDERS
+-- ==============================
+CREATE TABLE IF NOT EXISTS orders (
+    order_id BIGINT NOT NULL AUTO_INCREMENT,
+    order_number VARCHAR(50) NOT NULL,
+    owner_id BIGINT NOT NULL,
+    pet_id BIGINT NOT NULL,
+    contact_name VARCHAR(150) NOT NULL,
+    contact_email VARCHAR(255) NOT NULL,
+    contact_number VARCHAR(50) NOT NULL,
+    pickup_date DATE NOT NULL,
+    pickup_time TIME NULL,
+    pickup_location VARCHAR(150) NOT NULL,
+    notes TEXT NULL,
+    order_status VARCHAR(50) NOT NULL,
+    payment_status VARCHAR(50) NOT NULL,
+    item_count INT NOT NULL,
+    sub_total DECIMAL(10,2) NOT NULL,
+    pickup_fee DECIMAL(10,2) NOT NULL,
+    total_amount DECIMAL(10,2) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (order_id),
+    UNIQUE KEY uk_orders_order_number (order_number),
+    KEY idx_orders_owner_payment (owner_id, payment_status),
+    CONSTRAINT fk_orders_owner FOREIGN KEY (owner_id)
+        REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_orders_pet FOREIGN KEY (pet_id)
+        REFERENCES pets(pet_id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ==============================
+-- ORDER ITEMS
+-- ==============================
+CREATE TABLE IF NOT EXISTS order_items (
+    order_item_id BIGINT NOT NULL AUTO_INCREMENT,
+    order_id BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    product_name VARCHAR(100) NOT NULL,
+    unit_price DECIMAL(10,2) NOT NULL,
+    quantity INT NOT NULL,
+    line_total DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY (order_item_id),
+    KEY idx_order_items_order (order_id),
+    CONSTRAINT fk_order_items_order FOREIGN KEY (order_id)
+        REFERENCES orders(order_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
