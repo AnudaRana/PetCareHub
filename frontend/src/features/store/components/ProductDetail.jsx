@@ -35,7 +35,6 @@ const ProductDetail = ({ product: initialProduct, onClose }) => {
     return '🐾';
   };
 
-  const colorList = product.colors ? product.colors.split(',').map(c => c.trim()) : [];
 
   return (
     <div className="product-detail-overlay" onClick={onClose}>
@@ -91,22 +90,6 @@ const ProductDetail = ({ product: initialProduct, onClose }) => {
               </div>
             )}
 
-            {/* Color Selector */}
-            {colorList.length > 0 && (
-              <div className="product-colors-selector">
-                <p className="selector-label">Available Colors:</p>
-                <div className="color-options">
-                  {colorList.map((color, idx) => (
-                    <div 
-                      key={idx} 
-                      className="color-circle" 
-                      style={{ backgroundColor: color.toLowerCase() }}
-                      title={color}
-                    ></div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             <div className="product-detail-description-section">
               <p className="product-detail-description">{product.description}</p>

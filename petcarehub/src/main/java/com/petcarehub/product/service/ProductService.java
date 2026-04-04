@@ -1,6 +1,6 @@
 package com.petcarehub.product.service;
 
-import com.petcarehub.product.dto.ProductResponseDTO;
+import com.petcarehub.product.dto.ProductResponse;
 import com.petcarehub.product.entity.Product;
 import com.petcarehub.product.repository.ProductRepository;
 import com.petcarehub.product.entity.ProductAttribute;
@@ -18,13 +18,13 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductAttributeRepository productAttributeRepository;
 
-    public List<ProductResponseDTO> getAllProducts() {
+    public List<ProductResponse> getAllProducts() {
         return productRepository.findAll().stream()
                 .map(p -> mapToDTO(p, false))
                 .collect(Collectors.toList());
     }
 
-    public ProductResponseDTO getProductDTOById(Long id) {
+    public ProductResponse getProductDTOById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         return mapToDTO(product, true);
@@ -35,10 +35,10 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
-    private ProductResponseDTO mapToDTO(Product product, boolean includeRelated) {
+    private ProductResponse mapToDTO(Product product, boolean includeRelated) {
         ProductAttribute attr = productAttributeRepository.findById(product.getProductId()).orElse(null);
 
-        ProductResponseDTO dto = ProductResponseDTO.builder()
+        ProductResponse dto = ProductResponse.builder()
                 .productId(product.getProductId())
                 .name(product.getName())
                 .description(product.getDescription())
@@ -53,8 +53,9 @@ public class ProductService {
                 .build();
 
         if (includeRelated) {
-            List<ProductResponseDTO> related = productRepository.findAll().stream()
-                    .filter(p -> p.getName().equalsIgnoreCase(product.getName()) && !p.getProductId().equals(product.getProductId()))
+            List<ProductResponse> related = productRepository.findAll().stream()
+                    .filter(p -> p.getName().equalsIgnoreCase(product.getName())
+                            && !p.getProductId().equals(product.getProductId()))
                     .filter(p -> {
                         ProductAttribute a = productAttributeRepository.findById(p.getProductId()).orElse(null);
                         return a != null && a.getBrand() != null && a.getBrand().equalsIgnoreCase(dto.getBrand());
@@ -65,5 +66,17 @@ public class ProductService {
         }
 
         return dto;
+    }
+
+    public List<ProductResponse> searchProducts(String keyword) {
+        return productRepository.searchProduct(keyword).stream()
+                .map(p -> mapToDTO(p, false))
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductResponse> getProductsByCategory(String category) {
+        return productRepository.findByCategoryContainingIgnoreCase(category).stream()
+                .map(p -> mapToDTO(p, false))
+                .collect(Collectors.toList());
     }
 }

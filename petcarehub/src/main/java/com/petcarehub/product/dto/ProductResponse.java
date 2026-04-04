@@ -6,12 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductResponseDTO {
+public class ProductResponse {
     private Long productId;
     private String name;
     private String description;
@@ -24,5 +25,5 @@ public class ProductResponseDTO {
     private String colors;
     private String flavors;
 
-    private java.util.List<ProductResponseDTO> relatedVariants;
+    private List<ProductResponse> relatedVariants;
 }

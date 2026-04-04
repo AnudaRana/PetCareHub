@@ -157,7 +157,7 @@ public class DataInitializer implements CommandLineRunner {
         seedStoreProduct("Nylon Dog Collar", "MyPets", 800, "Adjustable nylon dog collar", "accessories", "40cm (red, blue, black, purple)", "gcl_dg.PNG");
         seedStoreProduct("Cat Harness", "MyPets", 1500, "Various cat harness options", "accessories", "(red, blue, black, purple)", "gcl_ch.png");
         seedStoreProduct("Embark Rope Toy", "Embark", 900, "Rope toy for dogs", "accessories", "Standard", "t_rrt.png");
-        seedStoreProduct("Ball Toy", "MyPets", 700, "Rubber spiky ball for play", "accessories", "Standard (brown, white, multicolor)", "t_pb.png");
+        seedStoreProduct("Ball Toy", "MyPets", 700, "Rubber spiky ball for play", "accessories", "Standard (brown, white, black)", "t_pb.png");
 
         // SUPPLEMENTS
         seedStoreProduct("Beaphar Bone Builder", "Beaphar", 5555, "Enhance Your Pet's Bone Health with Beaphar Bone Builder", "supplements", "standard", "s_b_bb.PNG");

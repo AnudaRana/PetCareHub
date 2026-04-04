@@ -21,16 +21,55 @@ const PetStorePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedProductId, setSelectedProductId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All Products');
 
+  // Categorical Navigation with IDs for filtering
+  const categories = [
+    { name: 'All Products', icon: <AppsIcon style={{ fontSize: '18px' }} /> },
+    { name: 'Dog Food', id: 'dog', icon: <PetsIcon style={{ fontSize: '18px' }} /> },
+    { name: 'Cat Food', id: 'cat', icon: <PetsIcon style={{ fontSize: '18px' }} /> },
+    { name: 'Accessories', id: 'accessories', icon: <LocalMallIcon style={{ fontSize: '18px' }} /> },
+    { name: 'Healthcare', id: 'health', icon: <MedicalServicesIcon style={{ fontSize: '18px' }} /> },
+    { name: 'Grooming', id: 'grooming', icon: <BrushIcon style={{ fontSize: '18px' }} /> },
+    { name: 'Supplements', id: 'supplements', icon: <MedicationLiquidIcon style={{ fontSize: '18px' }} /> }
+  ];
+
+  // Debounced search effect
   useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchProducts();
+    }, 400); // 400ms debounce
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Category change effect
+  useEffect(() => {
+    // Reset search when changing category for a cleaner experience
+    if (activeCategory !== 'All Products') {
+      setSearchTerm('');
+    }
     fetchProducts();
-  }, []);
+  }, [activeCategory]);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const { data } = await productService.getAllProducts();
-      setProducts(data || []);
+      let response;
+      
+      if (searchTerm.trim()) {
+        // 1. Search takes priority
+        response = await productService.searchProducts(searchTerm.trim());
+      } else if (activeCategory !== 'All Products') {
+        // 2. Category fallback
+        const catObj = categories.find(c => c.name === activeCategory);
+        response = await productService.getProductsByCategory(catObj.id);
+      } else {
+        // 3. Default: All Products
+        response = await productService.getAllProducts();
+      }
+
+      setProducts(response.data || []);
       setError(null);
     } catch (err) {
       console.error('Failed to fetch products:', err);
@@ -50,18 +89,6 @@ const PetStorePage = () => {
     ? products.find((p) => p.productId === selectedProductId)
     : null;
 
-  // Categorical Navigation with Icons (Functional filtering disabled per request)
-  const categories = [
-    { name: 'All Products', icon: <AppsIcon style={{ fontSize: '18px' }} /> },
-    { name: 'Dog Food', icon: <PetsIcon style={{ fontSize: '18px' }} /> },
-    { name: 'Cat Food', icon: <PetsIcon style={{ fontSize: '18px' }} /> },
-    { name: 'Accessories', icon: <LocalMallIcon style={{ fontSize: '18px' }} /> },
-    { name: 'Healthcare', icon: <MedicalServicesIcon style={{ fontSize: '18px' }} /> },
-    { name: 'Grooming', icon: <BrushIcon style={{ fontSize: '18px' }} /> },
-    { name: 'Supplements', icon: <MedicationLiquidIcon style={{ fontSize: '18px' }} /> }
-  ];
-  const [activeCategory, setActiveCategory] = useState('All Products');
-
   return (
     <div className="store-page">
       {/* ── Top Bar ──────────────────────────────────────────────────── */}
@@ -74,14 +101,15 @@ const PetStorePage = () => {
 
           <div className="store-topbar-spacer" />
 
-          {/* Search Bar - Moved to Right */}
+          {/* Search Bar - Server-Side Browsing */}
           <div className="store-search-wrapper">
             <SearchIcon className="store-search-icon" />
             <input 
               type="text" 
               className="store-search-input" 
-              placeholder="Search products..." 
-              readOnly
+              placeholder="Search products or brands..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
@@ -126,12 +154,14 @@ const PetStorePage = () => {
           <div className="store-empty">
             <span>🦴</span>
             <h3>No products found</h3>
-            <p>We are restockings our shelves soon. Check back later!</p>
+            <p>We couldn't find anything matching your search. Try another keyword!</p>
           </div>
         ) : (
           <>
             <p className="store-result-count">
-              Showing <strong>{products.length}</strong> product{products.length !== 1 ? 's' : ''}
+              Showing <strong>{products.length}</strong> product{products.length !== 1 ? 's' : ''} 
+              {searchTerm && ` for "${searchTerm}"`}
+              {activeCategory !== 'All Products' && !searchTerm && ` in ${activeCategory}`}
             </p>
             <div className="store-grid">
               {products.map((product) => (
