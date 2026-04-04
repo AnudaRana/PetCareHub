@@ -32,10 +32,14 @@ public class Product {
     @Column(name = "stock_quantity", nullable = false)
     private Integer stockQuantity;
 
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    private byte[] image;
+
+    @Column
+    private String imageUrl;
 
     @Column(name = "image_content_type")
     private String imageContentType;
+
+    @Column
+    private String category;
+
 }

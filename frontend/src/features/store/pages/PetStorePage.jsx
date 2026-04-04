@@ -1,24 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import ProductDetail from '../components/ProductDetail';
-import { ALL_VARIANT_CARDS, PRODUCT_GROUPS } from '../data/products';
+import productService from '../../../services/productService';
 import './PetStore.css';
+import logo from '../../../assets/logo-weyes.png'
 
-import TuneIcon from '@mui/icons-material/Tune';
+import AppsIcon from '@mui/icons-material/Apps';
+import PetsIcon from '@mui/icons-material/Pets';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
+import LocalMallIcon from '@mui/icons-material/LocalMall';
+import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
+import MedicationLiquidIcon from '@mui/icons-material/MedicationLiquid';
+import BrushIcon from '@mui/icons-material/Brush';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import SearchIcon from '@mui/icons-material/Search';
+
 
 const PetStorePage = () => {
-  const [selectedGroupId, setSelectedGroupId] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedProductId, setSelectedProductId] = useState(null);
 
-  const handleCardClick = (variantCard) => {
-    setSelectedGroupId(variantCard.groupId);
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const { data } = await productService.getAllProducts();
+      setProducts(data || []);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to fetch products:', err);
+      setError('Wait a moment, we are fetching the latest products for you...');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCloseDetail = () => setSelectedGroupId(null);
+  const handleCardClick = (product) => {
+    setSelectedProductId(product.productId);
+  };
 
-  const selectedGroup = selectedGroupId
-    ? PRODUCT_GROUPS.find((g) => g.id === selectedGroupId)
+  const handleCloseDetail = () => setSelectedProductId(null);
+
+  const selectedProduct = selectedProductId
+    ? products.find((p) => p.productId === selectedProductId)
     : null;
+
+  // Categorical Navigation with Icons (Functional filtering disabled per request)
+  const categories = [
+    { name: 'All Products', icon: <AppsIcon style={{ fontSize: '18px' }} /> },
+    { name: 'Dog Food', icon: <PetsIcon style={{ fontSize: '18px' }} /> },
+    { name: 'Cat Food', icon: <PetsIcon style={{ fontSize: '18px' }} /> },
+    { name: 'Accessories', icon: <LocalMallIcon style={{ fontSize: '18px' }} /> },
+    { name: 'Healthcare', icon: <MedicalServicesIcon style={{ fontSize: '18px' }} /> },
+    { name: 'Grooming', icon: <BrushIcon style={{ fontSize: '18px' }} /> },
+    { name: 'Supplements', icon: <MedicationLiquidIcon style={{ fontSize: '18px' }} /> }
+  ];
+  const [activeCategory, setActiveCategory] = useState('All Products');
 
   return (
     <div className="store-page">
@@ -26,19 +68,26 @@ const PetStorePage = () => {
       <header className="store-topbar">
         <div className="store-topbar-inner">
           <div className="store-brand">
-            <span className="store-brand-emoji">🐾</span>
+            <img src={logo} alt="PetCareHub Logo" className="store-logo" />
             <span className="store-brand-name">Pet Store</span>
           </div>
 
           <div className="store-topbar-spacer" />
 
-          {/* Action buttons (placeholders) */}
+          {/* Search Bar - Moved to Right */}
+          <div className="store-search-wrapper">
+            <SearchIcon className="store-search-icon" />
+            <input 
+              type="text" 
+              className="store-search-input" 
+              placeholder="Search products..." 
+              readOnly
+            />
+          </div>
+
+          {/* Action buttons (Cart only as requested) */}
           <div className="store-actions">
-            <button id="store-filter-btn" className="store-action-btn" title="Filters (coming soon)" disabled>
-              <TuneIcon />
-              <span className="store-action-label">Filter</span>
-            </button>
-            <button id="store-cart-btn" className="store-action-btn store-cart-btn" title="Cart (coming soon)" disabled>
+            <button id="store-cart-btn" className="store-action-btn store-cart-btn" title="Cart (coming soon)">
               <ShoppingCartOutlinedIcon />
               <span className="store-cart-badge">0</span>
             </button>
@@ -46,25 +95,60 @@ const PetStorePage = () => {
         </div>
       </header>
 
-      {/* ── Product Grid ─────────────────────────────────────────────── */}
-      <main className="store-main">
-        <p className="store-result-count">
-          Showing <strong>{ALL_VARIANT_CARDS.length}</strong> product{ALL_VARIANT_CARDS.length !== 1 ? 's' : ''}
-        </p>
-        <div className="store-grid">
-          {ALL_VARIANT_CARDS.map((card) => (
-            <ProductCard
-              key={card.variantId}
-              card={card}
-              onClick={() => handleCardClick(card)}
-            />
+      {/* ── Category Filter  ─────────────────────────────── */}
+      <nav className="store-categories">
+        <div className="store-categories-inner">
+          {categories.map((cat) => (
+            <button
+              key={cat.name}
+              className={`store-cat-pill ${activeCategory === cat.name ? 'active' : ''}`}
+              onClick={() => setActiveCategory(cat.name)}
+            >
+              <span className="cat-icon">{cat.icon}</span>
+              <span className="cat-label">{cat.name}</span>
+            </button>
           ))}
         </div>
+      </nav>
+
+      {/* ── Product Grid ─────────────────────────────────────────────── */}
+      <main className="store-main">
+        {loading ? (
+          <div className="store-loading">
+            <p>Fetching premium pet products...</p>
+          </div>
+        ) : error ? (
+          <div className="store-error">
+            <p>{error}</p>
+            <button className="btn btn-teal" onClick={fetchProducts}>Try Again</button>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="store-empty">
+            <span>🦴</span>
+            <h3>No products found</h3>
+            <p>We are restockings our shelves soon. Check back later!</p>
+          </div>
+        ) : (
+          <>
+            <p className="store-result-count">
+              Showing <strong>{products.length}</strong> product{products.length !== 1 ? 's' : ''}
+            </p>
+            <div className="store-grid">
+              {products.map((product) => (
+                <ProductCard
+                  key={product.productId}
+                  product={product}
+                  onClick={() => handleCardClick(product)}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </main>
 
       {/* ── Product Detail Modal ─────────────────────────────────────── */}
-      {selectedGroup && (
-        <ProductDetail group={selectedGroup} onClose={handleCloseDetail} />
+      {selectedProduct && (
+        <ProductDetail product={selectedProduct} onClose={handleCloseDetail} />
       )}
     </div>
   );
