@@ -4,26 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3e9a5bbe-cc8c-4360-9af7-fd0af1f1dc7b" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_3_5_2026_12_48_AM_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_3_5_2026_12_48_AM_[Changes]1/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_3_5_2026_12_48_AM__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/CartItemRow.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/CartItemRow.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/CartStepper.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/CartStepper.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/CartSummary.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/CartSummary.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/hooks/useCart.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/hooks/useCart.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Cart.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Cart.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/styles/Cart.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/Cart.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/petcarehub/repository/CartRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/petcarehub/repository/CartRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/petcarehub/service/CartServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/petcarehub/service/CartServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/petcarehub/service/FlatRateShippingPolicy.java" beforeDir="false" afterPath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/petcarehub/service/FlatRateShippingPolicy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/petcarehub/src/main/resources/data.sql" beforeDir="false" afterPath="$PROJECT_DIR$/petcarehub/src/main/resources/data.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/petcarehub/src/main/resources/schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/petcarehub/src/main/resources/schema.sql" afterDir="false" />
+    <list default="true" id="5921f366-8bee-40d5-bb2d-5a1dc49919ec" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../../personalTest/petcarehub(2)" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,13 +13,12 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
   </component>
   <component name="ProjectColorInfo">{
-  &quot;customColor&quot;: &quot;&quot;,
-  &quot;associatedIndex&quot;: 6
+  &quot;associatedIndex&quot;: 3
 }</component>
-  <component name="ProjectId" id="3BrL1ffcsrS1MpEbwYZeY2zyAFv" />
+  <component name="ProjectId" id="3BvyrXtyjvsytDsFPGG9anXnK61" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -45,15 +26,50 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.PetcarehubApplication.executor": "Run",
+    "Application.com.petcarehub.PetcarehubApplication.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "feature/cart-and-payment-management",
+    "git-widget-placeholder": "master",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/ranas/OneDrive/Documents/PetCareHub - Sprint 2/PetCareHub"
+    "last_opened_file_path": "C:/Users/ranas/OneDrive/Documents/PetCareHub - Sprint 2/PetCareHub-restructured-like-zip2/PetCareHub-development"
   }
 }]]></component>
+  <component name="RunManager" selected="Application.com.petcarehub.PetcarehubApplication">
+    <configuration name="PetcarehubApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.petcarehub.petcarehub.PetcarehubApplication" />
+      <module name="petcarehub" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.petcarehub.petcarehub.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="com.petcarehub.PetcarehubApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.petcarehub.PetcarehubApplication" />
+      <module name="petcarehub" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.petcarehub.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.com.petcarehub.PetcarehubApplication" />
+        <item itemvalue="Application.PetcarehubApplication" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -63,11 +79,11 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="3e9a5bbe-cc8c-4360-9af7-fd0af1f1dc7b" name="Changes" comment="" />
-      <created>1775242030442</created>
+      <changelist id="5921f366-8bee-40d5-bb2d-5a1dc49919ec" name="Changes" comment="" />
+      <created>1775384038129</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1775242030442</updated>
+      <updated>1775384038129</updated>
     </task>
     <servers />
   </component>
