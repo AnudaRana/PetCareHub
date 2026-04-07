@@ -9,6 +9,9 @@ import ForgotPasswordOtp from './features/auth/pages/ForgotPasswordOtp';
 import ResetPassword from './features/auth/pages/ResetPassword';
 import RoleDashboard from './features/dashboard/pages/RoleDashboard';
 import PetStorePage from './features/store/pages/PetStorePage';
+import Cart from "./features/cart/pages/Cart.jsx";
+import OrderDetails from "./features/cart/pages/OrderDetails.jsx";
+import PaymentPage from "./features/cart/pages/PaymentPage.jsx";
 
 const Protected = ({ children }) => {
   const { token, loading } = useAuth();
@@ -31,6 +34,9 @@ const App = () => (
       <Route path="/verify-otp" element={<ForgotPasswordOtp />} />
       <Route path="/reset" element={<ResetPassword />} />
       <Route path="/store" element={<PetStorePage />} />
+      <Route path="/cart" element={<Cart />} />
+      <Route path="/checkout/order-details" element={<OrderDetails />} />
+      <Route path="/checkout/payment/:orderId" element={<PaymentPage />} />
 
       <Route
         path="/dashboard/*"
@@ -41,7 +47,6 @@ const App = () => (
         }
       />
       
-
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </Router>
