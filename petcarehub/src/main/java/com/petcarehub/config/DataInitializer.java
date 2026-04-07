@@ -26,6 +26,7 @@ public class DataInitializer implements CommandLineRunner {
     private final PetRepository petRepository;
     private final com.petcarehub.product.repository.ProductRepository productRepository;
     private final com.petcarehub.product.repository.ProductAttributeRepository productAttributeRepository;
+    private final com.petcarehub.order.repository.OrderRepository orderRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -95,6 +96,23 @@ public class DataInitializer implements CommandLineRunner {
 
         // ── Product Store seed ────────────────────────────────────────────────
         seedStoreCatalog();
+
+        // TODO: Delete these dummy orders when no longer needed
+        // ── Dummy Orders ──────────────────────────────────────────────────────
+        java.util.List<Pet> allPets = petRepository.findAll();
+        java.util.List<com.petcarehub.product.entity.Product> allProducts = productRepository.findAll();
+        
+        if (owner_1 != null) {
+            Pet pet1 = allPets.stream().filter(p -> p.getOwner().getUserId().equals(owner_1.getUserId())).findFirst().orElse(null);
+            seedDummyOrder(owner_1, pet1, allProducts, "DUM1", com.petcarehub.order.entity.OrderStatus.PENDING);
+            seedDummyOrder(owner_1, pet1, allProducts, "DUM2", com.petcarehub.order.entity.OrderStatus.COMPLETED);
+            seedDummyOrder(owner_1, pet1, allProducts, "DUM3", com.petcarehub.order.entity.OrderStatus.CANCELLED);
+        }
+        if (owner_2 != null) {
+            Pet pet2 = allPets.stream().filter(p -> p.getOwner().getUserId().equals(owner_2.getUserId())).findFirst().orElse(null);
+            seedDummyOrder(owner_2, pet2, allProducts, "DUM4", com.petcarehub.order.entity.OrderStatus.READY);
+            seedDummyOrder(owner_2, pet2, allProducts, "DUM5", com.petcarehub.order.entity.OrderStatus.PENDING);
+        }
     }
 
     private void seedStoreCatalog() {
@@ -215,6 +233,46 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private void seedDummyOrder(User owner, Pet pet, java.util.List<com.petcarehub.product.entity.Product> products, String orderNumPrefix, com.petcarehub.order.entity.OrderStatus status) {
+        if (owner == null || pet == null || products.isEmpty()) return;
+
+        boolean exists = orderRepository.findAll().stream().anyMatch(o -> o.getOrderNumber().startsWith(orderNumPrefix));
+        if (exists) return;
+
+        com.petcarehub.order.entity.Order order = new com.petcarehub.order.entity.Order();
+        order.setOrderNumber(orderNumPrefix + "-" + java.util.UUID.randomUUID().toString().substring(0, 5).toUpperCase());
+        order.setUser(owner);
+        order.setPet(pet);
+        order.setOwnerFullName(owner.getFirstName() + " " + owner.getLastName());
+        order.setOwnerEmail(owner.getEmail());
+        order.setContactNumber(owner.getMobileNumber() != null ? owner.getMobileNumber() : "0700000000");
+        order.setPickupDate(java.time.LocalDate.now().plusDays(2));
+        order.setAdditionalNotes("Dummy order note: " + orderNumPrefix);
+        order.setPickupFee(java.math.BigDecimal.ZERO);
+        order.setOrderStatus(status);
+        order.setPaymentStatus("PAID");
+        order.setPaymentMethod("CREDIT_CARD");
+
+        // Take a random product based on orderNumPrefix length or hash to get some variety
+        com.petcarehub.product.entity.Product product = products.get(Math.abs(orderNumPrefix.hashCode()) % products.size());
+        com.petcarehub.order.entity.OrderItem item = new com.petcarehub.order.entity.OrderItem();
+        item.setOrder(order);
+        item.setProduct(product);
+        item.setProductName(product.getName());
+        item.setProductPrice(product.getPrice());
+        item.setQuantity(2);
+        item.setLineTotal(product.getPrice().multiply(java.math.BigDecimal.valueOf(2)));
+        
+        java.util.List<com.petcarehub.order.entity.OrderItem> items = new java.util.ArrayList<>();
+        items.add(item);
+        order.setOrderItems(items);
+        order.setSubTotal(item.getLineTotal());
+        order.setTotal(item.getLineTotal());
+
+        orderRepository.save(order);
+        System.out.println("[DataInitializer] Created dummy order: " + order.getOrderNumber() + " for " + owner.getEmail());
+    }
 
     private void seedAdminUser() {
         final String adminEmail = "prasannapradeepkumara90@gmail.com";

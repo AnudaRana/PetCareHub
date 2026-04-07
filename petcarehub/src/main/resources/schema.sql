@@ -107,3 +107,69 @@ CREATE TABLE IF NOT EXISTS product_attribute (
     CONSTRAINT fk_product_attribute_product FOREIGN KEY (product_id)
         REFERENCES product(product_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
+-- CART TABLE
+-- ============================================================
+CREATE TABLE IF NOT EXISTS cart (
+                                    cart_id BIGINT NOT NULL AUTO_INCREMENT,
+                                    user_id BIGINT NOT NULL,
+                                    product_id BIGINT NOT NULL,
+                                    quantity INT NOT NULL,
+                                    PRIMARY KEY (cart_id),
+    CONSTRAINT fk_cart_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_cart_product FOREIGN KEY (product_id) REFERENCES product(product_id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- ============================================================
+-- ORDERS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS orders (
+                                      order_id                      BIGINT           NOT NULL AUTO_INCREMENT,
+                                      order_number                  VARCHAR(50)      UNIQUE,
+                                      user_id                       BIGINT           NOT NULL,
+                                      pet_id                        BIGINT           NOT NULL,
+                                      owner_full_name               VARCHAR(150)     NOT NULL,
+                                      owner_email                   VARCHAR(150)     NOT NULL,
+                                      contact_number                VARCHAR(50)      NOT NULL,
+                                      pickup_date                   DATE             NOT NULL,
+                                      additional_notes              TEXT,
+                                      sub_total                     DECIMAL(10, 2)   NOT NULL,
+                                      pickup_fee                    DECIMAL(10, 2)   NOT NULL DEFAULT 0.00,
+                                      total                         DECIMAL(10, 2)   NOT NULL,
+                                      order_status                  VARCHAR(40)      NOT NULL,
+                                      payment_status                VARCHAR(40)      NOT NULL,
+                                      payment_method                VARCHAR(40),
+                                      bank_name                     VARCHAR(100),
+                                      bank_account_name             VARCHAR(100),
+                                      bank_account_number           VARCHAR(50),
+                                      bank_branch                   VARCHAR(100),
+                                      payment_receipt_file_name     VARCHAR(255),
+                                      payment_receipt_content_type  VARCHAR(100),
+                                      payment_receipt               LONGBLOB,
+                                      created_at                    DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                      updated_at                    DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                      placed_at                     DATETIME,
+                                      PRIMARY KEY (order_id),
+                                      UNIQUE KEY uk_orders_order_number (order_number),
+                                      CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+                                      CONSTRAINT fk_orders_pet FOREIGN KEY (pet_id) REFERENCES pets(pet_id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
+-- ORDER ITEMS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS order_items (
+                                           order_item_id BIGINT NOT NULL AUTO_INCREMENT,
+                                           order_id      BIGINT          NOT NULL,
+                                           product_id    BIGINT          NOT NULL,
+                                           product_name  VARCHAR(100)    NOT NULL,
+                                           product_price DECIMAL(10, 2)  NOT NULL,
+                                           quantity      INT             NOT NULL,
+                                           line_total    DECIMAL(10, 2)  NOT NULL,
+                                           PRIMARY KEY (order_item_id),
+                                           CONSTRAINT fk_order_items_order FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+                                           CONSTRAINT fk_order_items_product FOREIGN KEY (product_id) REFERENCES product(product_id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+

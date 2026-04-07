@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import DashboardLayout from '../components/DashboardLayout';
 import { getPetsByOwner } from '../../../services/petService';
+import { getOwnerOrders } from '../../../services/orderService';
 
 // Import the actual page content components
 import MyPets from '../../pet/components/owner/MyPets';
@@ -11,6 +12,8 @@ import MyProfile from './profile/MyProfile';
 import DoctorChanneling from '../../appointment/pages/DoctorChanneling';
 import MyAppointments from '../../appointment/pages/MyAppointments';
 import PetMedicalRecordPage from '../../medical/pages/PetMedicalRecordPage';
+import MyOrders from '../../order/pages/MyOrders';
+import OrderDetails from '../../order/pages/OrderDetails';
 
 // Icons
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -24,17 +27,22 @@ import HistoryIcon from '@mui/icons-material/History';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import VaccinesIcon from '@mui/icons-material/Vaccines';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 
 import './OwnerDashboard.css';
 
 const OwnerDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     petCount: 0,
     upcomingCount: 0,
     totalCount: 0,
     loading: true
   });
+  const [latestOrders, setLatestOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
 
   useEffect(() => {
     if (!user?.userId) return;
@@ -64,8 +72,22 @@ const OwnerDashboard = () => {
         setStats(prev => ({ ...prev, loading: false }));
       }
     };
+    
+    const fetchOrders = async () => {
+      try {
+        setOrdersLoading(true);
+        const res = await getOwnerOrders(user.userId);
+        // show up to 3 most recent
+        setLatestOrders((res.data || []).slice(0, 3));
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+      } finally {
+        setOrdersLoading(false);
+      }
+    };
 
     fetchStats();
+    fetchOrders();
   }, [user?.userId]);
 
   const ownerMenu = [
@@ -94,16 +116,62 @@ const OwnerDashboard = () => {
             <div className="owner-stats-layout">
               <div className="order-history-column">
                 <div className="order-history-card">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                     <div>
                       <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#0a0f23' }}>Order History</h3>
                       <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#666' }}>Your recent purchases</p>
                     </div>
-                    <ShoppingCartIcon style={{ color: '#ec4899', opacity: 0.8 }} />
+                    <button 
+                      className="btn btn-dark-blue"
+                      onClick={() => navigate('/dashboard/my-orders')}
+                      style={{ 
+                        display: 'flex', alignItems: 'center', gap: '4px',
+                        padding: '6px 16px', fontSize: '0.85rem'
+                      }}>
+                      <FormatListBulletedIcon fontSize="small" /> My Orders
+                    </button>
                   </div>
                   <div className="order-history-content">
-                    <p style={{ margin: 0 }}>No history found yet</p>
-                    <span style={{ fontSize: '12px', opacity: 0.6, marginTop: '8px' }}>Coming Soon</span>
+                    {ordersLoading ? (
+                      <p style={{ margin: 0 }}>Loading orders...</p>
+                    ) : latestOrders.length > 0 ? (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        {latestOrders.map(order => (
+                          <div key={order.orderId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                            <div>
+                              <p style={{ margin: '0 0 4px 0', fontWeight: 600, fontSize: '0.9rem' }}>{order.orderNumber}</p>
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                                  {new Date(order.createdAt).toLocaleDateString()}
+                                </span>
+                                <span style={{ 
+                                  fontSize: '0.75rem', padding: '2px 8px', borderRadius: '12px', fontWeight: 600,
+                                  backgroundColor: order.orderStatus === 'PENDING' ? '#fef3c7' : 
+                                                   order.orderStatus === 'COMPLETED' ? '#d1fae5' : 
+                                                   order.orderStatus === 'CANCELLED' ? '#fee2e2' : '#dbeafe',
+                                  color: order.orderStatus === 'PENDING' ? '#d97706' : 
+                                         order.orderStatus === 'COMPLETED' ? '#059669' : 
+                                         order.orderStatus === 'CANCELLED' ? '#dc2626' : '#2563eb'
+                                }}>
+                                  {order.orderStatus}
+                                </span>
+                              </div>
+                            </div>
+                            <button 
+                              className="btn btn-dark-blue"
+                              onClick={() => navigate(`/dashboard/order-details/${order.orderId}`)}
+                              style={{
+                                display: 'flex', alignItems: 'center', gap: '4px',
+                                padding: '4px 12px', fontSize: '0.8rem'
+                              }}>
+                              <VisibilityIcon style={{ fontSize: '14px' }} /> View
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p style={{ margin: 0, color: '#6b7280', fontSize: '0.9rem' }}>No orders found yet</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -169,6 +237,8 @@ const OwnerDashboard = () => {
         <Route path="appointments" element={<MyAppointments />} />
         <Route path="doctor-channeling" element={<DoctorChanneling />} />
         <Route path="pet-medical-record" element={<PetMedicalRecordPage />} />
+        <Route path="my-orders" element={<MyOrders />} />
+        <Route path="order-details/:orderId" element={<OrderDetails />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

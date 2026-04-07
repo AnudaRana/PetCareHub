@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import DashboardLayout from '../components/DashboardLayout';
@@ -9,6 +9,9 @@ import StaffAllPets from '../../pet/components/staff/StaffAllPets';
 import StaffAllAppointments from '../../appointment/pages/StaffAllAppointments';
 import MyProfile from './profile/MyProfile';
 import PetMedicalRecordPage from '../../medical/pages/PetMedicalRecordPage';
+import ManageOrders from '../../order/pages/ManageOrders';
+import OrderDetails from '../../order/pages/OrderDetails';
+import { getPendingOrders } from '../../../services/orderService';
 
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -19,15 +22,20 @@ import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 
 import '../components/Dashboard.css';
 
 const StaffDashboard = () => {
   const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     upcomingCount: 0,
     loading: true
   });
+  const [pendingOrders, setPendingOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
 
   useEffect(() => {
     const fetchClinicalStats = async () => {
@@ -50,7 +58,20 @@ const StaffDashboard = () => {
       }
     };
 
+    const fetchOrders = async () => {
+      try {
+        setOrdersLoading(true);
+        const res = await getPendingOrders();
+        setPendingOrders((res.data || []).slice(0, 3));
+      } catch (error) {
+        console.error("Failed to fetch pending orders:", error);
+      } finally {
+        setOrdersLoading(false);
+      }
+    };
+
     fetchClinicalStats();
+    fetchOrders();
   }, []);
 
   const staffMenu = [
@@ -87,13 +108,58 @@ const StaffDashboard = () => {
                 </div>
               </div>
 
-              <div className="stat-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div className="stat-card" style={{ gridColumn: 'span 2' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                   <div>
                     <h3>Current Orders</h3>
-                    <p style={{ fontSize: '14px', color: 'var(--color-text-light)', fontWeight: 500 }}>Coming Soon</p>
+                    <p style={{ fontSize: '14px', color: 'var(--color-text-light)', fontWeight: 500 }}>Oldest pending orders</p>
                   </div>
-                  <ShoppingCartIcon style={{ color: '#f59e0b', opacity: 0.8, fontSize: '32px' }} />
+                  <button 
+                    className="btn btn-dark-blue"
+                    onClick={() => navigate('/dashboard/manage-orders')}
+                    style={{ 
+                      display: 'flex', alignItems: 'center', gap: '4px',
+                      padding: '6px 16px', fontSize: '0.85rem'
+                    }}>
+                    <ManageAccountsIcon fontSize="small" /> Manage Orders
+                  </button>
+                </div>
+                <div className="order-history-content">
+                  {ordersLoading ? (
+                    <p style={{ margin: 0 }}>Loading orders...</p>
+                  ) : pendingOrders.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      {pendingOrders.map(order => (
+                        <div key={order.orderId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                          <div>
+                            <p style={{ margin: '0 0 4px 0', fontWeight: 600, fontSize: '0.9rem' }}>{order.orderNumber} - {order.ownerFullName}</p>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                              <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                                {new Date(order.createdAt).toLocaleDateString()}
+                              </span>
+                              <span style={{ 
+                                fontSize: '0.75rem', padding: '2px 8px', borderRadius: '12px', fontWeight: 600,
+                                backgroundColor: '#fef3c7', color: '#d97706'
+                              }}>
+                                {order.orderStatus}
+                              </span>
+                            </div>
+                          </div>
+                          <button 
+                            className="btn btn-dark-blue"
+                            onClick={() => navigate(`/dashboard/order-details/${order.orderId}`)}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: '4px',
+                              padding: '4px 12px', fontSize: '0.8rem'
+                            }}>
+                            <VisibilityIcon style={{ fontSize: '14px' }} /> View
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p style={{ margin: 0, color: '#6b7280', fontSize: '0.9rem' }}>No pending orders</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -109,6 +175,8 @@ const StaffDashboard = () => {
         {/* Placeholder for Appointments */}
         <Route path="staff-appointments" element={<StaffAllAppointments />} />
         <Route path="pet-medical-record" element={<PetMedicalRecordPage />} />
+        <Route path="manage-orders" element={<ManageOrders />} />
+        <Route path="order-details/:orderId" element={<OrderDetails />} />
 
         {/* Catch-all to redirect back to main dashboard if path is wrong */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

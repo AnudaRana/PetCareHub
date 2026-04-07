@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import ProductDetail from '../components/ProductDetail';
 import productService from '../../../services/productService';
+import { useAuth } from '../../auth/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import './PetStore.css';
 import logo from '../../../assets/logo-weyes.png'
 
 import AppsIcon from '@mui/icons-material/Apps';
 import PetsIcon from '@mui/icons-material/Pets';
-import SmartToyIcon from '@mui/icons-material/SmartToy';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import MedicationLiquidIcon from '@mui/icons-material/MedicationLiquid';
@@ -17,6 +20,8 @@ import SearchIcon from '@mui/icons-material/Search';
 
 
 const PetStorePage = () => {
+  const { token } = useAuth();
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -96,12 +101,12 @@ const PetStorePage = () => {
         <div className="store-topbar-inner">
           <div className="store-brand">
             <img src={logo} alt="PetCareHub Logo" className="store-logo" />
-            <span className="store-brand-name">Pet Store</span>
+            {/*<span className="store-brand-name">Pet Store</span>*/}
           </div>
 
           <div className="store-topbar-spacer" />
 
-          {/* Search Bar - Server-Side Browsing */}
+          {/* Search Bar */}
           <div className="store-search-wrapper">
             <SearchIcon className="store-search-icon" />
             <input 
@@ -113,11 +118,18 @@ const PetStorePage = () => {
             />
           </div>
 
-          {/* Action buttons (Cart only as requested) */}
+          {/* Cart button*/}
           <div className="store-actions">
             <button id="store-cart-btn" className="store-action-btn store-cart-btn" title="Cart (coming soon)">
               <ShoppingCartOutlinedIcon />
               <span className="store-cart-badge">0</span>
+            </button>
+            <button 
+              className="store-action-btn store-cart-btn" 
+              title={token ? "Go to Dashboard" : "Go Home"}
+              onClick={() => navigate(token ? "/dashboard" : "/")}
+            >
+              {token ? <DashboardIcon /> : <HomeOutlinedIcon />}
             </button>
           </div>
         </div>
