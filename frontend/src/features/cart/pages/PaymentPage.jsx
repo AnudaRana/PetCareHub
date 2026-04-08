@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useAuth } from "../../auth/contexts/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 import CheckoutTopbar from "../components/CheckoutTopbar";
 import CartStepper from "../components/CartStepper";
 import CheckoutOrderSummary from "../components/CheckoutOrderSummary";
+import ConfirmationModal from "../components/ConfirmationModal";
 import { orderService } from "../services/orderService";
 
 const PAYMENT_OPTIONS = {
@@ -23,12 +25,15 @@ const PAYMENT_OPTIONS = {
   }
 };
 
-import ConfirmationModal from "../components/ConfirmationModal";
-
 export default function PaymentPage() {
   const navigate = useNavigate();
   const { orderId } = useParams();
-  const userId = useMemo(() => Number(localStorage.getItem("userId") || 1), []);
+  const { user, loading: authLoading } = useAuth();
+  const userId = useMemo(() => {
+    if (user?.userId) return Number(user.userId);
+    const s = localStorage.getItem("userId");
+    return s ? Number(s) : null;
+  }, [user?.userId]);
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -36,16 +41,24 @@ export default function PaymentPage() {
   const [order, setOrder] = useState(null);
   const [selectedMethod, setSelectedMethod] = useState("");
   const [receiptFile, setReceiptFile] = useState(null);
-
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     const loadOrder = async () => {
+      if (authLoading) return;
+      if (!userId) {
+        setError("Unable to detect the logged-in user.");
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       setError("");
+
       try {
         const data = await orderService.getOrder(userId, orderId);
         setOrder(data);
+
         if (data.paymentMethod) {
           setSelectedMethod(data.paymentMethod);
         }
@@ -58,15 +71,19 @@ export default function PaymentPage() {
     };
 
     loadOrder();
-  }, [orderId, userId]);
+  }, [authLoading, orderId, userId]);
 
   const canSubmit = Boolean(selectedMethod);
   const orderPlaced = order?.orderStatus === "PLACED";
 
   const handleMethodSelect = (method) => {
-    if (!PAYMENT_OPTIONS[method].selectable || orderPlaced) return;
+    if (!PAYMENT_OPTIONS[method].selectable || orderPlaced) {
+      return;
+    }
+
     setSelectedMethod(method);
     setError("");
+
     if (method !== "BANK_DEPOSIT") {
       setReceiptFile(null);
     }
@@ -85,6 +102,7 @@ export default function PaymentPage() {
 
     setSubmitting(true);
     setError("");
+
     try {
       const data = await orderService.submitPayment(userId, orderId, selectedMethod, receiptFile);
       setOrder(data);
@@ -99,7 +117,7 @@ export default function PaymentPage() {
   const handleCancelOrderAction = async () => {
     try {
       await orderService.cancelOrder(userId, orderId);
-      navigate("/dashboard");
+      navigate("/cart");
     } catch (err) {
       console.error(err);
       setError("Failed to cancel the order.");

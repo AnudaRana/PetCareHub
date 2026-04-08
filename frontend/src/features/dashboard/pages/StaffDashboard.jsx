@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import DashboardLayout from '../components/DashboardLayout';
@@ -17,13 +17,12 @@ import HealingOutlinedIcon from '@mui/icons-material/HealingOutlined';
 import ContentPasteSearchOutlinedIcon from '@mui/icons-material/ContentPasteSearchOutlined';
 import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
-import EventNoteIcon from '@mui/icons-material/EventNote';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 import '../components/Dashboard.css';
 
 const StaffDashboard = () => {
   const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     upcomingCount: 0,
     loading: true
@@ -33,13 +32,10 @@ const StaffDashboard = () => {
     const fetchClinicalStats = async () => {
       try {
         setStats(prev => ({ ...prev, loading: true }));
-
         const response = await axios.get(`${API_BASE_URL}/api/appointments`);
         const data = response.data?.data || response.data || [];
         const appointments = Array.isArray(data) ? data : [];
-        
         const upcoming = appointments.filter(a => (a.status || '').toUpperCase() === 'UPCOMING');
-
         setStats({
           upcomingCount: upcoming.length,
           loading: false
@@ -49,7 +45,6 @@ const StaffDashboard = () => {
         setStats(prev => ({ ...prev, loading: false }));
       }
     };
-
     fetchClinicalStats();
   }, []);
 
@@ -57,60 +52,80 @@ const StaffDashboard = () => {
     { name: 'Home', icon: HomeOutlinedIcon, path: '/' },
     { name: 'My Dashboard', icon: DashboardIcon, path: '/dashboard' },
     { name: 'My Profile', icon: PersonOutlineOutlinedIcon, path: '/dashboard/profile' },
-    { name: 'Patient Records', icon: HealingOutlinedIcon, path: '/dashboard/staff-patients' },
+    { name: 'All Pets', icon: HealingOutlinedIcon, path: '/dashboard/staff-patients' },
     { name: 'Manage Appointments', icon: ContentPasteSearchOutlinedIcon, path: '/dashboard/staff-appointments' },
-    { name: 'Store Management', icon: StoreOutlinedIcon, path: '/dashboard/store' },
-    { name: 'Settings', icon: SettingsOutlinedIcon, path: '/dashboard/settings' }
+    { name: 'Store Management', icon: StoreOutlinedIcon, path: '/dashboard/store', disabled: true },
+    { name: 'Settings', icon: SettingsOutlinedIcon, path: '/dashboard/settings', disabled: true }
   ];
 
-  if (authLoading) return <div className="loading-state">Loading Staff Dashboard...</div>;
+  if (authLoading) return <div className="loading-state">Syncing Operational Hub...</div>;
 
   return (
     <DashboardLayout menuItems={staffMenu}>
       <Routes>
-
         <Route index element={
-          <>
-            <div className="dashboard-header-banner">
-              <h2>Welcome back, {user?.firstName}!</h2>
-              <p>Manage clinic schedule and shop inventory.</p>
-            </div>
-
-            <div className="dashboard-stats-grid">
-              <div className="stat-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div>
-                    <h3>Upcoming Appointments</h3>
-                    <p>{stats.loading ? '...' : `${stats.upcomingCount} clinical sessions`}</p>
-                  </div>
-                  <EventNoteIcon style={{ color: '#2dd4bf', opacity: 0.8, fontSize: '32px' }} />
-                </div>
+          <div className="animate-fade-up">
+            <div className="staff-home-greeting">
+              <div>
+                <h1>Welcome back, {user?.firstName || 'Staff'}!</h1>
+                <p>Manage clinic schedule, patient intakes, and shop operations.</p>
               </div>
-
-              <div className="stat-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div>
-                    <h3>Current Orders</h3>
-                    <p style={{ fontSize: '14px', color: 'var(--color-text-light)', fontWeight: 500 }}>Coming Soon</p>
-                  </div>
-                  <ShoppingCartIcon style={{ color: '#f59e0b', opacity: 0.8, fontSize: '32px' }} />
-                </div>
+              <div className="staff-role-badge">
+                <span className="doc-sidebar-role-icon">📋</span>
+                CLINIC STAFF
               </div>
             </div>
-          </>
+
+            <div className="staff-stats-grid">
+              <div className="staff-stat-card" style={{ '--accent': '#2dd4bf' }}>
+                <div className="staff-stat-icon">📅</div>
+                <div className="staff-stat-value">{stats.loading ? '...' : stats.upcomingCount}</div>
+                <div className="staff-stat-label">Upcoming</div>
+                <div className="staff-stat-sub">Clinical sessions</div>
+              </div>
+
+              <div className="staff-stat-card" style={{ '--accent': '#f59e0b' }}>
+                <div className="staff-stat-icon">🛒</div>
+                <div className="staff-stat-value">—</div>
+                <div className="staff-stat-label">Stock Alerts</div>
+                <div className="staff-stat-sub">Items below threshold</div>
+              </div>
+
+              <div className="staff-stat-card" style={{ '--accent': '#6366f1' }}>
+                <div className="staff-stat-icon">🔔</div>
+                <div className="staff-stat-value">—</div>
+                <div className="staff-stat-label">Notifications</div>
+                <div className="staff-stat-sub">System updates</div>
+              </div>
+            </div>
+
+            <div className="staff-quick-actions">
+              <h3>Operational Portals</h3>
+              <div className="staff-action-cards">
+                <div className="staff-action-card" onClick={() => navigate('/dashboard/staff-patients')}>
+                  <div className="staff-action-icon">📋</div>
+                  <div className="staff-action-label">Patient Intake</div>
+                  <div className="staff-action-arrow">→</div>
+                </div>
+                <div className="staff-action-card" onClick={() => navigate('/dashboard/staff-appointments')}>
+                  <div className="staff-action-icon">📅</div>
+                  <div className="staff-action-label">Clinic Schedule</div>
+                  <div className="staff-action-arrow">→</div>
+                </div>
+                <div className="staff-action-card" onClick={() => navigate('/dashboard/store')}>
+                  <div className="staff-action-icon">🏬</div>
+                  <div className="staff-action-label">Shop Inventory</div>
+                  <div className="staff-action-arrow">→</div>
+                </div>
+              </div>
+            </div>
+          </div>
         } />
 
-        {/* --- NESTED ROUTES --- */}
-        {/* This renders the All Pets searchable table inside the dashboard */}
         <Route path="staff-patients" element={<StaffAllPets />} />
-
         <Route path="profile" element={<MyProfile />} />
-
-        {/* Placeholder for Appointments */}
         <Route path="staff-appointments" element={<StaffAllAppointments />} />
         <Route path="pet-medical-record" element={<PetMedicalRecordPage />} />
-
-        {/* Catch-all to redirect back to main dashboard if path is wrong */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </DashboardLayout>

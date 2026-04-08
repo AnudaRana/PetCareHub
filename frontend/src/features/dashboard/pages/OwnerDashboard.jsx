@@ -24,6 +24,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import VaccinesIcon from '@mui/icons-material/Vaccines';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 
 import './OwnerDashboard.css';
 
@@ -76,6 +77,7 @@ const OwnerDashboard = () => {
     { name: 'My Appointments', icon: CalendarTodayIcon, path: '/dashboard/appointments' },
     { name: 'Doctor Channeling', icon: BookOnlineOutlinedIcon, path: '/dashboard/doctor-channeling' },
     { name: 'Shop', icon: StoreIcon, path: '/store' },
+    { name: 'Settings', icon: SettingsOutlinedIcon, path: '/dashboard/settings', disabled: true }
   ];
 
   if (!user) return <div>Loading...</div>;
@@ -83,85 +85,79 @@ const OwnerDashboard = () => {
   return (
     <DashboardLayout menuItems={ownerMenu}>
       <Routes>
+
         {/* The default dashboard view (Home) */}
         <Route index element={
-          <>
-            <div className="dashboard-header-banner">
-              <h2>Welcome back, {user?.firstName || user?.email}!</h2>
-              <p>Manage your furry friends and appointments.</p>
+          <div className="animate-fade-up">
+            <div className="doc-home-greeting">
+              <div>
+                <h1>Welcome back, {user?.firstName || user?.email}!</h1>
+                <p>Manage your furry friends, track health records and upcoming clinic visits.</p>
+              </div>
+              <div className="doc-role-badge">
+                <span className="doc-sidebar-role-icon">👤</span>
+                PET OWNER
+              </div>
             </div>
 
-            <div className="owner-stats-layout">
-              <div className="order-history-column">
-                <div className="order-history-card">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#0a0f23' }}>Order History</h3>
-                      <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#666' }}>Your recent purchases</p>
-                    </div>
-                    <ShoppingCartIcon style={{ color: '#ec4899', opacity: 0.8 }} />
-                  </div>
-                  <div className="order-history-content">
-                    <p style={{ margin: 0 }}>No history found yet</p>
-                    <span style={{ fontSize: '12px', opacity: 0.6, marginTop: '8px' }}>Coming Soon</span>
-                  </div>
-                </div>
+            <div className="doc-stats-grid">
+              <div className="doc-stat-card" style={{ '--accent': 'var(--color-primary)' }}>
+                <div className="doc-stat-icon">🐕</div>
+                <div className="doc-stat-value">{stats.loading ? '...' : stats.petCount}</div>
+                <div className="doc-stat-label">Registered Pets</div>
+                <div className="doc-stat-sub">Active profiles</div>
               </div>
 
-              <div className="secondary-stats-grid">
-                <div className="stat-card">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <h3>Registered Pets</h3>
-                      <p>{stats.loading ? '...' : stats.petCount}</p>
-                    </div>
-                    <PetsOutlinedIcon style={{ color: 'var(--color-primary)', opacity: 0.8 }} />
-                  </div>
-                </div>
+              <div className="doc-stat-card" style={{ '--accent': '#2dd4bf' }}>
+                <div className="doc-stat-icon">📅</div>
+                <div className="doc-stat-value">{stats.loading ? '...' : stats.upcomingCount}</div>
+                <div className="doc-stat-label">Upcoming</div>
+                <div className="doc-stat-sub">Next appointments</div>
+              </div>
 
-                <div className="stat-card">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <h3>Upcoming</h3>
-                      <p>{stats.loading ? '...' : stats.upcomingCount}</p>
-                    </div>
-                    <CalendarTodayIcon style={{ color: '#2dd4bf', opacity: 0.8 }} />
-                  </div>
-                </div>
+              <div className="doc-stat-card" style={{ '--accent': '#6366f1' }}>
+                <div className="doc-stat-icon">📜</div>
+                <div className="doc-stat-value">{stats.loading ? '...' : stats.totalCount}</div>
+                <div className="doc-stat-label">Total Visits</div>
+                <div className="doc-stat-sub">Lifetime history</div>
+              </div>
 
-                <div className="stat-card">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <h3>Total Appointments</h3>
-                      <p>{stats.loading ? '...' : stats.totalCount}</p>
-                    </div>
-                    <HistoryIcon style={{ color: '#6366f1', opacity: 0.8 }} />
-                  </div>
-                </div>
+              <div className="doc-stat-card" style={{ '--accent': '#f59e0b' }}>
+                <div className="doc-stat-icon">💊</div>
+                <div className="doc-stat-value">0</div>
+                <div className="doc-stat-label">Vaccinations</div>
+                <div className="doc-stat-sub">Due in 30 days</div>
+              </div>
+            </div>
 
-                <div className="stat-card">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <h3>Current Orders</h3>
-                      <p style={{ fontSize: '14px', color: 'var(--color-text-light)', fontWeight: 500 }}>Coming Soon</p>
-                    </div>
-                    <LocalMallIcon style={{ color: '#f59e0b', opacity: 0.8 }} />
-                  </div>
+            <div className="doc-quick-actions">
+              <h3>Direct Access</h3>
+              <div className="doc-action-cards">
+                <div className="doc-action-card" onClick={() => navigate('/dashboard/pets')}>
+                  <div className="doc-action-icon">🐾</div>
+                  <div className="doc-action-label">My Pets</div>
+                  <div className="doc-action-arrow">→</div>
                 </div>
-
-                <div className="stat-card">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                      <h3>Upcoming Vaccines</h3>
-                      <p style={{ fontSize: '14px', color: 'var(--color-text-light)', fontWeight: 500 }}>Coming Soon</p>
-                    </div>
-                    <VaccinesIcon style={{ color: '#06b6d4', opacity: 0.8 }} />
-                  </div>
+                <div className="doc-action-card" onClick={() => navigate('/dashboard/doctor-channeling')}>
+                  <div className="doc-action-icon">🏥</div>
+                  <div className="doc-action-label">Book Vet</div>
+                  <div className="doc-action-arrow">→</div>
+                </div>
+                <div className="doc-action-card" onClick={() => navigate('/store')}>
+                  <div className="doc-action-icon">🛒</div>
+                  <div className="doc-action-label">Pet Store</div>
+                  <div className="doc-action-arrow">→</div>
+                </div>
+                <div className="doc-action-card" onClick={() => navigate('/dashboard/profile')}>
+                  <div className="doc-action-icon">⚙️</div>
+                  <div className="doc-action-label">Settings</div>
+                  <div className="doc-action-arrow">→</div>
                 </div>
               </div>
             </div>
-          </>
+          </div>
         } />
+
 
         {/* Nested Pages that will appear in the "children" area */}
         <Route path="profile" element={<MyProfile />} />

@@ -2,14 +2,15 @@ import React from 'react';
 import TreatmentCard from './TreatmentCard';
 
 const TreatmentList = ({ treatments, isDoctor, onEdit }) => (
-  <div className="popup-panel">
+  <div className="update-list animate-fade-up">
     {treatments.map((t) => (
       <TreatmentCard key={t.id} treatment={t} isDoctor={isDoctor} onEdit={onEdit} />
     ))}
     {treatments.length === 0 && (
-      <div className="empty-medical-state">
-        <span className="empty-medical-icon">📂</span>
-        <p>No treatments found for this pet.</p>
+      <div className="empty-state" style={{ padding: '40px 20px', border: '2px dashed rgba(0,0,0,0.05)', borderRadius: '12px' }}>
+        <span className="empty-state-icon">📋</span>
+        <h3>No medical session history found</h3>
+        <p>This patient has no treatment or diagnosis records on file.</p>
       </div>
     )}
   </div>

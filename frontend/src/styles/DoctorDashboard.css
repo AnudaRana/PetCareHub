@@ -1,578 +1,187 @@
-/* â”€â”€ Doctor Sidebar Extras â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.doc-sidebar {
-  /* Slightly different Sky-blue tinted dark for doctor/vet context */
-  background: linear-gradient(180deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
-}
+/* ── Doctor Portal Styles ──────────────────────────────────── */
 
-.doc-sidebar-role-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 16px 12px;
-  padding: 8px 14px;
-  background: var(--color-sidebar-active-bg);
-  border: 1px solid rgba(0, 240, 255, 0.25);
-  border-radius: 10px;
-  color: var(--color-accent-light);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.doc-sidebar-role-icon {
-  font-size: 1rem;
-}
-
-.doc-user-avatar {
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark)) !important;
-  box-shadow: 0 2px 10px rgba(0, 240, 255, 0.35) !important;
-}
-
-/* â”€â”€ Doctor Avatar in topbar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.doc-avatar {
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark)) !important;
-}
-
-/* â”€â”€ Doctor Home â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.doc-home {
-  max-width: 1000px;
-}
-
-.doc-home-greeting {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 32px;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.doc-home-greeting h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  margin: 0 0 6px;
-}
-
-.doc-home-greeting p {
-  color: var(--color-text-light);
-  font-size: 0.9rem;
-  margin: 0;
-}
-
-.doc-role-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 20px;
-  background: rgba(0, 240, 255, 0.1);
-  border: 1.5px solid rgba(0, 240, 255, 0.3);
-  border-radius: 20px;
-  color: var(--color-accent-dark);
-  font-weight: 700;
-  font-size: 0.85rem;
-  white-space: nowrap;
-}
-
-/* â”€â”€ Stats Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.doc-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
-.doc-stat-card {
-  background: var(--color-white);
-  border-radius: 14px;
-  padding: 20px 22px;
-  box-shadow: 0 2px 12px rgba(10, 15, 36, 0.07);
-  border-top: 3px solid var(--accent, var(--color-accent));
-  transition: transform 0.18s, box-shadow 0.18s;
-}
-
-.doc-stat-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(10, 15, 36, 0.1);
-}
-
-.doc-stat-icon {
-  font-size: 1.5rem;
-  margin-bottom: 8px;
-}
-
-.doc-stat-value {
-  font-size: 2rem;
-  font-weight: 800;
-  color: var(--accent, var(--color-accent));
-  font-family: 'Playfair Display', serif;
-  line-height: 1;
-}
-
-.doc-stat-label {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--color-text);
-  margin-top: 4px;
-}
-
-.doc-stat-sub {
-  font-size: 0.75rem;
-  color: var(--color-text-light);
-  margin-top: 2px;
-}
-
-/* Inline stat card (used in All Pets) */
-.doc-stat-card-inline {
-  background: var(--color-white);
-  border-radius: 14px;
-  padding: 20px 22px;
-  box-shadow: 0 2px 12px rgba(62, 64, 149, 0.07);
-  border-top: 3px solid var(--accent, var(--color-accent));
-}
-
-/* â”€â”€ Quick Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.doc-quick-actions {
-  margin-top: 8px;
-}
-
-.doc-quick-actions h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--color-text);
-  margin-bottom: 16px;
-}
-
-.doc-action-cards {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-}
-
-.doc-action-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 18px;
-  background: var(--color-white);
-  border: 1.5px solid var(--color-border);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-align: left;
-  font-family: var(--font-family);
-}
-
-.doc-action-card:hover {
-  border-color: var(--color-accent);
-  background: rgba(0, 240, 255, 0.04);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 240, 255, 0.12);
-}
-
-.doc-action-icon {
-  font-size: 1.3rem;
-  flex-shrink: 0;
-}
-
-.doc-action-label {
-  flex: 1;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.doc-action-arrow {
-  color: var(--color-accent);
-  font-size: 1rem;
-  font-weight: 700;
-  opacity: 0;
-  transition: opacity 0.18s;
-}
-
-.doc-action-card:hover .doc-action-arrow {
-  opacity: 1;
-}
-
-/* â”€â”€ Coming Soon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.doc-coming-soon {
-  height: 60vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-}
-
-.doc-coming-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.18), rgba(0, 184, 196, 0.18));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-accent);
-}
-
-.doc-coming-soon h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: 28px;
-  color: var(--color-primary);
-  margin: 0;
-}
-
-.doc-coming-soon p {
-  color: var(--color-text-light);
-  font-size: 14px;
-  text-align: center;
-  max-width: 320px;
-  margin: 0;
-  line-height: 1.6;
-}
-
-.doc-coming-badge {
-  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-dark));
-  color: white;
-  padding: 6px 18px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-/* â”€â”€ Read-only Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.doc-readonly-banner {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 18px;
-  background: rgba(0, 240, 255, 0.07);
-  border: 1.5px solid rgba(0, 240, 255, 0.2);
-  border-radius: 10px;
-  font-size: 0.85rem;
-  color: var(--color-accent-dark);
-  margin-bottom: 20px;
-}
-
-/* â”€â”€ Pets Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .doc-pets-table {
-  background: var(--color-white);
-  border-radius: 14px;
-  border: 1px solid var(--color-border);
-  overflow: hidden;
-  box-shadow: 0 2px 12px rgba(10, 15, 36, 0.05);
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    margin-top: 16px;
+    animation: fadeUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .doc-pets-table-header {
-  display: grid;
-  grid-template-columns: 2fr 1.5fr 1.5fr 0.7fr 0.8fr 1fr;
-  gap: 0;
-  padding: 12px 20px;
-  background: rgba(10, 15, 36, 0.03);
-  border-bottom: 1px solid var(--color-border);
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-text-light);
+    display: grid;
+    grid-template-columns: 2.5fr 1.8fr 1.5fr 0.8fr 0.8fr 1fr;
+    padding: 18px 24px;
+    background: rgba(10, 15, 36, 0.04);
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-light);
 }
 
 .doc-pets-table-row {
-  display: grid;
-  grid-template-columns: 2fr 1.5fr 1.5fr 0.7fr 0.8fr 1fr;
-  gap: 0;
-  padding: 14px 20px;
-  align-items: center;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-  cursor: pointer;
-  transition: background 0.15s;
+    display: grid;
+    grid-template-columns: 2.5fr 1.8fr 1.5fr 0.8fr 0.8fr 1fr;
+    padding: 20px 24px;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .doc-pets-table-row:last-child {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 .doc-pets-table-row:hover {
-  background: rgba(0, 240, 255, 0.04);
+    background: rgba(0, 240, 255, 0.04);
+    padding-left: 32px; /* Subtle slide effect */
 }
 
 .doc-pet-name-cell {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
 .doc-pet-mini-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  overflow: hidden;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(20, 27, 61, 0.15);
 }
 
 .doc-pet-mini-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.doc-pet-mini-avatar span {
-  font-size: 1.1rem;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .doc-view-btn {
-  padding: 6px 14px;
-  background: rgba(0, 240, 255, 0.1);
-  color: var(--color-accent-dark);
-  border: 1.5px solid rgba(0, 240, 255, 0.3);
-  border-radius: 8px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
-  font-family: var(--font-family);
+    padding: 8px 18px;
+    background: rgba(0, 240, 255, 0.1);
+    color: var(--color-primary-dark);
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--font-family);
 }
 
 .doc-view-btn:hover {
-  background: var(--color-accent);
-  color: white;
-  border-color: var(--color-accent);
+    background: var(--color-primary-dark);
+    color: white;
+    border-color: var(--color-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(20, 27, 61, 0.2);
 }
 
-/* â”€â”€ Doctor Pet Detail extras â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Doctor Pet Detail Overlays ────────────────────────────── */
 .doc-pet-detail-panel {
-  max-width: 620px !important;
-}
-
-.doc-pet-detail-header {
-  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-accent-dark)) !important;
-}
-
-.doc-readonly-pill {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 20px;
-  padding: 4px 12px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
-  letter-spacing: 0.05em;
-  backdrop-filter: blur(8px);
+    max-width: 680px !important;
 }
 
 .doc-owner-info-card {
-  background: rgba(0, 240, 255, 0.07);
-  border: 1.5px solid rgba(0, 240, 255, 0.2);
-  border-radius: 12px;
-  padding: 14px 18px;
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+    background: rgba(0, 240, 255, 0.06);
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .doc-owner-info-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--color-accent-dark);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--color-primary-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
 }
 
 .doc-owner-info-value {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--color-text);
+    font-size: 1.1rem;
+    font-weight: 73000;
+    color: var(--color-text);
 }
 
-.doc-owner-info-sub {
-  font-size: 0.75rem;
-  color: var(--color-text-light);
-}
-
-/* â”€â”€ Medical Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Medical Records Section inside Modal ──────────────────── */
 .doc-medical-section {
-  background: rgba(255, 255, 255, 0.5);
-  border: 1.5px solid rgba(0, 0, 0, 0.06);
-  border-radius: 12px;
-  padding: 18px;
-  margin-top: 4px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 18px;
+    padding: 24px;
+    margin-top: 8px;
 }
 
 .doc-medical-title {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--color-text);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.doc-medical-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  gap: 6px;
-  color: var(--color-text-light);
-}
-
-.doc-medical-empty span {
-  font-size: 2rem;
-}
-
-.doc-medical-empty p {
-  font-size: 0.9rem;
-  font-weight: 500;
-  margin: 0;
-  color: var(--color-text-light);
-}
-
-.doc-medical-empty small {
-  font-size: 0.78rem;
-  color: var(--color-text-light);
-  opacity: 0.7;
-}
-
-/* â”€â”€ Add Record button (disabled/coming soon) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-.doc-add-record-btn {
-  background: var(--color-accent) !important;
-  color: white !important;
-  border: none !important;
-  opacity: 1;
-  cursor: pointer !important;
-  transition: all 0.2s ease;
-}
-
-.doc-add-record-btn:hover {
-  background: var(--color-accent-dark) !important;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 240, 255, 0.3);
-}
-
-/* â”€â”€ Responsive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-@media (max-width: 900px) {
-
-  .doc-stats-grid,
-  .doc-action-cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .doc-pets-table-header,
-  .doc-pets-table-row {
-    grid-template-columns: 2fr 1fr 1fr 0.6fr;
-  }
-
-  .doc-pets-table-header span:nth-child(5),
-  .doc-pets-table-header span:nth-child(6),
-  .doc-pets-table-row span:nth-child(5),
-  .doc-pets-table-row span:nth-child(6) {
-    display: none;
-  }
-}
-
-@media (max-width: 600px) {
-
-  .doc-stats-grid,
-  .doc-action-cards {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-/* Treatment List Styles */
-.doc-treatment-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--color-text);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .doc-treatment-item {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 10px;
-  padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  transition: all 0.2s;
+    background: var(--color-white);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: 14px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.2s;
+    margin-bottom: 12px;
 }
 
 .doc-treatment-item:hover {
-  border-color: var(--color-accent);
-  background: var(--color-white);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border-color: var(--color-accent);
+    transform: translateX(4px);
+    box-shadow: var(--shadow-sm);
 }
 
 .doc-treatment-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
 }
 
 .doc-treatment-date {
-  font-weight: 700;
-  color: var(--color-accent-dark);
-  background: rgba(0, 240, 255, 0.1);
-  padding: 2px 8px;
-  border-radius: 4px;
+    font-weight: 800;
+    color: var(--color-primary-dark);
+    background: var(--color-accent-light);
+    padding: 4px 10px;
+    border-radius: 6px;
 }
 
-.doc-treatment-doc {
-  color: var(--color-text-light);
-  font-style: italic;
-}
-
-.doc-treatment-main strong {
-  display: block;
-  font-size: 0.9rem;
-  color: var(--color-text);
-  margin-bottom: 2px;
-}
-
-.doc-treatment-main p {
-  font-size: 0.82rem;
-  color: var(--color-text-light);
-  margin: 0;
-  line-height: 1.4;
-}
-
-.doc-view-all-link {
-  background: none;
-  border: none;
-  color: var(--color-accent-dark);
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-  padding: 8px 0;
-  text-align: left;
-  transition: color 0.2s;
-}
-
-.doc-view-all-link:hover {
-  color: var(--color-primary);
-  text-decoration: underline;
-}
-
-.doc-medical-loading {
-  padding: 20px;
-  text-align: center;
-  color: var(--color-text-light);
-  font-size: 0.85rem;
-  font-style: italic;
+@media (max-width: 1024px) {
+    .doc-pets-table-header, .doc-pets-table-row {
+        grid-template-columns: 2.5fr 1.5fr 1.5fr 1fr;
+    }
+    
+    .doc-pets-table-header span:nth-child(4),
+    .doc-pets-table-header span:nth-child(5),
+    .doc-pets-table-row span:nth-child(4),
+    .doc-pets-table-row span:nth-child(5) {
+        display: none;
+    }
 }

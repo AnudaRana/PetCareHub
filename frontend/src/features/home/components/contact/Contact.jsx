@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import './Contact.css'
+import './contact.css'
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import PhoneEnabledIcon from '@mui/icons-material/PhoneEnabled';
 import PlaceIcon from '@mui/icons-material/Place';

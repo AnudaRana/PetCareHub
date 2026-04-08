@@ -4,7 +4,6 @@ import { useAuth } from '../../auth/contexts/AuthContext';
 import "../../../styles/VetAppointments.css";
 
 const VetAppointments = () => {
-  // Updated to use useAuth from AuthContext
   const { user } = useAuth();
   const userId = user?.userId;
 
@@ -18,22 +17,19 @@ const VetAppointments = () => {
 
   useEffect(() => {
     if (!userId) return;
-
-    axios
-      .get(`/api/appointments/vet/${userId}`)
-      .then((res) => {
-        setAppointments(res.data || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Failed to load vet appointments:", err);
-        setLoading(false);
-      });
+    fetchAppointments();
   }, [userId]);
 
-  const refreshAppointments = async () => {
-    const res = await axios.get(`/api/appointments/vet/${userId}`);
-    setAppointments(res.data || []);
+  const fetchAppointments = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`/api/appointments/vet/${userId}`);
+      setAppointments(res.data || []);
+    } catch (err) {
+      console.error("Failed to load vet appointments:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getStatusClass = (status) => {
@@ -57,7 +53,6 @@ const VetAppointments = () => {
 
   const handleCancel = async () => {
     const trimmedReason = cancelReason.trim();
-
     if (!trimmedReason) {
       setCancelError("Cancellation reason is required.");
       return;
@@ -66,7 +61,6 @@ const VetAppointments = () => {
     try {
       setIsCancelling(true);
       setCancelError("");
-
       await axios.patch(
         `/api/appointments/${selectedAppointment.id}/cancel-by-vet`,
         {
@@ -74,84 +68,82 @@ const VetAppointments = () => {
           reason: trimmedReason,
         }
       );
-
-      await refreshAppointments();
+      await fetchAppointments();
       closeCancelModal();
     } catch (error) {
-      setCancelError(
-        error.response?.data?.message || "Failed to cancel appointment."
-      );
+      setCancelError(error.response?.data?.message || "Failed to cancel appointment.");
     } finally {
       setIsCancelling(false);
     }
   };
 
   return (
-    <div className="vet-appointments-container">
+    <div className="vet-appointments-container animate-fade-up">
       <div className="vet-appointments-card">
-        <div className="vet-appointments-card-header">
-          <h2 className="section-title">Assigned Appointments</h2>
-        </div>
+        <header className="vet-appointments-card-header">
+          <h2 className="section-title">Clinical Daily Schedule</h2>
+          <div className="doc-sidebar-role-badge" style={{ margin: 0, background: 'rgba(20,27,61,0.05)', color: 'var(--color-primary-dark)', border: '1px solid rgba(20,27,61,0.1)' }}>
+            {appointments.filter(a => a.status === 'UPCOMING').length} UPCOMING
+          </div>
+        </header>
 
         {loading ? (
-          <div className="vet-appointments-loading">
-            Loading appointments...
+          <div className="loading-container" style={{ padding: '60px 0' }}>
+            <div className="spinner" />
+            <p style={{ color: 'var(--color-text-light)', marginTop: '16px' }}>Synchronizing schedule...</p>
           </div>
         ) : appointments.length === 0 ? (
-          <div className="vet-appointments-empty">
-            No appointments found.
+          <div className="empty-state" style={{ padding: '60px 20px' }}>
+            <span className="empty-state-icon">📅</span>
+            <h3>No appointments found</h3>
+            <p>You have no clinical sessions registered in the system currently.</p>
           </div>
         ) : (
           <div className="vet-appointments-grid">
             {appointments.map((a) => (
               <div key={a.id} className="vet-appointment-item">
                 <h3>
-                  {a.pet?.name} ({a.pet?.species})
+                  <span>{a.pet?.species === 'Dog' ? '🐕' : a.pet?.species === 'Cat' ? '🐈' : '🐾'}</span>
+                  {a.pet?.name}
                 </h3>
 
                 <div className="vet-appointment-details">
-                  <p>
-                    <strong>Type:</strong> {a.appointmentType}
-                  </p>
-                  <p>
-                    <strong>Date:</strong> {a.date}
-                  </p>
-                  <p>
-                    <strong>Time:</strong> {a.timeSlot}
-                  </p>
-                  <p>
-                    <strong>Owner:</strong> {a.owner?.firstName} {a.owner?.lastName}
-                  </p>
-                  <p>
-                    <strong>Notes:</strong> {a.notes || "None"}
-                  </p>
-                  <p>
-                    <strong>Status:</strong>{" "}
-                    <span className={getStatusClass(a.status)}>
-                      {a.status}
-                    </span>
-                  </p>
+                  <p><strong>Clinical Reason:</strong> <span>{a.appointmentType}</span></p>
+                  <p><strong>Scheduled Date:</strong> <span>{new Date(a.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span></p>
+                  <p><strong>Time Slot:</strong> <span>{a.timeSlot}</span></p>
+                  <p><strong>Primary Owner:</strong> <span>{a.owner?.firstName} {a.owner?.lastName}</span></p>
+                  
+                  <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+                    <p style={{ marginBottom: '8px' }}><strong>Note for Clinician:</strong></p>
+                    <p style={{ display: 'block', fontStyle: 'italic', background: 'rgba(0,0,0,0.02)', padding: '10px', borderRadius: '8px' }}>
+                      {a.notes || "No additional clinical notes provided."}
+                    </p>
+                  </div>
+
+                  <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <strong>Status</strong>
+                    <span className={getStatusClass(a.status)}>{a.status}</span>
+                  </div>
 
                   {a.status === "CANCELLED" && (
-                    <>
-                      <p>
-                        <strong>Cancelled By:</strong> {a.cancelledBy}
-                      </p>
-                      <p>
-                        <strong>Reason:</strong> {a.cancellationReason || "No reason provided"}
-                      </p>
-                    </>
+                    <div style={{ marginTop: '12px', padding: '12px', background: 'rgba(239, 68, 68, 0.05)', borderRadius: '10px', borderLeft: '3px solid #dc2626' }}>
+                      <p style={{ color: '#dc2626', fontWeight: 600, fontSize: '0.8rem', marginBottom: '4px' }}>CANCELLATION DATA</p>
+                      <p style={{ fontSize: '0.85rem' }}><strong>By:</strong> {a.cancelledBy}</p>
+                      <p style={{ fontSize: '0.85rem' }}><strong>Reason:</strong> {a.cancellationReason || "Not specified"}</p>
+                    </div>
                   )}
                 </div>
 
-                <button
-                  className="btn btn-teal"
-                  disabled={a.status === "CANCELLED"}
-                  onClick={() => openCancelModal(a)}
-                  type="button"
-                >
-                  Cancel Appointment
-                </button>
+                {a.status !== "CANCELLED" && (
+                  <button
+                    className="btn btn-white"
+                    style={{ marginTop: 'auto', color: '#dc2626', borderColor: 'rgba(239, 68, 68, 0.2)' }}
+                    onClick={() => openCancelModal(a)}
+                    type="button"
+                  >
+                    Cancel Session
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -160,27 +152,27 @@ const VetAppointments = () => {
 
       {/* Cancellation Modal */}
       {selectedAppointment && (
-        <div className="success-modal-overlay">
-          <div className="success-modal vet-cancel-modal">
-            <h3>Cancel Appointment</h3>
+        <div className="success-modal-overlay" onClick={closeCancelModal}>
+          <div className="vet-cancel-modal" onClick={e => e.stopPropagation()}>
+            <h3>Authorize Cancellation</h3>
             <p className="vet-cancel-modal-subtitle">
-              Please provide a reason for cancelling this appointment.
+              Documenting the clinical reason for this session termination.
             </p>
 
             <div className="vet-cancel-form-group">
               <label htmlFor="cancelReason" className="vet-cancel-label">
-                Cancellation Reason
+                Clinical Reason for Cancellation
               </label>
               <textarea
                 id="cancelReason"
                 className="vet-cancel-textarea"
-                placeholder="Enter the reason for cancellation"
+                placeholder="Discuss the reason for this update (e.g. equipment failure, doctor emergency)..."
                 value={cancelReason}
                 onChange={(e) => {
                   setCancelReason(e.target.value);
                   if (cancelError) setCancelError("");
                 }}
-                rows={5}
+                rows={4}
               />
             </div>
 
@@ -190,21 +182,23 @@ const VetAppointments = () => {
 
             <div className="vet-cancel-modal-actions">
               <button
-                className="btn btn-cancel"
+                className="btn btn-primary"
                 onClick={handleCancel}
                 type="button"
+                style={{ flex: 2, background: '#dc2626', borderColor: '#dc2626' }}
                 disabled={isCancelling}
               >
-                {isCancelling ? "Cancelling..." : "Confirm Cancel"}
+                {isCancelling ? "Archiving..." : "Confirm Cancellation"}
               </button>
 
               <button
                 className="btn btn-white"
                 onClick={closeCancelModal}
                 type="button"
+                style={{ flex: 1 }}
                 disabled={isCancelling}
               >
-                Close
+                Discard
               </button>
             </div>
           </div>

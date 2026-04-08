@@ -5,6 +5,27 @@ export const API_BASE_URL = typeof import.meta !== 'undefined' && import.meta.en
     ? import.meta.env.VITE_API_BASE_URL
     : '';
 
+/**
+ * Robust helper to build pet image URLs.
+ */
+export const getImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    
+    const baseUrl = API_BASE_URL || 'http://localhost:8080';
+    let normalizedPath = path.replace(/^[\\\/]+/, '').replace(/\\/g, '/');
+    
+    // Ensure the path is correctly prefixed if missing but expected by backend mapping
+    if (!normalizedPath.startsWith('uploads/') && !normalizedPath.startsWith('api/')) {
+        // If the backend stores only the filename, we need to prepend uploads/
+        // However, if the backend stores the full path, this check prevents double-prepending
+        // We'll trust the provided 'uploads' folder context.
+        normalizedPath = `uploads/${normalizedPath}`;
+    }
+    
+    return `${baseUrl}/${normalizedPath}`;
+};
+
 const API_BASE = '/api/pets';
 
 // No JWT headers needed as requested

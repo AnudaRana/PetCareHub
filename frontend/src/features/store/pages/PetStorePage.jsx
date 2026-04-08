@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import ProductCard from '../components/ProductCard';
 import ProductDetail from '../components/ProductDetail';
 import productService from '../../../services/productService';
+import { cartService } from '../../cart/services/cartService';
+import { useAuth } from '../../auth/contexts/AuthContext';
 import './PetStore.css';
-import logo from '../../../assets/logo-weyes.png'
+import logo from '../../../assets/logo-weyes.png';
 
 import AppsIcon from '@mui/icons-material/Apps';
 import PetsIcon from '@mui/icons-material/Pets';
-import SmartToyIcon from '@mui/icons-material/SmartToy';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import MedicationLiquidIcon from '@mui/icons-material/MedicationLiquid';
@@ -15,57 +18,86 @@ import BrushIcon from '@mui/icons-material/Brush';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 
-
 const PetStorePage = () => {
+  const navigate = useNavigate();
+  const { user, token } = useAuth();
+  const userId = useMemo(() => {
+    if (user?.userId) return Number(user.userId);
+    const stored = localStorage.getItem('userId');
+    return stored ? Number(stored) : null;
+  }, [user?.userId]);
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('All Products');
+  const [cartCount, setCartCount] = useState(0);
 
-  // Categorical Navigation with IDs for filtering
   const categories = [
-    { name: 'All Products', icon: <AppsIcon style={{ fontSize: '18px' }} /> },
-    { name: 'Dog Food', id: 'dog', icon: <PetsIcon style={{ fontSize: '18px' }} /> },
-    { name: 'Cat Food', id: 'cat', icon: <PetsIcon style={{ fontSize: '18px' }} /> },
-    { name: 'Accessories', id: 'accessories', icon: <LocalMallIcon style={{ fontSize: '18px' }} /> },
-    { name: 'Healthcare', id: 'health', icon: <MedicalServicesIcon style={{ fontSize: '18px' }} /> },
-    { name: 'Grooming', id: 'grooming', icon: <BrushIcon style={{ fontSize: '18px' }} /> },
-    { name: 'Supplements', id: 'supplements', icon: <MedicationLiquidIcon style={{ fontSize: '18px' }} /> }
-  ];
+    { name: 'All Products' },
+    { name: 'Dog Food', id: 'dog' },
+    { name: 'Cat Food', id: 'cat' },
+    { name: 'Accessories', id: 'accessories' },
+    { name: 'Healthcare', id: 'health' },
+    { name: 'Grooming', id: 'grooming' },
+    { name: 'Supplements', id: 'supplements' }
+  ].map((category) => ({
+    ...category,
+    icon:
+      category.name === 'All Products' ? <AppsIcon style={{ fontSize: '18px' }} /> :
+      category.name.includes('Food') ? <PetsIcon style={{ fontSize: '18px' }} /> :
+      category.name === 'Accessories' ? <LocalMallIcon style={{ fontSize: '18px' }} /> :
+      category.name === 'Healthcare' ? <MedicalServicesIcon style={{ fontSize: '18px' }} /> :
+      category.name === 'Grooming' ? <BrushIcon style={{ fontSize: '18px' }} /> :
+      <MedicationLiquidIcon style={{ fontSize: '18px' }} />
+  }));
 
-  // Debounced search effect
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchProducts();
-    }, 400); // 400ms debounce
+    }, 400);
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // Category change effect
   useEffect(() => {
-    // Reset search when changing category for a cleaner experience
     if (activeCategory !== 'All Products') {
       setSearchTerm('');
     }
     fetchProducts();
   }, [activeCategory]);
 
+  useEffect(() => {
+    if (!userId || !token) {
+      setCartCount(0);
+      return;
+    }
+
+    const loadCartCount = async () => {
+      try {
+        const cart = await cartService.getCart(userId);
+        const count = (cart.items || []).reduce((sum, item) => sum + (item.quantity || 0), 0);
+        setCartCount(count);
+      } catch (err) {
+        console.error('Failed to load cart count:', err);
+      }
+    };
+
+    loadCartCount();
+  }, [token, userId]);
+
   const fetchProducts = async () => {
     try {
       setLoading(true);
       let response;
-      
+
       if (searchTerm.trim()) {
-        // 1. Search takes priority
         response = await productService.searchProducts(searchTerm.trim());
       } else if (activeCategory !== 'All Products') {
-        // 2. Category fallback
-        const catObj = categories.find(c => c.name === activeCategory);
+        const catObj = categories.find((c) => c.name === activeCategory);
         response = await productService.getProductsByCategory(catObj.id);
       } else {
-        // 3. Default: All Products
         response = await productService.getAllProducts();
       }
 
@@ -79,11 +111,34 @@ const PetStorePage = () => {
     }
   };
 
-  const handleCardClick = (product) => {
-    setSelectedProductId(product.productId);
-  };
-
+  const handleCardClick = (product) => setSelectedProductId(product.productId);
   const handleCloseDetail = () => setSelectedProductId(null);
+
+  const handleAddToCart = async (product) => {
+    if (!token || !userId) {
+      toast.info('Please log in to add products to your cart.');
+      navigate('/login');
+      return;
+    }
+
+    if (!product?.productId) {
+      console.error('Invalid product data:', product);
+      toast.error('Could not add product: Missing ID');
+      return;
+    }
+
+    try {
+      const updatedCart = await cartService.addItem(userId, product.productId, 1);
+      const items = updatedCart.items || [];
+      const count = items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+      setCartCount(count);
+      toast.success(`${product.name} added to cart`);
+    } catch (err) {
+      console.error('Failed to add item to cart:', err);
+      const msg = err?.response?.data?.message || 'Failed to add the product to cart.';
+      toast.error(msg);
+    }
+  };
 
   const selectedProduct = selectedProductId
     ? products.find((p) => p.productId === selectedProductId)
@@ -91,39 +146,44 @@ const PetStorePage = () => {
 
   return (
     <div className="store-page">
-      {/* ── Top Bar ──────────────────────────────────────────────────── */}
       <header className="store-topbar">
         <div className="store-topbar-inner">
-          <div className="store-brand">
-            <img src={logo} alt="PetCareHub Logo" className="store-logo" />
-            <span className="store-brand-name">Pet Store</span>
-          </div>
+            <div className="store-brand" onClick={() => navigate('/dashboard')}>
+                <img src={logo} alt="PetCareHub Logo" className="store-logo" />
+                <div className="store-brand-text">
+                    <span className="store-brand-name">PetCare Hub</span>
+                    <span className="store-brand-tag">PREMIUM STORE</span>
+                </div>
+            </div>
 
-          <div className="store-topbar-spacer" />
+            <div className="store-search-wrapper">
+                <SearchIcon className="store-search-icon" />
+                <input
+                    type="text"
+                    className="store-search-input"
+                    placeholder="Search products, treats, accessories..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
 
-          {/* Search Bar - Server-Side Browsing */}
-          <div className="store-search-wrapper">
-            <SearchIcon className="store-search-icon" />
-            <input 
-              type="text" 
-              className="store-search-input" 
-              placeholder="Search products or brands..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-
-          {/* Action buttons (Cart only as requested) */}
-          <div className="store-actions">
-            <button id="store-cart-btn" className="store-action-btn store-cart-btn" title="Cart (coming soon)">
-              <ShoppingCartOutlinedIcon />
-              <span className="store-cart-badge">0</span>
-            </button>
-          </div>
+            <div className="store-actions">
+                <button 
+                    className="store-action-btn store-cart-btn"
+                    onClick={() => navigate('/cart')}
+                    id="store-cart-btn"
+                >
+                    <div className="cart-icon-wrapper">
+                        <ShoppingCartOutlinedIcon style={{ fontSize: '22px' }} />
+                        {cartCount > 0 && (
+                            <span className="store-cart-badge animate-pop">{cartCount}</span>
+                        )}
+                    </div>
+                </button>
+            </div>
         </div>
       </header>
 
-      {/* ── Category Filter  ─────────────────────────────── */}
       <nav className="store-categories">
         <div className="store-categories-inner">
           {categories.map((cat) => (
@@ -139,7 +199,6 @@ const PetStorePage = () => {
         </div>
       </nav>
 
-      {/* ── Product Grid ─────────────────────────────────────────────── */}
       <main className="store-main">
         {loading ? (
           <div className="store-loading">
@@ -159,7 +218,7 @@ const PetStorePage = () => {
         ) : (
           <>
             <p className="store-result-count">
-              Showing <strong>{products.length}</strong> product{products.length !== 1 ? 's' : ''} 
+              Showing <strong>{products.length}</strong> product{products.length !== 1 ? 's' : ''}
               {searchTerm && ` for "${searchTerm}"`}
               {activeCategory !== 'All Products' && !searchTerm && ` in ${activeCategory}`}
             </p>
@@ -169,6 +228,7 @@ const PetStorePage = () => {
                   key={product.productId}
                   product={product}
                   onClick={() => handleCardClick(product)}
+                  onQuickAdd={handleAddToCart}
                 />
               ))}
             </div>
@@ -176,9 +236,8 @@ const PetStorePage = () => {
         )}
       </main>
 
-      {/* ── Product Detail Modal ─────────────────────────────────────── */}
       {selectedProduct && (
-        <ProductDetail product={selectedProduct} onClose={handleCloseDetail} />
+        <ProductDetail product={selectedProduct} onClose={handleCloseDetail} onAddToCart={handleAddToCart} />
       )}
     </div>
   );

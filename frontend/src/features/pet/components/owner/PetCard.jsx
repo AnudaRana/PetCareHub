@@ -1,15 +1,6 @@
-
 import React from 'react';
-import { API_BASE_URL } from '../../../../services/petService';
+import { getImageUrl } from '../../../../services/petService';
 import '../../../../styles/PetCard.css';
-
-const SPECIES_EMOJI = {
-    Dog: '🐕',
-    Cat: '🐈',
-    Bird: '🐦',
-    Rabbit: '🐇',
-    Fish: '🐟',
-};
 
 const GENDER_DISPLAY = {
     MALE: { label: '♂ Male', icon: '♂' },
@@ -18,38 +9,34 @@ const GENDER_DISPLAY = {
 };
 
 const PetCard = ({ pet, onSelect }) => {
-    const speciesEmoji = SPECIES_EMOJI[pet.species] || '🐾';
     const gender = GENDER_DISPLAY[pet.gender] || GENDER_DISPLAY.UNKNOWN;
+    const imageUrl = getImageUrl(pet.petImagePath);
 
     return (
-        <div className="pet-card-container" onClick={() => onSelect(pet)}>
-            {/* Top dark blue banner with the gradient */}
-            <div className="pet-card-banner">
-                {pet.petImagePath ? (
-                    <img
-                        className="pet-card-avatar-img"
-                        src={`${API_BASE_URL}/${pet.petImagePath}`}
-                        alt={pet.name}
-                    />
-                ) : (
-                    <div className="pet-card-avatar">
-                        <span style={{ fontSize: 24 }}>{speciesEmoji}</span>
-                    </div>
-                )}
-            </div>
-
-            <div className="pet-card-content">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
-                        <h3 className="pet-card-title">{pet.name}</h3>
-                        <p className="pet-card-subtitle">{pet.breed || 'Mixed breed'}</p>
+        <div className="pet-card-container-v2" onClick={() => onSelect(pet)}>
+            <div className="pet-card-banner-v2">
+                <div className="pet-card-image-ring">
+                    {imageUrl ? (
+                        <img
+                            className="pet-card-avatar-v2"
+                            src={imageUrl}
+                            alt={pet.name}
+                            onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                            }}
+                        />
+                    ) : null}
+                    <div className="pet-card-placeholder-v2" style={{ display: imageUrl ? 'none' : 'flex' }}>
+                        <span className="placeholder-icon">🐾</span>
                     </div>
                 </div>
             </div>
 
-            <div className="pet-card-footer">
-                <span className="pet-card-gender">{gender.label}</span>
-                <span className="pet-card-species">{pet.species}</span>
+            <div className="pet-card-body-v2">
+                <h3 className="pet-card-name-v2">{pet.name}</h3>
+                <p className="pet-card-breed-v2">{pet.breed || 'Companion'}</p>
             </div>
         </div>
     );

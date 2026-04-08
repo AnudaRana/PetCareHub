@@ -67,44 +67,61 @@ const MyPets = () => {
 
     return (
         
-            <div className="my-pets-container">
-            {/* Header */}
-            <div style={{ marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                    <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 700, color: 'var(--color-primary)', margin: '0 0 6px' }}>My Pets</h2>
-                    <p style={{ color: 'var(--color-text-light)', fontSize: 14, margin: 0 }}>Manage and track your beloved companions</p>
+
+        <div className="my-pets-container">
+            {/* Header section matches image */}
+            <header className="my-pets-header" style={{ marginBottom: '40px' }}>
+                <div className="my-pets-title">
+                    <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.4rem', color: '#1a1a1a' }}>My Pets</h1>
+                    <p style={{ color: '#64748b', fontSize: '1rem', fontWeight: 500 }}>Manage and track your beloved companions</p>
                 </div>
                 <button
-                    className="btn btn-teal"
+                    className="btn-add-pet"
                     onClick={() => setShowAddForm(true)}
-                    id="add-pet-btn"
+                    style={{ 
+                        background: '#00f0ff', 
+                        color: 'white', 
+                        fontWeight: 700, 
+                        padding: '12px 28px', 
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 15px rgba(0, 240, 255, 0.3)'
+                    }}
                 >
                     + Add New Pet
                 </button>
-            </div>
+            </header>
 
-            {/* Stats row */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
-                <div style={{
-                    background: 'var(--color-white)',
-                    borderRadius: 14,
-                    padding: '20px 22px',
-                    boxShadow: '0 2px 12px rgba(62,64,149,0.07)',
-                    borderTop: `3px solid var(--color-primary)`,
-                    transition: 'transform 0.18s, box-shadow 0.18s',
+            {/* Stats Overview matches image */}
+            <div className="my-pets-stats-row" style={{ marginBottom: '48px' }}>
+                <div className="stat-card-simple" style={{ 
+                    background: 'white', 
+                    padding: '24px 32px', 
+                    borderRadius: '20px', 
+                    width: '300px',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                    border: '1px solid #f1f5f9'
                 }}>
-                    <div style={{ fontSize: 30, fontWeight: 800, color: 'var(--color-primary)', fontFamily: "'Playfair Display', serif" }}>
-                        {!loading && !error ? pets.length : '-'}
+                    <div style={{ fontSize: '2.8rem', fontWeight: 800, color: '#1e293b', marginBottom: '8px' }}>
+                        {!loading && !error ? pets.length : '0'}
                     </div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-text)', marginTop: 2 }}>My Pets</div>
-                    <div style={{ fontSize: 11, color: 'var(--color-text-light)', marginTop: 1 }}>registered</div>
+                    <div style={{ fontSize: '1rem', fontWeight: 700, color: '#334155' }}>My Pets</div>
+                    <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>registered</div>
                 </div>
             </div>
 
-            {/* Search */}
-            <div className="search-bar-wrapper">
-                <span className="search-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            {/* Search Bar matches image */}
+            <div className="search-bar-wrapper" style={{ 
+                background: 'white', 
+                borderRadius: '12px', 
+                padding: '4px 8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
+                marginBottom: '32px',
+                width: '100%',
+                maxWidth: '500px',
+                border: '1px solid #f1f5f9'
+            }}>
+                <span className="search-icon" style={{ opacity: 0.5 }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
@@ -115,51 +132,48 @@ const MyPets = () => {
                     placeholder="Search pets by name..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    id="pet-search-input"
-                    aria-label="Search pets by name"
+                    style={{ border: 'none', background: 'transparent' }}
                 />
             </div>
 
-            {/* Error Banner */}
+            {/* Error handling */}
             {error && (
                 <div className="error-banner">
-                    ⚠ {error}
-                    <button onClick={() => fetchPets(searchQuery)}>Retry</button>
+                    <span style={{ fontSize: '1.2rem' }}>⚠️</span>
+                    <div style={{ flex: 1 }}>{error}</div>
+                    <button onClick={() => fetchPets(searchQuery)}>Retry Connection</button>
                 </div>
             )}
 
-            {/* Loading pets */}
+            {/* Loading active state */}
             {loading && (
                 <div className="loading-container">
                     <div className="spinner" aria-label="Loading pets..." />
-                    <p style={{ color: 'var(--color-text-light)', fontSize: '0.9rem' }}>Loading your pets...</p>
+                    <p style={{ color: 'var(--color-text-light)', fontWeight: 500 }}>Fetching pet profiles...</p>
                 </div>
             )}
 
-            {/* Pet Grid */}
+            {/* Content grid */}
             {!loading && !error && (
                 <>
                     {pets.length > 0 && (
-                        <p className="pets-count-label">
-                            Showing <span>{pets.length}</span> pet{pets.length !== 1 ? 's' : ''}
-                            {searchQuery && ` matching "${searchQuery}"`}
+                        <p className="pets-count-label" style={{ marginBottom: '24px', fontSize: '0.9rem', color: '#64748b' }}>
+                            Showing <strong>{pets.length}</strong> pet{pets.length !== 1 ? 's' : ''}
                         </p>
                     )}
 
                     {pets.length === 0 ? (
                         <div className="empty-state">
                             <span className="empty-state-icon">🐾</span>
-                            <h3>No pet profiles found</h3>
+                            <h3>No companion profiles found</h3>
                             {searchQuery ? (
-                                <p>No pets match your search "<strong>{searchQuery}</strong>". Try a different name.</p>
+                                <p>We couldn't find any results for "<strong>{searchQuery}</strong>". Try another keyword.</p>
                             ) : (
-                                <p>You haven't registered any pets yet. Add your first furry friend!</p>
+                                <p>You haven't registered any pets yet. Start by adding your first furry friend!</p>
                             )}
-                            {!searchQuery && (
-                                <button className="btn btn-teal" onClick={() => setShowAddForm(true)}>
-                                    + Register Your First Pet
-                                </button>
-                            )}
+                            <button className="btn btn-teal" onClick={() => setShowAddForm(true)} style={{ marginTop: '16px' }}>
+                                + Add Your First Pet
+                            </button>
                         </div>
                     ) : (
                         <div className="pets-grid">
@@ -171,26 +185,40 @@ const MyPets = () => {
                                 />
                             ))}
 
-                            {/* Add pet card */}
+                            {/* Add pet card-like button */}
+                            {/* Add New Pet Card matches image */}
                             {!searchQuery && (
-                                <div style={{
-                                    borderRadius: 18, border: `2px dashed rgba(188,190,192,0.5)`,
-                                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                                    minHeight: 240, cursor: 'pointer', gap: 10, color: 'var(--color-text-light)',
-                                    transition: 'border-color 0.18s',
-                                    background: 'var(--color-white)',
-                                }}
-                                    onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--color-accent)'}
-                                    onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(188,190,192,0.5)'}
-                                    onClick={() => setShowAddForm(true)}
+                                <div className="add-pet-card" 
+                                     style={{ 
+                                         minHeight: '280px', 
+                                         display: 'flex',
+                                         flexDirection: 'column', 
+                                         alignItems: 'center',
+                                         justifyContent: 'center',
+                                         border: '2px dashed #e2e8f0',
+                                         background: 'white',
+                                         borderRadius: '24px',
+                                         cursor: 'pointer',
+                                         transition: 'all 0.3s ease'
+                                     }}
+                                     onClick={() => setShowAddForm(true)}
                                 >
-                                    <div style={{
-                                        width: 46, height: 46, borderRadius: '50%',
-                                        background: `rgba(0,174,239,0.1)`,
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, color: 'var(--color-accent)',
-                                    }}>+</div>
-                                    <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-primary)' }}>Add New Pet</span>
-                                    <span style={{ fontSize: 12, color: 'var(--color-text-light)' }}>Register a companion</span>
+                                    <div style={{ 
+                                        width: '60px', 
+                                        height: '60px', 
+                                        borderRadius: '50%', 
+                                        background: '#e0faff', 
+                                        color: '#00f0ff', 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center',
+                                        fontSize: '1.8rem',
+                                        marginBottom: '20px'
+                                    }}>
+                                        +
+                                    </div>
+                                    <div style={{ fontWeight: 700, color: '#1e293b', fontSize: '1.1rem', marginBottom: '8px' }}>Add New Pet</div>
+                                    <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Register a companion</p>
                                 </div>
                             )}
                         </div>
@@ -198,7 +226,7 @@ const MyPets = () => {
                 </>
             )}
 
-            {/* Pet Detail Modal */}
+            {/* Interactions */}
             {selectedPet && (
                 <PetDetail
                     pet={selectedPet}
@@ -208,7 +236,6 @@ const MyPets = () => {
                 />
             )}
 
-            {/* Add Pet Form Modal */}
             {showAddForm && (
                 <AddPetForm
                     onClose={() => setShowAddForm(false)}
@@ -216,7 +243,8 @@ const MyPets = () => {
                     userId={userId}
                 />
             )}
-            </div>
+        </div>
+
         
     );
 };

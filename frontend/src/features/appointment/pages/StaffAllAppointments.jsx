@@ -18,16 +18,12 @@ const StaffAllAppointments = () => {
     try {
       setLoading(true);
       setError('');
-
       const response = await axios.get(`${API_BASE_URL}/api/appointments`);
       const data = response.data?.data || response.data || [];
-
-      console.log('Appointments data:', data);
-
       setAppointments(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Failed to load appointments:', err);
-      setError('Failed to load appointments.');
+      setError('Failed to load appointments from server.');
       setAppointments([]);
     } finally {
       setLoading(false);
@@ -35,52 +31,17 @@ const StaffAllAppointments = () => {
   };
 
   const getOwnerName = (appointment) => {
-    const ownerFirst =
-      appointment.owner?.firstName ||
-      appointment.user?.firstName ||
-      appointment.ownerFirstName ||
-      '';
-
-    const ownerLast =
-      appointment.owner?.lastName ||
-      appointment.user?.lastName ||
-      appointment.ownerLastName ||
-      '';
-
+    const ownerFirst = appointment.owner?.firstName || appointment.user?.firstName || appointment.ownerFirstName || '';
+    const ownerLast = appointment.owner?.lastName || appointment.user?.lastName || appointment.ownerLastName || '';
     const fullNameFromParts = `${ownerFirst} ${ownerLast}`.trim();
-
-    return (
-      appointment.owner?.fullName ||
-      appointment.user?.fullName ||
-      appointment.owner?.name ||
-      appointment.user?.name ||
-      appointment.ownerName ||
-      fullNameFromParts ||
-      'N/A'
-    );
+    return appointment.owner?.fullName || appointment.user?.fullName || appointment.ownerName || fullNameFromParts || 'Anonymous Owner';
   };
 
   const getDoctorName = (appointment) => {
-    const vetFirst =
-      appointment.vet?.firstName ||
-      appointment.vetFirstName ||
-      '';
-
-    const vetLast =
-      appointment.vet?.lastName ||
-      appointment.vetLastName ||
-      '';
-
+    const vetFirst = appointment.vet?.firstName || appointment.vetFirstName || '';
+    const vetLast = appointment.vet?.lastName || appointment.vetLastName || '';
     const fullNameFromParts = `${vetFirst} ${vetLast}`.trim();
-
-    return (
-      appointment.vet?.fullName ||
-      appointment.vet?.name ||
-      appointment.doctorName ||
-      fullNameFromParts ||
-      appointment.doctor ||
-      'N/A'
-    );
+    return appointment.vet?.fullName || appointment.doctorName || fullNameFromParts || appointment.doctor || 'Unassigned';
   };
 
   const filteredAppointments = useMemo(() => {
@@ -97,50 +58,48 @@ const StaffAllAppointments = () => {
         doctorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         appointmentType.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const matchesStatus =
-        statusFilter === 'ALL' || status === statusFilter;
-
+      const matchesStatus = statusFilter === 'ALL' || status === statusFilter;
       return matchesSearch && matchesStatus;
     });
   }, [appointments, searchTerm, statusFilter]);
 
   const getStatusClass = (status) => {
     const value = (status || '').toLowerCase();
-
     if (value === 'confirmed') return 'confirmed';
     if (value === 'pending') return 'pending';
     if (value === 'cancelled') return 'cancelled';
     if (value === 'completed') return 'completed';
     if (value === 'updated') return 'updated';
-    if (value === 'upcoming') return 'default';
-
     return 'default';
   };
 
   if (loading) {
     return (
       <div className="staff-appointments-page">
-        <div className="staff-appointments-loading">Loading appointments...</div>
+        <div className="loading-container" style={{ padding: '80px 0' }}>
+            <div className="spinner" />
+            <p style={{ color: 'var(--color-text-light)', marginTop: '16px', fontWeight: 500 }}>Syncing Clinic Schedule...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="staff-appointments-page">
-      <div className="staff-appointments-header">
+    <div className="staff-appointments-page animate-fade-up">
+      <header className="staff-appointments-header">
         <div>
-          <h2>All Appointments</h2>
-          <p>Clinic staff can view all appointments in the system here.</p>
+          <h2>Master Clinic Schedule</h2>
+          <p>Comprehensive operational view of all registered medical sessions.</p>
         </div>
         <button className="btn btn-teal" onClick={fetchAppointments} type="button">
-          Refresh
+          🔄 Refresh Dashboard
         </button>
-      </div>
+      </header>
 
       <div className="staff-appointments-toolbar">
         <input
           type="text"
-          placeholder="Search by pet, owner, doctor, or appointment type..."
+          placeholder="Search patients, owners, clinicians..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="staff-appointments-search"
@@ -151,50 +110,66 @@ const StaffAllAppointments = () => {
           onChange={(e) => setStatusFilter(e.target.value)}
           className="staff-appointments-filter"
         >
-          <option value="ALL">All Statuses</option>
+          <option value="ALL">All Session Statuses</option>
           <option value="UPCOMING">Upcoming</option>
-          <option value="PENDING">Pending</option>
+          <option value="PENDING">Pending Approval</option>
           <option value="CONFIRMED">Confirmed</option>
-          <option value="UPDATED">Updated</option>
-          <option value="CANCELLED">Cancelled</option>
-          <option value="COMPLETED">Completed</option>
+          <option value="UPDATED">Rescheduled</option>
+          <option value="CANCELLED">Terminated</option>
+          <option value="COMPLETED">Archived</option>
         </select>
       </div>
 
-      {error && <div className="staff-appointments-error">{error}</div>}
+      {error && (
+        <div className="error-banner" style={{ marginBottom: '24px' }}>
+          <span style={{ fontSize: '1.2rem' }}>⚠️</span>
+          <div style={{ flex: 1 }}>{error}</div>
+          <button onClick={fetchAppointments}>Retry Connection</button>
+        </div>
+      )}
 
       {filteredAppointments.length === 0 ? (
-        <div className="staff-appointments-empty">No appointments found.</div>
+        <div className="empty-state" style={{ padding: '60px 20px' }}>
+            <span className="empty-state-icon">📋</span>
+            <h3>No sessions found</h3>
+            <p>No medical appointments match your active filter criteria.</p>
+        </div>
       ) : (
-        <div className="staff-appointments-table-wrapper">
+        <div className="staff-appointments-table-wrapper shadow-premium">
           <table className="staff-appointments-table">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Pet</th>
-                <th>Owner</th>
-                <th>Doctor</th>
-                <th>Type</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Status</th>
+                <th>Patient</th>
+                <th>Owner contact</th>
+                <th>Clinician</th>
+                <th>Procedure</th>
+                <th>Clinical Date</th>
+                <th>Registry Status</th>
                 <th>Notes</th>
               </tr>
             </thead>
             <tbody>
               {filteredAppointments.map((appointment) => (
                 <tr key={appointment.id}>
-                  <td>{appointment.id}</td>
-                  <td>{appointment.pet?.name || appointment.petName || 'N/A'}</td>
-                  <td>{getOwnerName(appointment)}</td>
-                  <td>{getDoctorName(appointment)}</td>
-                  <td>{appointment.appointmentType || 'N/A'}</td>
-                  <td>{appointment.date || 'N/A'}</td>
-                  <td>{appointment.timeSlot || appointment.time || 'N/A'}</td>
                   <td>
-                    <span
-                      className={`staff-appointment-status ${getStatusClass(appointment.status)}`}
-                    >
+                    <div style={{ fontWeight: 700, color: 'var(--color-primary-dark)' }}>{appointment.pet?.name || appointment.petName || 'N/A'}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--color-text-light)' }}>ID: #{appointment.id}</div>
+                  </td>
+                  <td>
+                    <div style={{ fontWeight: 600 }}>{getOwnerName(appointment)}</div>
+                  </td>
+                  <td>
+                    <div style={{ fontWeight: 600 }}>Dr. {getDoctorName(appointment)}</div>
+                  </td>
+                  <td>
+                    <div className="pet-detail-species-badge" style={{ fontSize: '0.75rem', background: 'rgba(20,27,61,0.05)' }}>{appointment.appointmentType || 'N/A'}</div>
+                  </td>
+                  <td>
+                    <div style={{ fontWeight: 700 }}>{appointment.date || 'N/A'}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-light)' }}>{appointment.timeSlot || appointment.time || 'N/A'}</div>
+                  </td>
+                  <td>
+                    <span className={`staff-appointment-status ${getStatusClass(appointment.status)}`}>
                       {appointment.status || 'N/A'}
                     </span>
                   </td>

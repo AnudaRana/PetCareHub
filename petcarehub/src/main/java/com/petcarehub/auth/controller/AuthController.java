@@ -69,7 +69,14 @@ public class AuthController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(new LoginResponse(
-                token, user.getEmail(), user.getFirstName(), user.getLastName(), user.getProfilePicture(), roles));
+                token,
+                user.getUserId(),
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
+                (user.getFirstName() + " " + user.getLastName()).trim(),
+                user.getProfilePicture(),
+                roles));
     }
 
     // Added: Get current user profile for dashboard

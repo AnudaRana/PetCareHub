@@ -3,7 +3,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import productService from '../../../services/productService';
 
-const ProductDetail = ({ product: initialProduct, onClose }) => {
+const ProductDetail = ({ product: initialProduct, onClose, onAddToCart }) => {
   const [product, setProduct] = useState(initialProduct);
   const [loading, setLoading] = useState(false);
 
@@ -16,8 +16,8 @@ const ProductDetail = ({ product: initialProduct, onClose }) => {
   const handleVariantSwitch = async (id) => {
     setLoading(true);
     try {
-      const data = await productService.getProductById(id);
-      setProduct(data);
+      const response = await productService.getProductById(id);
+      setProduct(response.data);
     } catch (err) {
       console.error("Failed to fetch variant:", err);
     } finally {
@@ -35,17 +35,14 @@ const ProductDetail = ({ product: initialProduct, onClose }) => {
     return '🐾';
   };
 
-
   return (
     <div className="product-detail-overlay" onClick={onClose}>
       <div className={`product-detail-modal ${loading ? 'loading' : ''}`} onClick={(e) => e.stopPropagation()}>
-        {/* Close button */}
         <button className="product-detail-close" onClick={onClose} aria-label="Close">
           <CloseIcon />
         </button>
 
         <div className="product-detail-layout">
-          {/* Left: Image */}
           <div className="product-detail-img-col">
             {product.imageUrl ? (
               <img
@@ -64,55 +61,49 @@ const ProductDetail = ({ product: initialProduct, onClose }) => {
             </div>
           </div>
 
-          {/* Right: Info */}
           <div className="product-detail-info-col">
-            {product.brand && <p className="product-detail-brand">{product.brand}</p>}
+            <p className="product-detail-brand">{product.brand || 'PetCareHub Selection'}</p>
             <h2 className="product-detail-name">{product.name}</h2>
-            
-            {/* Variants Selector (Size/Flavor) */}
+
+            <p className="product-detail-description">{product.description}</p>
+
             {product.relatedVariants && product.relatedVariants.length > 0 && (
-              <div className="product-variants-selector">
-                <p className="selector-label">Available Options:</p>
+              <div className="product-variants-selector" style={{ marginBottom: '24px' }}>
+                <p className="selector-label">Available Sizes / Options:</p>
                 <div className="variant-options">
                   <button className="variant-btn active">
-                    {product.variants || 'Standard'}
+                    {product.variants || 'Current'}
                   </button>
                   {product.relatedVariants.map(variant => (
-                    <button 
-                      key={variant.productId} 
+                    <button
+                      key={variant.productId}
                       className="variant-btn"
                       onClick={() => handleVariantSwitch(variant.productId)}
                     >
-                      {variant.variants || 'Other'}
+                      {variant.variants}
                     </button>
                   ))}
                 </div>
               </div>
             )}
 
-
-            <div className="product-detail-description-section">
-              <p className="product-detail-description">{product.description}</p>
-            </div>
-
-            {/* Price & Stock row */}
             <div className="product-detail-price-row">
-              <span className="product-detail-price">
-                {formattedPrice}
-              </span>
+              <span className="product-detail-price">{formattedPrice}</span>
               <div className="product-detail-stock">
                 <span className={`stock-dot ${product.stockQuantity > 0 ? 'in-stock' : 'out-of-stock'}`}></span>
-                <span className="stock-text">
-                  {product.stockQuantity > 0 ? `${product.stockQuantity} in stock` : 'Out of stock'}
-                </span>
+                <span className="stock-text">{product.stockQuantity > 0 ? `${product.stockQuantity} Left` : 'Sold Out'}</span>
               </div>
             </div>
 
-            {/* Actions */}
             <div className="product-detail-actions">
-              <button className="btn btn-teal product-detail-add-btn" disabled={product.stockQuantity <= 0}>
-                <ShoppingCartOutlinedIcon style={{ fontSize: '18px', marginRight: '8px' }} />
-                {product.stockQuantity > 0 ? 'Add to Cart' : 'Out of Stock'}
+              <button
+                className="btn btn-dark-blue product-detail-add-btn"
+                style={{ width: '100%', height: '56px', fontSize: '1rem' }}
+                disabled={product.stockQuantity <= 0}
+                onClick={() => onAddToCart?.(product)}
+              >
+                <ShoppingCartOutlinedIcon style={{ fontSize: '20px', marginRight: '10px' }} />
+                {product.stockQuantity > 0 ? 'Add to Cart' : 'Temporarily Unavailable'}
               </button>
             </div>
           </div>

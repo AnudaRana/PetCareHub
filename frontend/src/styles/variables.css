@@ -1,0 +1,42 @@
+:root {
+  --font-family: "Outfit", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Core Colors */
+  --color-primary: #36b8b7;
+  --color-primary-dark: #141b3d;
+  --color-primary-light: #5eead4;
+  
+  --color-accent: #00f0ff;
+  --color-accent-dark: #00b8c4;
+  --color-accent-light: #e0f2fe;
+
+  --color-text: #0a0f24;
+  --color-text-light: #64748b;
+  --color-error: #ff3b30;
+  --color-success: #34c759;
+  --color-white: #ffffff;
+  --color-bg: #f8fafc;
+  --color-border: rgba(0, 0, 0, 0.08);
+
+  /* Sidebar Specific */
+  --color-sidebar-bg: #0a0f24;
+  --color-sidebar-text: #94a3b8;
+  --color-sidebar-hover: rgba(255, 255, 255, 0.05);
+  --color-sidebar-active-bg: rgba(0, 240, 255, 0.1);
+
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
+
+  /* Effects & Layout */
+  --radius-sm: 12px;
+  --radius-lg: 24px;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.12);
+  --shadow-glow: 0 0 15px rgba(0, 240, 255, 0.3);
+  
+  --sidebar-width: 280px;
+}
+

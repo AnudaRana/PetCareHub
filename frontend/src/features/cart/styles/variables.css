@@ -1,8 +1,5 @@
-:root {
-  --font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  --transition: 0.22s ease;
+@import "../../../styles/variables.css";
 
-  --color-primary: #36b8b7;
-  --glass-bg: rgba(255, 255, 255, 0.06);
-  --glass-border: rgba(255, 255, 255, 0.10);
+:root {
+  --cart-surface: rgba(255, 255, 255, 0.06);
 }

@@ -1,7 +1,6 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
-import '../styles/medical.css';
+import React, { useEffect, useMemo, useState } from 'react';
+import '../../../styles/medical.css';
 import TreatmentList from '../../medical/components/TreatmentList';
-import { useAuth } from '../../auth/contexts/AuthContext';
 import { useLocation } from 'react-router-dom';
 import { getTreatmentsByPetId } from '../../../services/medicalApi';
 
@@ -37,46 +36,22 @@ const TreatmentPage = () => {
   const sorted = useMemo(() => sortByDateDesc(treatments), [treatments]);
   const role = localStorage.getItem('role') || 'ROLE_OWNER';
   const isDoctor = role === 'ROLE_VET';
-  const user = useAuth()?.user;
-
-  const renderSidebar = () => {
-    if (role === 'ROLE_VET') return <DoctorSidebar activeTab="" onTabChange={() => {}} doctor={user} />;
-    if (role === 'ROLE_STAFF') return <StaffSidebar activeTab="" onTabChange={() => {}} staff={user} />;
-    return <OwnerSidebar activeTab="" onTabChange={() => {}} user={user} />;
-  };
 
   return (
-    <div className="dashboard-layout">
-      {renderSidebar()}
-
-      <div className="dashboard-main">
-        <header className="dashboard-topbar">
-          <div className="topbar-breadcrumb">
-            <span className="breadcrumb-home">Medical Records</span>
-            <span className="breadcrumb-sep">›</span>
-            <span className="breadcrumb-current">Treatments</span>
-          </div>
-          <div className="topbar-right">
-            <div className="topbar-user-section">
-              <span className="topbar-greeting">
-                Welcome, <strong>{user.fullName}</strong>
-              </span>
-              <div className="topbar-avatar" title="Profile">
-                {user.initials}
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <main className="dashboard-content">
-          <div className="medical-page">
-            <h1>Treatment Full List</h1>
-            <TreatmentList treatments={sorted} isDoctor={isDoctor} onEdit={() => {}} />
-          </div>
-        </main>
+    <div className="medical-page-container">
+      <div className="medical-page">
+        <div className="topbar-breadcrumb" style={{ marginBottom: '16px' }}>
+          <span className="breadcrumb-home">Medical Records</span>
+          <span className="breadcrumb-sep">›</span>
+          <span className="breadcrumb-current">Treatments</span>
+        </div>
+        <h1>Treatment Full List</h1>
+        {pet && <p>Records for: <strong>{pet.name}</strong></p>}
+        <TreatmentList treatments={sorted} isDoctor={isDoctor} onEdit={() => {}} />
       </div>
     </div>
   );
 };
 
 export default TreatmentPage;
+

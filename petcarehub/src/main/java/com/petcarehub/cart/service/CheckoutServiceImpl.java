@@ -1,15 +1,22 @@
 package com.petcarehub.cart.service;
 
-import com.petcarehub.cart.dto.*;
-import com.petcarehub.cart.entity.*;
-import com.petcarehub.pet.entity.Pet;
-import com.petcarehub.user.entity.User;
+import com.petcarehub.cart.dto.CheckoutContextDto;
+import com.petcarehub.cart.dto.CreateOrderRequest;
+import com.petcarehub.cart.dto.OrderItemSummaryDto;
+import com.petcarehub.cart.dto.OrderSummaryDto;
+import com.petcarehub.cart.dto.PendingOrderDto;
+import com.petcarehub.cart.dto.PetOptionDto;
+import com.petcarehub.cart.entity.Cart;
+import com.petcarehub.cart.entity.CustomerOrder;
+import com.petcarehub.cart.entity.OrderItem;
 import com.petcarehub.cart.enums.OrderStatus;
 import com.petcarehub.cart.enums.PaymentMethod;
 import com.petcarehub.cart.enums.PaymentStatus;
 import com.petcarehub.cart.repository.CartRepository;
 import com.petcarehub.cart.repository.OrderRepository;
+import com.petcarehub.pet.entity.Pet;
 import com.petcarehub.pet.repository.PetRepository;
+import com.petcarehub.user.entity.User;
 import com.petcarehub.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -21,6 +28,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -62,8 +70,9 @@ public class CheckoutServiceImpl implements CheckoutService {
         dto.fullName = buildFullName(user);
         dto.email = user.getEmail();
         dto.contactNumber = user.getMobileNumber();
-        dto.pets = petRepository.findByOwner_UserIdOrderByNameAsc(userId)
+        dto.pets = petRepository.findByOwner_UserId(userId)
                 .stream()
+                .sorted(Comparator.comparing(pet -> pet.getName() == null ? "" : pet.getName().toLowerCase(Locale.ROOT)))
                 .map(this::toPetOption)
                 .toList();
         return dto;
@@ -72,9 +81,14 @@ public class CheckoutServiceImpl implements CheckoutService {
     @Override
     public OrderSummaryDto createOrderFromCart(Long userId, CreateOrderRequest request) {
         validateCreateOrderRequest(request);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
-        Pet pet = petRepository.findByPetIdAndOwner_UserId(request.petId, userId)
+
+        Pet pet = petRepository.findByOwner_UserId(userId)
+                .stream()
+                .filter(ownerPet -> ownerPet.getPetId().equals(request.petId))
+                .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(BAD_REQUEST, "Selected pet does not belong to the logged-in owner"));
 
         List<Cart> cartItems = cartRepository.findByUser_UserId(userId);
@@ -97,12 +111,14 @@ public class CheckoutServiceImpl implements CheckoutService {
 
         BigDecimal subTotal = BigDecimal.ZERO;
         List<OrderItem> orderItems = new ArrayList<>();
+
         for (Cart cartItem : cartItems) {
             OrderItem orderItem = new OrderItem();
             orderItem.setProduct(cartItem.getProduct());
             orderItem.setProductName(cartItem.getProduct().getName());
             orderItem.setProductPrice(cartItem.getProduct().getPrice());
             orderItem.setQuantity(cartItem.getQuantity());
+
             BigDecimal lineTotal = cartItem.getProduct().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
             orderItem.setLineTotal(lineTotal);
             subTotal = subTotal.add(lineTotal);
@@ -114,12 +130,13 @@ public class CheckoutServiceImpl implements CheckoutService {
         order.setPickupFee(pickupFee);
         order.setTotal(subTotal.add(pickupFee));
 
-        // Save once to get the orderId, then set orderNumber and items
         CustomerOrder saved = orderRepository.save(order);
         saved.setOrderNumber(String.format("ORD-%06d", saved.getOrderId()));
+
         for (OrderItem item : orderItems) {
             saved.addItem(item);
         }
+
         CustomerOrder persisted = orderRepository.save(saved);
         cartRepository.deleteByUser_UserId(userId);
         return toOrderSummary(persisted);
@@ -193,6 +210,7 @@ public class CheckoutServiceImpl implements CheckoutService {
             if (receipt == null || receipt.isEmpty()) {
                 throw new ResponseStatusException(BAD_REQUEST, "Please upload the bank deposit receipt");
             }
+
             order.setBankName(BANK_NAME);
             order.setBankAccountName(BANK_ACCOUNT_NAME);
             order.setBankAccountNumber(BANK_ACCOUNT_NUMBER);
@@ -200,6 +218,7 @@ public class CheckoutServiceImpl implements CheckoutService {
             order.setPaymentStatus(PaymentStatus.RECEIPT_SUBMITTED);
             order.setPaymentReceiptFileName(receipt.getOriginalFilename());
             order.setPaymentReceiptContentType(receipt.getContentType());
+
             try {
                 order.setPaymentReceipt(receipt.getBytes());
             } catch (IOException ex) {

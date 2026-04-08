@@ -5,142 +5,146 @@ import Logo from '../../../assets/logo-w.png';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import LogoutIcon from '@mui/icons-material/Logout';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import './Dashboard.css';
 
 const DashboardLayout = ({ children, menuItems }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { user, logout } = useAuth();
-  const [mobileOpen, setMobileOpen] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { user, logout } = useAuth();
+    const [mobileOpen, setMobileOpen] = useState(false);
 
-  const toggleMobileMenu = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
-  // Close mobile menu if window is resized to desktop width
-  React.useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 1000) {
-        setMobileOpen(false);
-      }
+    const toggleMobileMenu = () => {
+        setMobileOpen(!mobileOpen);
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
 
-  const getInitials = (email) => {
-    if (!email) return 'U';
-    return email.substring(0, 2).toUpperCase();
-  };
+    const getInitials = (email) => {
+        if (!email) return 'U';
+        return email.substring(0, 2).toUpperCase();
+    };
 
-  const getUserName = () => {
-    if (user?.fullName) return user.fullName;
-    return user?.email ? user.email.split('@')[0] : 'User';
-  };
+    const getUserName = () => {
+        if (user?.fullName) return user.fullName;
+        if (user?.firstName) return user.firstName;
+        return user?.email ? user.email.split('@')[0] : 'User';
+    };
 
-  return (
-    <div className="dashboard-container">
+    const getSidebarClass = () => {
+        if (!user) return 'sidebar';
+        const role = (user.role || '').toUpperCase();
+        if (role === 'VET') return 'sidebar doc-sidebar';
+        if (role === 'STAFF') return 'sidebar staff-sidebar';
+        return 'sidebar';
+    };
 
-      <button className="mobile-menu-btn" onClick={toggleMobileMenu}>
-        <MenuIcon />
-      </button>
-
-      <div
-        className={`sidebar-overlay ${mobileOpen ? 'mobile-open' : ''}`}
-        onClick={() => setMobileOpen(false)}
-      />
-
-      <div className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-            <div className="sidebar-header">
-              <img src={Logo} alt='Logo' className="logo" />
-              <div className="sidebar-header-text">
-                <span className="sidebar-title">PetCareHub</span>
-              </div>
-              <button className="sidebar-close-btn" onClick={() => setMobileOpen(false)}>
-                <CloseIcon />
-              </button>
+    const getBreadcrumbs = () => {
+        const paths = location.pathname.split('/').filter(p => p);
+        return (
+            <div className="topbar-breadcrumb">
+                <span className="breadcrumb-home">Dashboard</span>
+                {paths.map((path, idx) => {
+                    if (path === 'dashboard') return null;
+                    return (
+                        <React.Fragment key={path}>
+                            <span className="breadcrumb-sep">/</span>
+                            <span className={idx === paths.length - 1 ? 'breadcrumb-current' : 'breadcrumb-home'}>
+                                {path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' ')}
+                            </span>
+                        </React.Fragment>
+                    );
+                })}
             </div>
+        );
+    };
 
-            <ul style={{ flex: 1, overflowY: 'auto', paddingBottom: '20px' }}>
-              {menuItems.map((item) => {
+    const isStaffOrVet = user?.role === 'VET' || user?.role === 'STAFF';
 
-                let isActive = false;
-                if (item.path === '/dashboard') {
+    return (
+        <div className="dashboard-layout">
+            <aside className={getSidebarClass() + (mobileOpen ? ' mobile-open' : '')}>
+                <div className="sidebar-decor-tr" />
+                <div className="sidebar-decor-bl" />
 
-                  isActive = location.pathname === '/dashboard';
-                } else if (item.path === '/') {
+                <div className="sidebar-logo">
+                    <img src={Logo} alt="PetCareHub" className="sidebar-logo-image" />
+                    <div className="sidebar-logo-text">
+                        <h2>PetCareHub</h2>
+                        <p>{user?.role || 'Portal'}</p>
+                    </div>
+                </div>
 
-                  isActive = location.pathname === '/';
-                } else {
-
-                  isActive = location.pathname.startsWith(item.path);
-                }
-
-                isActive = location.pathname === item.path;
-
-
-                if (item.name === 'Home') {
-                  isActive = false;
-                }
-
-                return (
-                  <li
-                    key={item.name}
-                    className={isActive ? 'active' : ''}
-                    onClick={() => {
-                      navigate(item.path);
-                      setMobileOpen(false);
-                    }}
-                  >
-                    <item.icon className="dashboard-icon" />
-                    {item.name}
-
-                    {isActive && <FiberManualRecordIcon className="active-dot" style={{ fontSize: '12px' }} />}
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
-
-          <div>
-            <div className="user-profile-card">
-              <div className="initials-box" style={{ overflow: 'hidden' }}>
-                {user?.profilePicture ? (
-                  <img src={user.profilePicture} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                ) : (
-                  getInitials(user?.email)
+                {isStaffOrVet && (
+                    <div className={user.role === 'VET' ? 'doc-sidebar-role-badge' : 'staff-sidebar-role-badge'}>
+                        <span className="doc-sidebar-role-icon">🛡️</span>
+                        {user.role} ACCESS
+                    </div>
                 )}
-              </div>
-              <div className="user-details">
-                <span className="user-name">{getUserName()}</span>
-                <span className="user-email">{user?.email || 'email@example.com'}</span>
-              </div>
-            </div>
 
-            <div className="logout-container">
-              <button className="logout-btn" onClick={handleLogout}>
-                <LogoutIcon style={{ fontSize: '18px' }} />
-                Logout
-              </button>
-            </div>
-          </div>
+                <ul className="sidebar-nav">
+                    {menuItems.map((item) => {
+                        const isActive = location.pathname === item.path || 
+                                       (item.path !== '/dashboard' && item.path !== '/' && location.pathname.startsWith(item.path));
+                        const isDisabled = item.disabled;
+                        
+                        return (
+                            <li
+                                key={item.name}
+                                className={`nav-item ${isActive ? 'active' : ''} ${isDisabled ? 'nav-item--disabled' : ''}`}
+                                onClick={() => {
+                                    if (isDisabled) return;
+                                    navigate(item.path);
+                                    setMobileOpen(false);
+                                }}
+                            >
+                                <div className="nav-item-icon">
+                                    <item.icon style={{ fontSize: '20px' }} />
+                                </div>
+                                <span className="nav-item-text">{item.name}</span>
+                                {isActive && <div className="nav-indicator-dot" />}
+                                {isDisabled && <span className="nav-item-tag">LOCKED</span>}
+                            </li>
+                        );
+                    })}
+                </ul>
 
+                <div className="sidebar-footer">
+                    <button className="sidebar-signout" onClick={handleLogout}>
+                        <LogoutIcon style={{ fontSize: '18px' }} />
+                        <span>Sign Out</span>
+                    </button>
+                </div>
+            </aside>
+
+            <main className="dashboard-main">
+                <header className="dashboard-topbar">
+                    <button className="mobile-toggle" onClick={toggleMobileMenu} style={{ display: window.innerWidth <= 1024 ? 'flex' : 'none', background: 'none', border: 'none', cursor: 'pointer' }}>
+                        <MenuIcon />
+                    </button>
+                    
+                    {getBreadcrumbs()}
+
+                    <div className="topbar-right">
+                        <div className="topbar-user-section">
+                            <span className="topbar-greeting">
+                                Welcome, <strong>{getUserName()}</strong>
+                            </span>
+                            <div className="topbar-avatar" onClick={() => navigate('/dashboard/profile')}>
+                                {getInitials(user?.email)}
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <section className="dashboard-content">
+                    {children}
+                </section>
+            </main>
         </div>
-      </div>
-
-      <div className="dashboard-content">
-        {children}
-      </div>
-    </div>
-  );
+    );
 };
 
 export default DashboardLayout;

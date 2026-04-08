@@ -1,20 +1,6 @@
-@import './variables.css';
-
-.my-pets-page {
-    min-height: 100vh;
-    background: var(--color-bg);
-}
-
-.my-pets-content {
-    margin-left: 290px;
-    min-height: 100vh;
-    padding: 40px;
-    overflow-y: auto;
-    box-sizing: border-box;
-}
-
 .my-pets-container {
     max-width: 1100px;
+    animation: fadeUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .my-pets-header {
@@ -27,59 +13,82 @@
 }
 
 .my-pets-title h1 {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     font-weight: 800;
     color: var(--color-text);
+    margin: 0;
 }
 
 .my-pets-title p {
     color: var(--color-text-light);
-    font-size: 0.88rem;
-    margin-top: 2px;
+    font-size: 0.9rem;
+    margin-top: 4px;
 }
 
 .btn-add-pet {
-    /* Styles are now handled by global .btn classes */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--color-accent);
+    color: var(--color-primary-dark);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition);
+    box-shadow: 0 4px 14px rgba(0, 240, 255, 0.25);
     white-space: nowrap;
+}
+
+.btn-add-pet:hover {
+    background: var(--color-accent-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 240, 255, 0.35);
 }
 
 .search-bar-wrapper {
     position: relative;
-    margin-bottom: 24px;
+    margin-bottom: 32px;
+    max-width: 460px;
 }
 
 .search-icon {
     position: absolute;
-    left: 14px;
+    left: 16px;
     top: 50%;
     transform: translateY(-50%);
     font-size: 1rem;
     color: var(--color-text-light);
     pointer-events: none;
+    display: flex;
+    align-items: center;
 }
 
 .search-input {
     width: 100%;
-    padding: 12px 14px 12px 42px;
-    border: 1.5px solid var(--color-border);
+    padding: 14px 16px 14px 48px;
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: var(--color-text);
     background: var(--color-white);
-    transition: border-color var(--transition), box-shadow var(--transition);
+    transition: all var(--transition);
     outline: none;
-    max-width: 420px;
+    box-shadow: var(--shadow-sm);
 }
 
 .search-input:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(54, 184, 183, 0.15);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 4px rgba(0, 240, 255, 0.1);
 }
 
 .pets-count-label {
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     color: var(--color-text-light);
-    margin-bottom: 16px;
+    margin-bottom: 20px;
+    font-weight: 500;
 }
 
 .pets-count-label span {
@@ -89,112 +98,107 @@
 
 .pets-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 24px;
 }
 
-/* Loading state */
+/* Empty & Loading States */
 .loading-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 400px;
-    padding: 60px 20px;
-    gap: 16px;
-    box-sizing: border-box;
+    padding: 80px 20px;
+    gap: 20px;
 }
 
 .spinner {
-    width: 44px;
-    height: 44px;
-    border: 4px solid var(--color-primary-light);
-    border-top-color: var(--color-primary);
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(0, 240, 255, 0.1);
+    border-top-color: var(--color-accent);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Empty state (Add New Pet inline card) */
 .empty-state {
     text-align: center;
-    padding: 60px 20px;
+    padding: 80px 40px;
     background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-radius: var(--radius-lg);
-    border: 2px dashed rgba(0, 0, 0, 0.15);
-    transition: var(--transition);
-    cursor: pointer;
-}
-
-.empty-state:hover {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: var(--color-accent);
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
+    border: 2px dashed var(--color-border);
+    transition: all var(--transition);
+    cursor: default;
 }
 
 .empty-state-icon {
-    font-size: 3.5rem;
+    font-size: 4rem;
     display: block;
-    margin-bottom: 12px;
-    opacity: 0.8;
-    transition: var(--transition);
-}
-
-.empty-state:hover .empty-state-icon {
-    opacity: 1;
-    transform: scale(1.05);
+    margin-bottom: 20px;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.1));
 }
 
 .empty-state h3 {
-    font-size: 1.15rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: var(--color-text);
-    margin-bottom: 6px;
-    font-family: 'DM Sans', sans-serif;
+    margin-bottom: 8px;
 }
 
 .empty-state p {
     color: var(--color-text-light);
-    font-size: 0.88rem;
-    margin-bottom: 20px;
+    font-size: 0.95rem;
+    margin-bottom: 28px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-/* Error state */
+/* Error banner */
 .error-banner {
-    background: var(--color-white);
-    border: 1.5px solid var(--color-error);
+    background: #fff5f5;
+    border: 1px solid #feb2b2;
     border-radius: var(--radius-sm);
-    padding: 14px 18px;
-    color: var(--color-error);
-    font-size: 0.88rem;
+    padding: 16px 20px;
+    color: #c53030;
+    font-size: 0.95rem;
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
 }
 
 .error-banner button {
-    background: none;
+    background: #c53030;
     border: none;
-    color: var(--color-primary);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 6px;
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     margin-left: auto;
-    text-decoration: underline;
+    transition: opacity 0.2s;
 }
 
-@media (max-width: 1100px) {
-    .my-pets-content {
-        margin-left: 0;
-        padding: 20px;
+.error-banner button:hover {
+    opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+    .my-pets-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn-add-pet {
+        justify-content: center;
+    }
+
+    .pets-grid {
+        grid-template-columns: 1fr;
     }
 }

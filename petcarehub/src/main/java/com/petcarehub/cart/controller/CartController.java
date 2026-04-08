@@ -1,5 +1,6 @@
 package com.petcarehub.cart.controller;
 
+import com.petcarehub.cart.dto.AddCartItemRequest;
 import com.petcarehub.cart.dto.CartResponseDto;
 import com.petcarehub.cart.dto.UpdateCartQuantityRequest;
 import com.petcarehub.cart.service.CartService;
@@ -12,11 +13,22 @@ import org.springframework.web.bind.annotation.*;
 public class CartController {
 
     private final CartService cartService;
-    public CartController(CartService cartService) { this.cartService = cartService; }
+
+    public CartController(CartService cartService) {
+        this.cartService = cartService;
+    }
 
     @GetMapping("/{userId}")
     public ResponseEntity<CartResponseDto> getCart(@PathVariable Long userId) {
         return ResponseEntity.ok(cartService.getCart(userId));
+    }
+
+    @PostMapping("/{userId}/items")
+    public ResponseEntity<CartResponseDto> addItem(
+            @PathVariable Long userId,
+            @Valid @RequestBody AddCartItemRequest request
+    ) {
+        return ResponseEntity.ok(cartService.addItem(userId, request.productId, request.quantity));
     }
 
     @PutMapping("/{userId}/items/{productId}")

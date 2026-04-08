@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
             const firstName = data.firstName || initialUser.firstName;
             const lastName = data.lastName || initialUser.lastName;
 
-            setUser({
+            const resolvedUser = {
                 userId: data.userId || initialUser.userId,
                 email: data.email || initialUser.email,
                 firstName,
@@ -71,18 +71,30 @@ export const AuthProvider = ({ children }) => {
                 initials: getInitials(firstName, lastName),
                 roles: data.roles || initialUser.roles,
                 profilePicture: pfp || initialUser.profilePicture
-            });
+            };
+
+            if (resolvedUser.userId) localStorage.setItem('userId', String(resolvedUser.userId));
+            if (resolvedUser.fullName) localStorage.setItem('fullName', resolvedUser.fullName);
+            if (resolvedUser.email) localStorage.setItem('email', resolvedUser.email);
+            if (resolvedUser.roles?.length) localStorage.setItem('role', resolvedUser.roles[0]);
+
+            setUser(resolvedUser);
         } catch (err) {
             console.error('AuthContext: Profile fetch failed', err);
             const decoded = jwtDecode(authToken);
-            setUser({
+            const fallbackUser = {
                 email: decoded.sub,
                 roles: decoded.roles || [],
                 userId: decoded.userId || decoded.user_id || null,
                 firstName: decoded.firstName || '',
                 lastName: decoded.lastName || '',
                 fullName: decoded.fullName || `${decoded.firstName || ''} ${decoded.lastName || ''}`.trim() || 'User'
-            });
+            };
+            if (fallbackUser.userId) localStorage.setItem('userId', String(fallbackUser.userId));
+            if (fallbackUser.fullName) localStorage.setItem('fullName', fallbackUser.fullName);
+            if (fallbackUser.email) localStorage.setItem('email', fallbackUser.email);
+            if (fallbackUser.roles?.length) localStorage.setItem('role', fallbackUser.roles[0]);
+            setUser(fallbackUser);
         } finally {
             setLoading(false);
         }

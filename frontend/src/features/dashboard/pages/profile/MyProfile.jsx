@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../../auth/contexts/AuthContext';
-// DashboardLayout removed to prevent double sidebar
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import './MyProfile.css';
@@ -22,8 +21,6 @@ const MyProfile = () => {
         password: '',
         confirmPassword: ''
     });
-
-    // We no longer need getMenuItems() here because the Parent Dashboard handles it.
 
     const fetchProfile = async () => {
         if (!token) return;
@@ -124,23 +121,28 @@ const MyProfile = () => {
         }
     };
 
-    if (loading || !profile) return <div className="loading-state">Loading Profile...</div>;
+    if (loading || !profile) return (
+        <div className="loading-container" style={{ padding: '80px 0' }}>
+            <div className="spinner" />
+            <p style={{ color: 'var(--color-text-light)', marginTop: '16px', fontWeight: 500 }}>Accessing Profile Data...</p>
+        </div>
+    );
 
     return (
-        <div className="profile-container-content">
+        <div className="profile-container-content animate-fade-up">
             <div className="profile-header-banner">
                 <div className="banner-info">
-                    <h2>My Profile</h2>
-                    <p>Manage your account settings and personal information.</p>
+                    <h2>Account Overview</h2>
+                    <p>Verified Professional Hub Presence & Registry Data</p>
                 </div>
                 {!isEditing && (
                     <button className="btn btn-teal" onClick={() => setIsEditing(true)}>
-                        Edit Profile
+                        🛠️ Modify Hub Identity
                     </button>
                 )}
             </div>
 
-            <div className="profile-main-container">
+            <div className="profile-main-container shadow-premium">
                 <div className="profile-summary-section">
                     <div className="avatar-wrapper">
                         {profile.profilePicture ? (
@@ -160,11 +162,11 @@ const MyProfile = () => {
                         />
 
                         <div className="avatar-actions">
-                            <button className="avatar-icon-btn camera" onClick={() => fileInputRef.current.click()}>
+                            <button className="avatar-icon-btn camera" onClick={() => fileInputRef.current.click()} title="Update Hub Avatar">
                                 <CameraAltIcon style={{ fontSize: '18px' }} />
                             </button>
                             {profile.profilePicture && (
-                                <button className="avatar-icon-btn delete" onClick={handleDeletePicture}>
+                                <button className="avatar-icon-btn delete" onClick={handleDeletePicture} title="Purge Identity Media">
                                     <DeleteOutlineIcon style={{ fontSize: '18px' }} />
                                 </button>
                             )}
@@ -176,7 +178,9 @@ const MyProfile = () => {
                         <p className="profile-email-text">{profile.email}</p>
                         <div className="profile-roles">
                             {profile.roles?.map(r => (
-                                <span key={r} className="role-tag">{r.replace('ROLE_', '')}</span>
+                                <span key={r} className="role-tag">
+                                    {r.replace('ROLE_', '') === 'VET' ? '⚕️ VET' : r.replace('ROLE_', '') === 'STAFF' ? '📋 STAFF' : '👤 OWNER'}
+                                </span>
                             ))}
                         </div>
                     </div>
@@ -185,24 +189,28 @@ const MyProfile = () => {
                 {!isEditing ? (
                     <div className="profile-details-view">
                         <div className="detail-box">
-                            <span className="detail-label">First Name</span>
-                            <span className="detail-value">{profile.firstName || '-'}</span>
+                            <span className="detail-label">First Registry Name</span>
+                            <span className="detail-value">{profile.firstName || 'Not Documented'}</span>
                         </div>
                         <div className="detail-box">
-                            <span className="detail-label">Last Name</span>
-                            <span className="detail-value">{profile.lastName || '-'}</span>
+                            <span className="detail-label">Last Registry Name</span>
+                            <span className="detail-value">{profile.lastName || 'Not Documented'}</span>
                         </div>
                         <div className="detail-box">
-                            <span className="detail-label">Mobile Number</span>
-                            <span className="detail-value">{profile.mobileNumber || '-'}</span>
+                            <span className="detail-label">Mobile Contact</span>
+                            <span className="detail-value">{profile.mobileNumber || 'No verified number'}</span>
                         </div>
                         <div className="detail-box">
-                            <span className="detail-label">Address</span>
-                            <span className="detail-value">{profile.address || '-'}</span>
+                            <span className="detail-label">Registry Address</span>
+                            <span className="detail-value">{profile.address || 'No physical address linked'}</span>
+                        </div>
+                        <div className="detail-box" style={{ gridColumn: '1 / -1', background: 'rgba(20,27,61,0.02)', border: '1px dashed rgba(20,27,61,0.1)' }}>
+                            <span className="detail-label">Database Footprint</span>
+                            <span className="detail-value" style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>VERIFIED_USER_{profile.userId}</span>
                         </div>
                     </div>
                 ) : (
-                    <form onSubmit={handleSave} className="profile-edit-form">
+                    <form onSubmit={handleSave} className="profile-edit-form premium-form">
                         <div className="form-grid">
                             <div className="form-input-group">
                                 <label>First Name</label>
@@ -213,34 +221,37 @@ const MyProfile = () => {
                                 <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange} required />
                             </div>
                             <div className="form-input-group">
-                                <label>Mobile Number</label>
-                                <input type="tel" name="mobileNumber" value={formData.mobileNumber} onChange={handleInputChange} />
+                                <label>Mobile Contact</label>
+                                <input type="tel" name="mobileNumber" value={formData.mobileNumber} onChange={handleInputChange} placeholder="+XX XXX XXX XXXX" />
                             </div>
                             <div className="form-input-group">
-                                <label>Address</label>
-                                <input type="text" name="address" value={formData.address} onChange={handleInputChange} />
+                                <label>Physical Address</label>
+                                <input type="text" name="address" value={formData.address} onChange={handleInputChange} placeholder="Current residency..." />
                             </div>
                         </div>
 
                         <hr className="form-divider" />
 
                         <div className="password-update-section">
-                            <h4>Change Password (Optional)</h4>
+                            <h4>Credential Management</h4>
                             <div className="form-grid">
                                 <div className="form-input-group">
-                                    <label>New Password</label>
-                                    <input type="password" name="password" placeholder="Leave blank to keep current" value={formData.password} onChange={handleInputChange} />
+                                    <label>Renew Password</label>
+                                    <input type="password" name="password" placeholder="••••••••" value={formData.password} onChange={handleInputChange} />
                                 </div>
                                 <div className="form-input-group">
-                                    <label>Confirm New Password</label>
-                                    <input type="password" name="confirmPassword" placeholder="Confirm new password" value={formData.confirmPassword} onChange={handleInputChange} />
+                                    <label>Authorize Password</label>
+                                    <input type="password" name="confirmPassword" placeholder="••••••••" value={formData.confirmPassword} onChange={handleInputChange} />
                                 </div>
                             </div>
+                            <p style={{ marginTop: '12px', fontSize: '0.8rem', color: 'var(--color-text-light)' }}>
+                                Identity confirmation required for credential synchronization. Leave empty to maintain current vault state.
+                            </p>
                         </div>
 
                         <div className="form-button-group">
-                            <button type="button" className="btn btn-cancel" onClick={() => setIsEditing(false)}>Cancel</button>
-                            <button type="submit" className="btn btn-teal">Save Changes</button>
+                            <button type="button" className="btn btn-white" onClick={() => setIsEditing(false)} style={{ flex: 1 }}>Discard Changes</button>
+                            <button type="submit" className="btn btn-teal" style={{ flex: 2 }}>Synchronize Identity</button>
                         </div>
                     </form>
                 )}

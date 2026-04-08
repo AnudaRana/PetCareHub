@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS users (
 -- ============================================================
 CREATE TABLE IF NOT EXISTS user_roles (
     user_id BIGINT NOT NULL,
-    role    VARCHAR(50) NOT NULL,
-    PRIMARY KEY (user_id, role),
+    roles   ENUM('ROLE_ADMIN','ROLE_OWNER','ROLE_STAFF','ROLE_VET') NOT NULL,
+    PRIMARY KEY (user_id, roles),
     CONSTRAINT fk_user_roles_user FOREIGN KEY (user_id)
         REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -154,32 +154,3 @@ CREATE TABLE IF NOT EXISTS order_items (
     CONSTRAINT fk_order_items_product FOREIGN KEY (product_id) REFERENCES product(product_id) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ============================================================
--- PRODUCT TABLE
--- ============================================================
-CREATE TABLE IF NOT EXISTS product (
-    product_id          BIGINT          NOT NULL AUTO_INCREMENT,
-    name                VARCHAR(100)    NOT NULL,
-    description         VARCHAR(255),
-    price               DECIMAL(10, 2)  NOT NULL,
-    stock_quantity      INT             NOT NULL,
-    image_url           VARCHAR(255),
-    image_content_type  VARCHAR(100),
-    category            VARCHAR(100),
-    PRIMARY KEY (product_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- ============================================================
--- PRODUCT_ATTRIBUTE TABLE
--- ============================================================
-CREATE TABLE IF NOT EXISTS product_attribute (
-    product_id  BIGINT          NOT NULL,
-    brand       VARCHAR(100),
-    variants    VARCHAR(255),
-    colors      VARCHAR(255),
-    flavors     VARCHAR(255),
-    category    VARCHAR(100),
-    PRIMARY KEY (product_id),
-    CONSTRAINT fk_product_attribute_product FOREIGN KEY (product_id)
-        REFERENCES product(product_id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

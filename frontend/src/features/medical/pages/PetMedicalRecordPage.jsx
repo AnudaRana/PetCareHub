@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import '../../../styles/medical.css';
 import MedicalModal from '../components/MedicalModel';
 import TreatmentList from '../components/TreatmentList';
@@ -10,11 +10,11 @@ import { getTreatmentsByPetId, addTreatmentToPet } from '../../../services/medic
 const sortByDateDesc = (items) => [...items].sort((a, b) => {
   const dateDiff = new Date(b.date) - new Date(a.date);
   if (dateDiff !== 0) return dateDiff;
-  // Fallback to ID sorting for same-day records if ID exists
   return (b.id || 0) - (a.id || 0);
 });
 
 const PetMedicalRecordPage = () => {
+  const navigate = useNavigate();
   const [treatments, setTreatments] = useState([]);
   const [isTreatmentModalOpen, setTreatmentModalOpen] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -23,53 +23,51 @@ const PetMedicalRecordPage = () => {
   const [successTitle, setSuccessTitle] = useState('');
   const [newTreatment, setNewTreatment] = useState({ date: '', diagnosis: '', notes: '', prescription: '', observation: '', doctorName: '', doctorId: '' });
   const [editingTreatmentId, setEditingTreatmentId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const location = useLocation();
   const pet = location.state?.pet;
+  const { user } = useAuth();
 
-  // Role logic kept for functional permissions
-  const role = localStorage.getItem('role') || 'ROLE_OWNER';
-  const isDoctor = role === 'ROLE_VET';
-  const canViewDetails = ['ROLE_VET', 'ROLE_OWNER', 'ROLE_STAFF'].includes(role);
+  const role = user?.role || localStorage.getItem('role') || 'ROLE_OWNER';
+  const isDoctor = role === 'ROLE_VET' || role === 'VET';
+  const canModify = isDoctor;
 
   useEffect(() => {
-    const loadTreatments = async () => {
-      if (!pet?.petId) return;
-      try {
-        const apiTreatments = await getTreatmentsByPetId(pet.petId);
-        const mappedTreatments = apiTreatments.map((t) => ({
-          id: t.id,
-          date: t.treatmentDate,
-          diagnosis: t.diagnosis || '',
-          notes: t.treatmentNotes || '',
-          prescription: t.prescriptions || '',
-          observation: t.physicalObservation || '',
-          doctorName: t.doctorName || '',
-          doctorId: t.doctorId || '',
-        }));
-        setTreatments(mappedTreatments);
-      } catch (err) {
-        console.error('Failed to load treatments:', err);
-      }
-    };
+    if (!pet) {
+        navigate('/dashboard');
+        return;
+    }
     loadTreatments();
   }, [pet]);
+
+  const loadTreatments = async () => {
+    if (!pet?.petId) return;
+    try {
+      setLoading(true);
+      const apiTreatments = await getTreatmentsByPetId(pet.petId);
+      const mappedTreatments = apiTreatments.map((t) => ({
+        id: t.id,
+        date: t.treatmentDate,
+        diagnosis: t.diagnosis || '',
+        notes: t.treatmentNotes || '',
+        prescription: t.prescriptions || '',
+        observation: t.physicalObservation || '',
+        doctorName: t.doctorName || '',
+        doctorId: t.doctorId || '',
+      }));
+      setTreatments(mappedTreatments);
+    } catch (err) {
+      console.error('Failed to load treatments:', err);
+    } finally {
+        setLoading(false);
+    }
+  };
 
   const latestTreatments = useMemo(() => sortByDateDesc(treatments), [treatments]);
 
   const doSaveTreatment = async () => {
     if (!newTreatment.date || !newTreatment.doctorName.trim() || !newTreatment.doctorId.trim()) return;
-
-    if (editingTreatmentId) {
-      setTreatments((old) => old.map((t) => (t.id === editingTreatmentId ? { ...t, ...newTreatment, id: editingTreatmentId } : t)));
-      setEditingTreatmentId(null);
-      setNewTreatment({ date: '', diagnosis: '', notes: '', prescription: '', observation: '', doctorName: '', doctorId: '' });
-      setTreatmentModalOpen(false);
-      setSuccessTitle('Medical Record Updated!');
-      setSuccessMessage('The medical treatment record has been successfully updated.');
-      setShowSuccessModal(true);
-      return;
-    }
 
     if (!pet?.petId) return;
 
@@ -97,8 +95,8 @@ const PetMedicalRecordPage = () => {
       };
 
       setTreatments((old) => [savedTreatment, ...old]);
-      setSuccessTitle('Medical Record Added!');
-      setSuccessMessage('The medical treatment record has been successfully added.');
+      setSuccessTitle('Medical Record Finalized');
+      setSuccessMessage('The clinical treatment documentation has been successfully archived.');
       setShowSuccessModal(true);
     } catch (err) {
       console.error('Failed to save treatment:', err);
@@ -109,13 +107,13 @@ const PetMedicalRecordPage = () => {
   };
 
   const handleSaveRequest = () => setShowConfirmModal(true);
-  const handleCancelSave = () => setShowConfirmModal(false);
   const handleConfirmSave = async () => {
     setShowConfirmModal(false);
     await doSaveTreatment();
   };
 
   const handleEditTreatment = (id) => {
+    // Currently limited to viewing/editing for doctors if applicable
     const entry = treatments.find((t) => t.id === id);
     if (!entry) return;
     setNewTreatment({ ...entry });
@@ -124,68 +122,124 @@ const PetMedicalRecordPage = () => {
   };
 
   return (
-    <div className="medical-page-container">
+    <div className="medical-page-container animate-fade-up">
       <div className="medical-page">
-        <h1>Pet Medical Record</h1>
-        <p>Medical records for: <strong>{pet?.name || 'Unknown Pet'}</strong></p>
+        <header style={{ marginBottom: '40px', borderBottom: '1px solid var(--color-border)', paddingBottom: '24px' }}>
+            <h1 className="section-title">Clinical History & Registry</h1>
+            <p style={{ margin: '8px 0 0', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span className="pet-detail-species-badge" style={{ margin: 0 }}>{pet?.species?.toUpperCase()}</span>
+                Comprehensive records for <strong>{pet?.name}</strong> (Registry ID: HUB-{pet?.petId})
+            </p>
+        </header>
 
         <div className="medical-grid">
           <section className="medical-block">
-            <div className="block-header">
-              <div className="block-title">
-                <h2>Medical Treatment</h2>
-              </div>
-              {isDoctor && (
+            <header className="block-header">
+              <h2>Medical Treatments & Diagnoses</h2>
+              {canModify && (
                 <button
                   className="btn btn-teal"
                   onClick={() => {
-                    setNewTreatment({ date: '', diagnosis: '', notes: '', prescription: '', observation: '', doctorName: '', doctorId: '' });
+                    setNewTreatment({ 
+                        date: new Date().toISOString().split('T')[0], 
+                        diagnosis: '', notes: '', prescription: '', observation: '', 
+                        doctorName: user?.fullName || '', 
+                        doctorId: `VET-${user?.userId || ''}` 
+                    });
                     setEditingTreatmentId(null);
                     setTreatmentModalOpen(true);
                   }}
                 >
-                  + Add Treatment
+                  + Add Clinical Entry
                 </button>
               )}
-            </div>
+            </header>
 
-            {canViewDetails ? (
-              <TreatmentList
-                treatments={latestTreatments}
-                isDoctor={isDoctor}
-                onEdit={handleEditTreatment}
-              />
+            {loading ? (
+                 <div className="loading-container" style={{ padding: '80px 0' }}>
+                    <div className="spinner" />
+                    <p style={{ color: 'var(--color-text-light)', marginTop: '16px', fontWeight: 500 }}>Accessing Vault...</p>
+                </div>
+            ) : treatments.length === 0 ? (
+                <div className="empty-state" style={{ padding: '60px 20px' }}>
+                    <span className="empty-state-icon">📋</span>
+                    <h3>No medical history found</h3>
+                    <p>This patient has no clinical treatment records registered in the system.</p>
+                </div>
             ) : (
-              <div className="no-access">Details available for Owner/Staff/Doctor only.</div>
+                <TreatmentList
+                  treatments={latestTreatments}
+                  isDoctor={isDoctor}
+                  onEdit={handleEditTreatment}
+                />
             )}
           </section>
         </div>
       </div>
 
-      {/* Modals */}
-      <MedicalModal
-        title={editingTreatmentId ? 'Edit Treatment' : 'Add Treatment'}
-        isOpen={isTreatmentModalOpen}
-        onClose={() => { setTreatmentModalOpen(false); setEditingTreatmentId(null); }}
-        onSave={handleSaveRequest}
-        disabled={!newTreatment.date || !newTreatment.doctorName.trim() || !newTreatment.doctorId.trim()}
-      >
-        <label>Date<input type="date" value={newTreatment.date} onChange={(e) => setNewTreatment({ ...newTreatment, date: e.target.value })} /></label>
-        <label>Diagnosis<input value={newTreatment.diagnosis} onChange={(e) => setNewTreatment({ ...newTreatment, diagnosis: e.target.value })} /></label>
-        <label>Treatment notes<textarea value={newTreatment.notes} onChange={(e) => setNewTreatment({ ...newTreatment, notes: e.target.value })} /></label>
-        <label>Prescription<input value={newTreatment.prescription} onChange={(e) => setNewTreatment({ ...newTreatment, prescription: e.target.value })} /></label>
-        <label>Physical observation<textarea value={newTreatment.observation} onChange={(e) => setNewTreatment({ ...newTreatment, observation: e.target.value })} /></label>
-        <label>Doctor name<input required value={newTreatment.doctorName} onChange={(e) => setNewTreatment({ ...newTreatment, doctorName: e.target.value })} /></label>
-        <label>Doctor ID<input required value={newTreatment.doctorId} onChange={(e) => setNewTreatment({ ...newTreatment, doctorId: e.target.value })} /></label>
-      </MedicalModal>
+      {/* Modern High-Fidelity Modal for Adding Record */}
+      {isTreatmentModalOpen && (
+          <div className="modal-overlay" onClick={() => setTreatmentModalOpen(false)}>
+              <div className="modal-container" style={{ maxWidth: '640px' }} onClick={e => e.stopPropagation()}>
+                  <header className="modal-header">
+                      <h2>{editingTreatmentId ? 'Modify Clinical Entry' : 'New Medical Documentation'}</h2>
+                      <button className="close-btn" onClick={() => setTreatmentModalOpen(false)}>✕</button>
+                  </header>
+                  
+                  <div className="modal-body" style={{ padding: '24px' }}>
+                      <form className="premium-form" onSubmit={(e) => { e.preventDefault(); handleSaveRequest(); }}>
+                          <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                              <label>Visit Date
+                                  <input type="date" value={newTreatment.date} onChange={(e) => setNewTreatment({ ...newTreatment, date: e.target.value })} required />
+                              </label>
+                              <label>Patient ID
+                                  <input type="text" value={`HUB-${pet.petId} - ${pet.name}`} disabled />
+                              </label>
+                          </div>
+
+                          <label>Primary Diagnosis
+                              <input value={newTreatment.diagnosis} onChange={(e) => setNewTreatment({ ...newTreatment, diagnosis: e.target.value })} placeholder="e.g. Chronic Kidney Disease" required />
+                          </label>
+                          
+                          <label>Clinical Observations
+                              <textarea rows="3" value={newTreatment.observation} onChange={(e) => setNewTreatment({ ...newTreatment, observation: e.target.value })} placeholder="Observations during vitals check..." />
+                          </label>
+
+                          <label>Treatment Plan & Notes
+                              <textarea rows="3" value={newTreatment.notes} onChange={(e) => setNewTreatment({ ...newTreatment, notes: e.target.value })} placeholder="Details of treatment administered..." />
+                          </label>
+
+                          <label>Prescriptions
+                              <input value={newTreatment.prescription} onChange={(e) => setNewTreatment({ ...newTreatment, prescription: e.target.value })} placeholder="Dosage, frequency, medications..." />
+                          </label>
+
+                          <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                              <label>Signing Doctor
+                                  <input value={newTreatment.doctorName} onChange={(e) => setNewTreatment({ ...newTreatment, doctorName: e.target.value })} required />
+                              </label>
+                              <label>Doctor ID
+                                  <input value={newTreatment.doctorId} onChange={(e) => setNewTreatment({ ...newTreatment, doctorId: e.target.value })} required />
+                              </label>
+                          </div>
+
+                          <div className="modal-actions" style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
+                              <button type="button" className="btn btn-white" onClick={() => setTreatmentModalOpen(false)} style={{ flex: 1 }}>Discard</button>
+                              <button type="submit" className="btn btn-teal" style={{ flex: 2 }}>{editingTreatmentId ? 'Update Record' : 'Finalize & Archive'}</button>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      )}
 
       {showConfirmModal && (
         <div className="confirm-backdrop" role="dialog" aria-modal="true">
           <div className="confirm-box">
-            <p>Confirm changes and save medical treatment?</p>
-            <div className="confirm-actions" style={{ justifyContent: 'flex-end', gap: '10px' }}>
-              <button className="btn btn-white" onClick={handleCancelSave}>Cancel</button>
-              <button className="btn btn-teal" onClick={handleConfirmSave}>Confirm</button>
+            <h3>Final Authorization</h3>
+            <p>Confirm integrity and archive this medical treatment record to the vault?</p>
+            <div className="confirm-actions">
+              <button className="btn btn-white" onClick={() => setShowConfirmModal(false)} style={{ flex: 1 }}>Review</button>
+              <button className="btn btn-teal" onClick={handleConfirmSave} style={{ flex: 2 }}>Yes, Archive Record</button>
             </div>
           </div>
         </div>

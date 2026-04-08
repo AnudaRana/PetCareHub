@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { API_BASE_URL, getAllPets } from '../../../../services/petService';
+import { getImageUrl, getAllPets } from '../../../../services/petService';
 import StaffPetDetail from './StaffPetDetail';
 import '../../../../styles/MyPets.css';
 import '../../../../styles/StaffDashboard.css';
 
-const SPECIES_EMOJI = { Dog: '🐕', Cat: '🐈', Bird: '🐦', Rabbit: '🐇', Fish: '🐟' };
-
 const StaffAllPets = () => {
+    // ... (rest of the component state/logic stays same)
   const [pets, setPets]               = useState([]);
   const [filtered, setFiltered]       = useState([]);
   const [loading, setLoading]         = useState(true);
@@ -44,31 +43,40 @@ const StaffAllPets = () => {
   }, [searchQuery, pets]);
 
   return (
-    <div>
-      <div style={{ marginBottom: 32 }}>
-        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 700, color: 'var(--color-primary)', margin: '0 0 6px' }}>
-          All Pet Profiles
-        </h2>
-        <p style={{ color: 'var(--color-text-light)', fontSize: 14, margin: 0 }}>
-          View and manage pet information for clinic operations.
-        </p>
-      </div>
 
-      {/* Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
-        <div className="staff-stat-card-inline" style={{ '--accent': '#10B981' }}>
-          <div style={{ fontSize: 28, fontWeight: 800, color: '#10B981', fontFamily: "'Playfair Display', serif" }}>
-            {!loading && !error ? pets.length : '—'}
-          </div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-text)', marginTop: 2 }}>Total Pets</div>
-          <div style={{ fontSize: 11, color: 'var(--color-text-light)', marginTop: 1 }}>registered</div>
+    <div className="my-pets-container animate-fade-up">
+      {/* Header with Role Badge */}
+      <div className="staff-home-greeting">
+        <div>
+          <h1>Clinic Pet Registry</h1>
+          <p>Access and manage pet information for clinic operations and records.</p>
+        </div>
+        <div className="staff-role-badge">
+          <span className="staff-sidebar-role-icon">📋</span>
+          Clinic Staff
         </div>
       </div>
 
-      {/* Search */}
-      <div className="search-bar-wrapper" style={{ marginBottom: 24 }}>
+      {/* Stats Summary */}
+      <div className="staff-stats-grid">
+        <div className="staff-stat-card" style={{ '--accent': 'var(--color-primary)' }}>
+          <div className="staff-stat-icon">🐕</div>
+          <div className="staff-stat-value">{!loading && !error ? pets.length : '—'}</div>
+          <div className="staff-stat-label">Total Registry</div>
+          <div className="staff-stat-sub">Active patients</div>
+        </div>
+        <div className="staff-stat-card" style={{ '--accent': '#10B981' }}>
+          <div className="staff-stat-icon">📈</div>
+          <div className="staff-stat-value">{!loading && !error ? filtered.length : '—'}</div>
+          <div className="staff-stat-label">Filtered Results</div>
+          <div className="staff-stat-sub">Active search database</div>
+        </div>
+      </div>
+
+      {/* Advanced Search */}
+      <div className="search-bar-wrapper">
         <span className="search-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
@@ -79,22 +87,23 @@ const StaffAllPets = () => {
           placeholder="Search by pet name, ID, or owner name..."
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          aria-label="Search pets"
-          style={{ maxWidth: 480 }}
+          aria-label="Search patients"
+          style={{ maxWidth: 520 }}
         />
       </div>
 
       {error && (
         <div className="error-banner">
-          ⚠ {error}
-          <button onClick={fetchAllPets}>Retry</button>
+          <span style={{ fontSize: '1.2rem' }}>⚠️</span>
+          <div style={{ flex: 1 }}>{error}</div>
+          <button onClick={fetchAllPets}>Retry Sync</button>
         </div>
       )}
 
       {loading && (
         <div className="loading-container">
           <div className="spinner" aria-label="Loading pets..." />
-          <p style={{ color: 'var(--color-text-light)', fontSize: '0.9rem' }}>Loading pet profiles...</p>
+          <p style={{ color: 'var(--color-text-light)', fontWeight: 500 }}>Syncing registry data...</p>
         </div>
       )}
 
@@ -102,29 +111,29 @@ const StaffAllPets = () => {
         <>
           {filtered.length > 0 && (
             <p className="pets-count-label">
-              Showing <span>{filtered.length}</span> of <span>{pets.length}</span> pet{pets.length !== 1 ? 's' : ''}
-              {searchQuery && ` matching "${searchQuery}"`}
+              Showing <span>{filtered.length}</span> patient record{filtered.length !== 1 ? 's' : ''}
+              {searchQuery && ` for "${searchQuery}"`}
             </p>
           )}
 
           {filtered.length === 0 ? (
             <div className="empty-state">
-              <span className="empty-state-icon">🐾</span>
-              <h3>No pet profiles found</h3>
+              <span className="empty-state-icon">🔍</span>
+              <h3>No patient profiles found</h3>
               {searchQuery
-                ? <p>No pets match "<strong>{searchQuery}</strong>". Try a different term.</p>
-                : <p>No pets are registered in the system yet.</p>
+                ? <p>We couldn't find any results for "<strong>{searchQuery}</strong>". Try searching by ID or name.</p>
+                : <p>No pet profiles are currently registered in the clinic database.</p>
               }
             </div>
           ) : (
-            <div className="staff-pets-table">
+            <div className="staff-pets-table shadow-premium">
               <div className="staff-pets-table-header">
-                <span>Pet</span>
-                <span>Species / Breed</span>
-                <span>Owner</span>
+                <span>Patient</span>
+                <span>Registry Info</span>
+                <span>Primary Owner</span>
                 <span>Age</span>
                 <span>Gender</span>
-                <span>Actions</span>
+                <span>Operations</span>
               </div>
               {filtered.map(pet => (
                 <StaffPetRow key={pet.petId} pet={pet} onSelect={setSelectedPet} />
@@ -138,6 +147,7 @@ const StaffAllPets = () => {
         <StaffPetDetail pet={selectedPet} onClose={() => setSelectedPet(null)} />
       )}
     </div>
+
   );
 };
 
@@ -152,14 +162,14 @@ const calcAge = (dob) => {
 };
 
 const StaffPetRow = ({ pet, onSelect }) => {
-  const emoji = SPECIES_EMOJI[pet.species] || '🐾';
+  const imageUrl = getImageUrl(pet.petImagePath);
   return (
     <div className="staff-pets-table-row" onClick={() => onSelect(pet)}>
       <span className="staff-pet-name-cell">
         <div className="staff-pet-mini-avatar">
-          {pet.petImagePath
-            ? <img src={`${API_BASE_URL}/${pet.petImagePath}`} alt={pet.name} />
-            : <span>{emoji}</span>
+          {imageUrl
+            ? <img src={imageUrl} alt={pet.name} />
+            : <span className="placeholder-icon">🐾</span>
           }
         </div>
         <div>

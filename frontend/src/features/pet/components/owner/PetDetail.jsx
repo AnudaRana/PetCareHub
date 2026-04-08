@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../../../../services/petService';
+import { getImageUrl } from '../../../../services/petService';
 import '../../../../styles/PetDetail.css';
 import EditPetForm from './EditPetForm';
 
-
-const SPECIES_EMOJI = { Dog: '🐕', Cat: '🐈', Bird: '🐦', Rabbit: '🐇', Fish: '🐟' };
 
 const PetDetail = ({ pet, onClose, onUpdateSuccess, userId }) => {
     const [isEditing, setIsEditing] = useState(false);
@@ -24,7 +22,7 @@ const PetDetail = ({ pet, onClose, onUpdateSuccess, userId }) => {
         );
     }
 
-    const emoji = SPECIES_EMOJI[pet.species] || '🐾';
+    const imageUrl = getImageUrl(pet.petImagePath);
 
     const calcAge = (dob) => {
         if (!dob) return 'Unknown';
@@ -37,27 +35,27 @@ const PetDetail = ({ pet, onClose, onUpdateSuccess, userId }) => {
     };
 
     return (
+
         <div
             className="pet-detail-overlay"
             onClick={onClose}
             role="dialog"
             aria-modal="true"
-            aria-label={`${pet.name}'s profile`}
         >
             <div className="pet-detail-panel" onClick={(e) => e.stopPropagation()}>
-                <div className="pet-detail-header">
-                    {pet.petImagePath ? (
+                <header className="pet-detail-header">
+                    {imageUrl ? (
                         <img
-                            src={`${API_BASE_URL}/${pet.petImagePath}`}
+                            src={imageUrl}
                             alt={pet.name}
                         />
                     ) : (
                         <div className="pet-detail-avatar-fallback">
-                            <span>{emoji}</span>
+                            <span className="placeholder-icon">🐾</span>
                         </div>
                     )}
                     <button className="pet-detail-back-btn" onClick={onClose} aria-label="Close">✕</button>
-                </div>
+                </header>
 
                 <div className="pet-detail-body">
                     <div className="pet-detail-title-row">
@@ -68,13 +66,13 @@ const PetDetail = ({ pet, onClose, onUpdateSuccess, userId }) => {
                     <div className="pet-detail-grid">
                         <div className="pet-detail-field">
                             <div className="pet-detail-field-label">Breed</div>
-                            <div className="pet-detail-field-value">{pet.breed || 'Mixed / Unknown'}</div>
+                            <div className="pet-detail-field-value">{pet.breed || 'Companion'}</div>
                         </div>
 
                         <div className="pet-detail-field">
                             <div className="pet-detail-field-label">Gender</div>
                             <div className="pet-detail-field-value">
-                                {pet.gender === 'MALE' ? '♂ Male' : pet.gender === 'FEMALE' ? '♀ Female' : '? Unknown'}
+                                {pet.gender === 'MALE' ? '♂ Male' : pet.gender === 'FEMALE' ? '♀ Female' : '? Mixed'}
                             </div>
                         </div>
 
@@ -84,25 +82,20 @@ const PetDetail = ({ pet, onClose, onUpdateSuccess, userId }) => {
                         </div>
 
                         <div className="pet-detail-field">
-                            <div className="pet-detail-field-label">Date of Birth</div>
-                            <div className="pet-detail-field-value">
-                                {pet.dateOfBirth ? new Date(pet.dateOfBirth).toLocaleDateString('en-GB') : '—'}
-                            </div>
-                        </div>
-
-                        <div className="pet-detail-field">
                             <div className="pet-detail-field-label">Weight</div>
                             <div className="pet-detail-field-value">{pet.weight ? `${pet.weight} kg` : '—'}</div>
                         </div>
 
-                        <div className="pet-detail-field">
-                            <div className="pet-detail-field-label">Owner</div>
-                            <div className="pet-detail-field-value">{pet.ownerName || '—'}</div>
+                        <div className="pet-detail-field full-width">
+                            <div className="pet-detail-field-label">Date of Birth</div>
+                            <div className="pet-detail-field-value">
+                                {pet.dateOfBirth ? new Date(pet.dateOfBirth).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}
+                            </div>
                         </div>
 
                         {pet.knownIllnesses && (
                             <div className="pet-detail-field full-width pet-detail-illnesses">
-                                <div className="pet-detail-field-label">Known Illnesses / Conditions</div>
+                                <div className="pet-detail-field-label">Medical Conditions</div>
                                 <div className="pet-detail-field-value">{pet.knownIllnesses}</div>
                             </div>
                         )}
@@ -112,25 +105,26 @@ const PetDetail = ({ pet, onClose, onUpdateSuccess, userId }) => {
                         <button
                             className="btn btn-teal"
                             onClick={() => setIsEditing(true)}
-                            style={{ flex: 1 }}
+                            style={{ flex: 1, padding: '14px' }}
                         >
-                            Edit Profile
+                            ✏️ Edit Profile
                         </button>
                         <button 
                             className="btn btn-dark-blue"
                             onClick={() => navigate('/dashboard/pet-medical-record', { state: { pet } })}
-                            style={{ flex: 1 }}
+                            style={{ flex: 1, padding: '14px' }}
                         >
-                            View Medical Records
+                            📊 Records
                         </button>
                     </div>
 
                     <p className="pet-detail-registered">
-                        Registered on {pet.createdAt ? new Date(pet.createdAt).toLocaleDateString('en-GB') : '—'}
+                        Profile created on {pet.createdAt ? new Date(pet.createdAt).toLocaleDateString('en-GB') : '—'}
                     </p>
                 </div>
             </div>
         </div>
+
     );
 };
 

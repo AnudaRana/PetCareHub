@@ -29,9 +29,16 @@ export default function Cart() {
   });
 
   const loadPendingOrders = async () => {
+    if (!userId) {
+      setPendingOrders([]);
+      setPendingError("");
+      return;
+    }
+
     try {
       const data = await orderService.getPendingOrders(userId);
       setPendingOrders(data);
+      setPendingError("");
     } catch (err) {
       console.error(err);
       setPendingError("Failed to load orders awaiting payment.");

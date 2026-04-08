@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useAuth } from "../../auth/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import CheckoutTopbar from "../components/CheckoutTopbar";
 import CartStepper from "../components/CartStepper";
@@ -17,7 +18,12 @@ const initialForm = {
 
 export default function OrderDetails() {
   const navigate = useNavigate();
-  const userId = useMemo(() => Number(localStorage.getItem("userId") || 1), []);
+  const { user, loading: authLoading } = useAuth();
+  const userId = useMemo(() => {
+    if (user?.userId) return Number(user.userId);
+    const s = localStorage.getItem("userId");
+    return s ? Number(s) : null;
+  }, [user?.userId]);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -29,6 +35,13 @@ export default function OrderDetails() {
 
   useEffect(() => {
     const loadPage = async () => {
+      if (authLoading) return;
+      if (!userId) {
+        setError("Unable to detect the logged-in user.");
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       setError("");
       try {
@@ -55,7 +68,7 @@ export default function OrderDetails() {
     };
 
     loadPage();
-  }, [userId]);
+  }, [authLoading, userId]);
 
   const validate = () => {
     const nextErrors = {};
