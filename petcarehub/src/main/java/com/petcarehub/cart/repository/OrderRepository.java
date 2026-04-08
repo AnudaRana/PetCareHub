@@ -13,4 +13,7 @@ public interface OrderRepository extends JpaRepository<CustomerOrder, Long> {
     Optional<CustomerOrder> findByOrderIdAndUser_UserId(Long orderId, Long userId);
 
     List<CustomerOrder> findByUser_UserIdAndOrderStatusOrderByCreatedAtDesc(Long userId, OrderStatus orderStatus);
+
+    @EntityGraph(attributePaths = {"pet", "items", "items.product"})
+    List<CustomerOrder> findByOrderStatusOrderByCreatedAtDesc(OrderStatus orderStatus);
 }
