@@ -165,7 +165,7 @@ export default function PaymentPage() {
 
               <div className="form-actions top-gap">
                 <button type="button" className="secondary-pill-btn" onClick={() => navigate("/cart")}>Back to Cart</button>
-                <button type="button" className="cart-topbar-btn disabled-btn" onClick={() => {}}>
+                <button type="button" className="cart-primary" onClick={() => navigate("/dashboard")}>
                   Go to Dashboard
                 </button>
               </div>
@@ -252,7 +252,7 @@ export default function PaymentPage() {
         onClose={() => setModalOpen(false)}
         onConfirm={handleCancelOrderAction}
         title="Cancel Order"
-        message="Are you sure you want to cancel this order? This will permanently delete the order from your records."
+        message="Are you sure you want to cancel this order? This action cannot be undone."
         confirmText="Cancel Order"
         isDanger={true}
       />
