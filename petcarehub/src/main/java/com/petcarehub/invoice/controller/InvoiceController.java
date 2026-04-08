@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,11 +47,13 @@ public class InvoiceController {
      */
     @GetMapping("/orders/eligible")
     public ResponseEntity<List<EligibleOrderDto>> getEligibleOrders() {
-        // Get all PLACED orders
-        List<CustomerOrder> placedOrders = orderRepository.findByOrderStatusOrderByCreatedAtDesc(OrderStatus.PLACED);
+        // Get orders that are placed, ready, or completed
+        List<CustomerOrder> eligibleStatusOrders = orderRepository.findByOrderStatusInOrderByCreatedAtDesc(
+                Arrays.asList(OrderStatus.PLACED, OrderStatus.READY, OrderStatus.COMPLETED)
+        );
         
         // Filter out orders that already have invoices
-        List<EligibleOrderDto> eligibleOrders = placedOrders.stream()
+        List<EligibleOrderDto> eligibleOrders = eligibleStatusOrders.stream()
                 .filter(order -> !invoiceRepository.existsByOrder_OrderId(order.getOrderId()))
                 .filter(order -> order.getItems() != null && !order.getItems().isEmpty())
                 .filter(order -> order.getPaymentMethod() != null)

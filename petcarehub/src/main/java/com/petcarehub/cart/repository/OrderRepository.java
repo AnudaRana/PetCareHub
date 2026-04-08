@@ -16,6 +16,9 @@ public interface OrderRepository extends JpaRepository<CustomerOrder, Long> {
 
     @EntityGraph(attributePaths = {"pet", "items", "items.product"})
     List<CustomerOrder> findByOrderStatusOrderByCreatedAtDesc(OrderStatus orderStatus);
+
+    @EntityGraph(attributePaths = {"pet", "items", "items.product"})
+    List<CustomerOrder> findByOrderStatusInOrderByCreatedAtDesc(List<OrderStatus> orderStatuses);
     
     // Owner billing: Get all orders for a specific owner
     @EntityGraph(attributePaths = {"pet"})
