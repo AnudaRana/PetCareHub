@@ -12,6 +12,8 @@ const OrderDetailsCard = ({ order, onClose, onRefresh, role, onToast }) => {
     const [cancelReason, setCancelReason] = useState('');
     const [otherReason, setOtherReason] = useState('');
     const [cancelling, setCancelling] = useState(false);
+    const [verifying, setVerifying] = useState(false);
+    const [receiptUrl, setReceiptUrl] = useState(null);
 
     const getStatusClass = (status) => {
         return `order-status-pill status-${(status || '').toLowerCase()}`;
@@ -36,6 +38,28 @@ const OrderDetailsCard = ({ order, onClose, onRefresh, role, onToast }) => {
         };
         fetchDetails();
     }, [order.orderId, token]);
+
+    useEffect(() => {
+        if (details?.paymentReceiptFileName && token) {
+            const fetchReceipt = async () => {
+                try {
+                    const response = await axios.get(`/api/shop/orders/${details.orderId}/receipt`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                        responseType: 'blob'
+                    });
+                    const url = URL.createObjectURL(response.data);
+                    setReceiptUrl(url);
+                } catch (error) {
+                    console.error("Error fetching receipt blob:", error);
+                }
+            };
+            fetchReceipt();
+        }
+        
+        return () => {
+            if (receiptUrl) URL.revokeObjectURL(receiptUrl);
+        }
+    }, [details?.orderId, details?.paymentReceiptFileName, token]);
 
     const commonReasons = role === 'OWNER' 
         ? ["", "Found a better price", "Changed my mind", "Ordered by mistake", "Other"]
@@ -64,6 +88,22 @@ const OrderDetailsCard = ({ order, onClose, onRefresh, role, onToast }) => {
             alert(err.response?.data?.message || "Cancellation failed");
         } finally {
             setCancelling(false);
+        }
+    };
+
+    const handleVerifyPayment = async () => {
+        try {
+            setVerifying(true);
+            await axios.put(`/api/shop/orders/${order.orderId}/verify-payment`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            onToast?.(`Payment for ${order.orderNumber} verified!`);
+            onRefresh();
+            onClose();
+        } catch (err) {
+            alert("Verification failed");
+        } finally {
+            setVerifying(false);
         }
     };
 
@@ -166,15 +206,62 @@ const OrderDetailsCard = ({ order, onClose, onRefresh, role, onToast }) => {
                 </div>
             )}
 
+            {details.paymentReceiptFileName && (
+                <div className="modal-section" style={{ marginTop: '32px' }}>
+                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '1.2rem' }}>🖼️</span> Payment Documentation
+                    </h4>
+                    <div className="receipt-viewer" style={{ 
+                        background: '#f8fafc', 
+                        padding: '16px', 
+                        borderRadius: '12px', 
+                        border: '1px dashed #cbd5e1',
+                        textAlign: 'center'
+                    }}>
+                        {receiptUrl ? (
+                            <img 
+                                src={receiptUrl} 
+                                alt="Payment Slip" 
+                                style={{ 
+                                    maxWidth: '100%', 
+                                    maxHeight: '400px', 
+                                    borderRadius: '8px',
+                                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' 
+                                }} 
+                            />
+                        ) : (
+                            <div style={{ padding: '40px', color: 'var(--color-text-light)' }}>
+                                <div className="spinner" style={{ margin: '0 auto 12px', width: '24px', height: '24px' }}></div>
+                                <p>Authenticating & retrieving image...</p>
+                            </div>
+                        )}
+                        <p style={{ marginTop: '12px', fontSize: '0.85rem', color: '#64748b' }}>
+                            File: {details.paymentReceiptFileName}
+                        </p>
+                    </div>
+                </div>
+            )}
+
             {!isCancelled && !showCancelForm && (
-                 <div style={{ marginTop: '40px', display: 'flex', gap: '16px' }}>
+                 <div style={{ marginTop: '40px', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                    {details.paymentStatus !== 'PAID' && (role === 'STAFF' || role === 'ADMIN') && (
+                        <button 
+                            className="btn btn-teal"
+                            onClick={handleVerifyPayment}
+                            disabled={verifying}
+                            style={{ flex: 1, minWidth: '200px' }}
+                        >
+                            {verifying ? 'Verifying...' : '✅ Verify Payment Slip'}
+                        </button>
+                    )}
                     <button 
                         className="btn btn-cancel"
                         onClick={() => setShowCancelForm(true)}
+                        style={{ flex: 1, minWidth: '200px' }}
                     >
                         ✕ Request Cancellation
                     </button>
-                    <button className="btn btn-white" onClick={onClose}>
+                    <button className="btn btn-white" onClick={onClose} style={{ flex: 1, minWidth: '150px' }}>
                         Return to List
                     </button>
                  </div>

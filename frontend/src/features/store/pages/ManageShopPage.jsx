@@ -24,6 +24,21 @@ const ManageShopPage = () => {
         }
     };
 
+    const handleDelete = async (id, name) => {
+        if (!window.confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) return;
+
+        try {
+            await axios.delete(`/api/products/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            showToast(`Product "${name}" deleted successfully.`);
+            fetchProducts();
+        } catch (error) {
+            console.error("Delete failed:", error);
+            alert("Failed to delete product. It might be linked to existing orders.");
+        }
+    };
+
     useEffect(() => {
         fetchProducts();
     }, []);
@@ -97,12 +112,21 @@ const ManageShopPage = () => {
                                             </span>
                                         </td>
                                         <td>
-                                            <button
-                                                className="order-action-btn"
-                                                onClick={() => handleEdit(p)}
-                                            >
-                                                Edit
-                                            </button>
+                                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                                                <button 
+                                                    className="order-action-btn"
+                                                    onClick={() => setSelectedProduct(p)}
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button 
+                                                    className="order-action-btn"
+                                                    style={{ background: 'var(--color-error)', color: 'white', borderColor: 'var(--color-error)' }}
+                                                    onClick={() => handleDelete(p.productId, p.name)}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}

@@ -21,6 +21,8 @@ const ProductFormCard = ({ product, onClose, onRefresh, onToast }) => {
     });
 
     const [saving, setSaving] = useState(false);
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
 
     useEffect(() => {
         if (product) {
@@ -36,8 +38,21 @@ const ProductFormCard = ({ product, onClose, onRefresh, onToast }) => {
                 colors: product.colors || '',
                 flavors: product.flavors || ''
             });
+            setImagePreview(`/api/products/${product.productId}/image`);
         }
     }, [product]);
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -52,12 +67,25 @@ const ProductFormCard = ({ product, onClose, onRefresh, onToast }) => {
                 headers: { Authorization: `Bearer ${token}` }
             };
 
+            let productId = product?.productId;
             if (isEdit) {
                 await axios.put(`/api/products/${product.productId}`, formData, config);
                 onToast?.("Product updated successfully!");
             } else {
-                await axios.post('/api/products', formData, config);
+                const res = await axios.post('/api/products', formData, config);
+                productId = res.data.productId;
                 onToast?.("Product added successfully!");
+            }
+
+            if (imageFile && productId) {
+                const imgData = new FormData();
+                imgData.append('file', imageFile);
+                await axios.post(`/api/products/${productId}/image`, imgData, {
+                    headers: { 
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
             }
 
             onRefresh();
@@ -98,12 +126,22 @@ const ProductFormCard = ({ product, onClose, onRefresh, onToast }) => {
                         <label>Category
                             <select name="category" value={formData.category} onChange={handleChange} required>
                                 <option value="">-- Select Category --</option>
-                                <option value="dog">Dog Food</option>
-                                <option value="cat">Cat Food</option>
-                                <option value="accessories">Accessories</option>
-                                <option value="health">Healthcare</option>
-                                <option value="grooming">Grooming</option>
-                                <option value="supplements">Supplements</option>
+                                <optgroup label="Dog Food">
+                                    <option value="dog-dry">Dog Dry Food</option>
+                                    <option value="dog-wet">Dog Wet Food</option>
+                                    <option value="dog-treats">Dog Treats</option>
+                                </optgroup>
+                                <optgroup label="Cat Food">
+                                    <option value="cat-dry">Cat Dry Food</option>
+                                    <option value="cat-wet">Cat Wet Food</option>
+                                    <option value="cat-treats">Cat Treats</option>
+                                </optgroup>
+                                <optgroup label="Other Categories">
+                                    <option value="accessories">Accessories</option>
+                                    <option value="health">Healthcare</option>
+                                    <option value="grooming">Grooming</option>
+                                    <option value="supplements">Supplements</option>
+                                </optgroup>
                             </select>
                         </label>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
@@ -127,15 +165,50 @@ const ProductFormCard = ({ product, onClose, onRefresh, onToast }) => {
                                 />
                             </label>
                         </div>
-                        <label>Image URL
-                            <input
-                                type="text"
-                                name="imageUrl"
-                                value={formData.imageUrl}
-                                onChange={handleChange}
-                                placeholder="https://example.com/image.jpg"
-                            />
-                        </label>
+                        <div className="product-image-upload-section">
+                            <label>Product Display Picture
+                                <div className="image-upload-wrapper">
+                                    <input
+                                        type="file"
+                                        id="product-image-input"
+                                        onChange={handleFileChange}
+                                        accept="image/*"
+                                        style={{ display: 'none' }}
+                                    />
+                                    <label htmlFor="product-image-input" className="image-drop-zone">
+                                        {imagePreview ? (
+                                            <img 
+                                                src={imagePreview} 
+                                                alt="Preview" 
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                                                onError={(e) => {
+                                                    e.target.style.display = 'none';
+                                                    e.target.nextSibling.style.display = 'block';
+                                                }}
+                                            />
+                                        ) : (
+                                            <div className="upload-placeholder">
+                                                <span className="upload-icon">📸</span>
+                                                <span>Click to upload image</span>
+                                            </div>
+                                        )}
+                                        <div className="upload-error-fallback" style={{ display: 'none' }}>
+                                            <span className="upload-icon">🖼️</span>
+                                            <span>Image not found</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </label>
+                            <label>Or use external URL (Legacy)
+                                <input
+                                    type="text"
+                                    name="imageUrl"
+                                    value={formData.imageUrl}
+                                    onChange={handleChange}
+                                    placeholder="https://example.com/image.jpg"
+                                />
+                            </label>
+                        </div>
                     </div>
 
                     <div className="form-section">

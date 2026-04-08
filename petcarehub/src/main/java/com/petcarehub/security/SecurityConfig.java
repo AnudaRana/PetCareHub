@@ -32,8 +32,13 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/api/forgotPassword/**", "/v3/api-docs/**", "/swagger-ui/**",
-                                "/swagger-ui.html", "/api/products/**", "/uploads/**", "/error")
+                                "/swagger-ui.html", "/uploads/**", "/error")
                         .permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products/*/image").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/products/**").hasAnyRole("ADMIN", "STAFF")
+                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/products/**").hasAnyRole("ADMIN", "STAFF")
+                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/products/**").hasAnyRole("ADMIN", "STAFF")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/users/**").authenticated()
                         .anyRequest().authenticated())

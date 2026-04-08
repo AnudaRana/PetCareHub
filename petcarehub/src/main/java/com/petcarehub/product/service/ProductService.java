@@ -9,7 +9,9 @@ import com.petcarehub.product.repository.ProductAttributeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -140,5 +142,32 @@ public class ProductService {
         return products.stream()
                 .map(p -> mapToDTO(p, false))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void saveProductImage(Long productId, MultipartFile file) {
+        Product product = getProductById(productId);
+        try {
+            product.setImage(file.getBytes());
+            product.setImageContentType(file.getContentType());
+            productRepository.save(product);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not store product image.", e);
+        }
+    }
+
+    public byte[] getProductImage(Long productId) {
+        Product product = getProductById(productId);
+        if (product.getImage() == null) {
+            throw new RuntimeException("No image found for product ID: " + productId);
+        }
+        return product.getImage();
+    }
+
+    @Transactional
+    public void deleteProduct(Long id) {
+        Product product = getProductById(id);
+        productAttributeRepository.deleteById(id);
+        productRepository.delete(product);
     }
 }

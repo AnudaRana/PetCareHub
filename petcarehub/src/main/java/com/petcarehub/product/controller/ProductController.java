@@ -2,11 +2,14 @@ package com.petcarehub.product.controller;
 
 import com.petcarehub.product.dto.ProductRequest;
 import com.petcarehub.product.dto.ProductResponse;
+import com.petcarehub.product.entity.Product;
 import com.petcarehub.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -52,5 +55,27 @@ public class ProductController {
     public ResponseEntity<List<ProductResponse>> getByCategory(@PathVariable("category") String category) {
         System.out.println("Filtering by category: " + category);
         return new ResponseEntity<>(productService.getProductsByCategory(category), HttpStatus.OK);
+    }
+
+    @PostMapping("/{id}/image")
+    public ResponseEntity<String> uploadImage(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file) {
+        productService.saveProductImage(id, file);
+        return ResponseEntity.ok("Image uploaded successfully");
+    }
+
+    @GetMapping("/{id}/image")
+    public ResponseEntity<byte[]> getProductImage(@PathVariable("id") Long id) {
+        Product product = productService.getProductById(id);
+        byte[] image = productService.getProductImage(id);
+        
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(product.getImageContentType()))
+                .body(image);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable("id") Long id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
     }
 }

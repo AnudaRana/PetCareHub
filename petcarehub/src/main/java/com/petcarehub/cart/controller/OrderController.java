@@ -5,6 +5,7 @@ import com.petcarehub.cart.entity.OrderCancellation;
 import com.petcarehub.cart.enums.OrderStatus;
 import com.petcarehub.cart.service.OrderManagementService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -73,5 +74,20 @@ public class OrderController {
         OrderStatus status = OrderStatus.valueOf(statusStr.toUpperCase());
         CustomerOrder updatedOrder = orderManagementService.updateOrderStatus(id, status);
         return ResponseEntity.ok(updatedOrder);
+    }
+
+    @PutMapping("/{id}/verify-payment")
+    public ResponseEntity<CustomerOrder> verifyPayment(@PathVariable Long id) {
+        return ResponseEntity.ok(orderManagementService.verifyPayment(id));
+    }
+
+    @GetMapping("/{id}/receipt")
+    public ResponseEntity<byte[]> getPaymentReceipt(@PathVariable Long id) {
+        CustomerOrder order = orderManagementService.getOrderById(id);
+        byte[] receipt = orderManagementService.getPaymentReceipt(id);
+        
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(order.getPaymentReceiptContentType()))
+                .body(receipt);
     }
 }

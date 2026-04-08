@@ -3,6 +3,7 @@ package com.petcarehub.cart.service;
 import com.petcarehub.cart.entity.CustomerOrder;
 import com.petcarehub.cart.entity.OrderCancellation;
 import com.petcarehub.cart.enums.OrderStatus;
+import com.petcarehub.cart.enums.PaymentStatus;
 import com.petcarehub.cart.repository.OrderRepository;
 import com.petcarehub.cart.repository.OrderCancellationRepository;
 import lombok.RequiredArgsConstructor;
@@ -77,5 +78,20 @@ public class OrderManagementService {
 
         order.setOrderStatus(newStatus);
         return orderRepository.save(order);
+    }
+
+    @Transactional
+    public CustomerOrder verifyPayment(Long orderId) {
+        CustomerOrder order = getOrderById(orderId);
+        order.setPaymentStatus(PaymentStatus.PAID);
+        return orderRepository.save(order);
+    }
+
+    public byte[] getPaymentReceipt(Long orderId) {
+        CustomerOrder order = getOrderById(orderId);
+        if (order.getPaymentReceipt() == null) {
+            throw new RuntimeException("No receipt found for order ID: " + orderId);
+        }
+        return order.getPaymentReceipt();
     }
 }

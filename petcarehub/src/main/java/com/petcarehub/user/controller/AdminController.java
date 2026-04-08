@@ -1,6 +1,9 @@
 package com.petcarehub.user.controller;
 
+import com.petcarehub.product.repository.ProductRepository;
+import com.petcarehub.cart.repository.OrderRepository;
 import com.petcarehub.user.dto.UserResponse;
+import com.petcarehub.user.entity.Role;
 import com.petcarehub.user.entity.User;
 import com.petcarehub.user.repository.UserRepository;
 import com.petcarehub.user.service.UserService;
@@ -19,6 +22,8 @@ public class AdminController {
 
     private final UserService userService;
     private final UserRepository userRepository;
+    private final ProductRepository productRepository;
+    private final OrderRepository orderRepository;
 
     // Create a new staff or vet (Admin only)
     @PostMapping
@@ -38,5 +43,17 @@ public class AdminController {
                 .map(userService::toUserResponse)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<java.util.Map<String, Long>> getStats() {
+        java.util.Map<String, Long> stats = new java.util.HashMap<>();
+        stats.put("totalUsers", userRepository.count());
+        stats.put("totalProducts", productRepository.count());
+        stats.put("totalOrders", orderRepository.count());
+        stats.put("vets", userRepository.findAll().stream().filter(u -> u.getRoles().contains(Role.ROLE_VET)).count());
+        stats.put("staff", userRepository.findAll().stream().filter(u -> u.getRoles().contains(Role.ROLE_STAFF)).count());
+        return ResponseEntity.ok(stats);
     }
 }

@@ -35,9 +35,13 @@ public class Product {
 
     @Column
     private String imageUrl;
-
+    
     @Column(name = "image_content_type")
     private String imageContentType;
+
+    @Lob
+    @Column(name = "image", columnDefinition = "LONGBLOB")
+    private byte[] image;
 
     @Column
     private String category;
