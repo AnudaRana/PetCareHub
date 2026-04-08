@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ProductCard from '../components/ProductCard';
 import ProductDetail from '../components/ProductDetail';
+import ProductFormCard from '../components/ProductFormCard';
 import productService from '../../../services/productService';
 import { cartService } from '../../cart/services/cartService';
 import { useAuth } from '../../auth/contexts/AuthContext';
@@ -34,6 +35,10 @@ const PetStorePage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('All Products');
   const [cartCount, setCartCount] = useState(0);
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  const { hasRole } = useAuth();
+  const isAdminNonVetOrStaff = (hasRole('ADMIN') && !hasRole('VET')) || hasRole('STAFF');
 
   const categories = [
     { name: 'All Products' },
@@ -47,11 +52,11 @@ const PetStorePage = () => {
     ...category,
     icon:
       category.name === 'All Products' ? <AppsIcon style={{ fontSize: '18px' }} /> :
-      category.name.includes('Food') ? <PetsIcon style={{ fontSize: '18px' }} /> :
-      category.name === 'Accessories' ? <LocalMallIcon style={{ fontSize: '18px' }} /> :
-      category.name === 'Healthcare' ? <MedicalServicesIcon style={{ fontSize: '18px' }} /> :
-      category.name === 'Grooming' ? <BrushIcon style={{ fontSize: '18px' }} /> :
-      <MedicationLiquidIcon style={{ fontSize: '18px' }} />
+        category.name.includes('Food') ? <PetsIcon style={{ fontSize: '18px' }} /> :
+          category.name === 'Accessories' ? <LocalMallIcon style={{ fontSize: '18px' }} /> :
+            category.name === 'Healthcare' ? <MedicalServicesIcon style={{ fontSize: '18px' }} /> :
+              category.name === 'Grooming' ? <BrushIcon style={{ fontSize: '18px' }} /> :
+                <MedicationLiquidIcon style={{ fontSize: '18px' }} />
   }));
 
   useEffect(() => {
@@ -148,39 +153,57 @@ const PetStorePage = () => {
     <div className="store-page">
       <header className="store-topbar">
         <div className="store-topbar-inner">
-            <div className="store-brand" onClick={() => navigate('/dashboard')}>
-                <img src={logo} alt="PetCareHub Logo" className="store-logo" />
-                <div className="store-brand-text">
-                    <span className="store-brand-name">PetCare Hub</span>
-                    <span className="store-brand-tag">PREMIUM STORE</span>
-                </div>
+          <div className="store-brand" onClick={() => navigate('/dashboard')}>
+            <img src={logo} alt="PetCareHub Logo" className="store-logo" />
+            <div className="store-brand-text">
+              <span className="store-brand-name">PetCare Hub</span>
+              <span className="store-brand-tag">PREMIUM STORE</span>
             </div>
+          </div>
 
-            <div className="store-search-wrapper">
-                <SearchIcon className="store-search-icon" />
-                <input
-                    type="text"
-                    className="store-search-input"
-                    placeholder="Search products, treats, accessories..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
+          <div className="store-search-wrapper">
+            <SearchIcon className="store-search-icon" />
+            <input
+              type="text"
+              className="store-search-input"
+              placeholder="Search products, treats, accessories..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
 
-            <div className="store-actions">
-                <button 
-                    className="store-action-btn store-cart-btn"
-                    onClick={() => navigate('/cart')}
-                    id="store-cart-btn"
-                >
-                    <div className="cart-icon-wrapper">
-                        <ShoppingCartOutlinedIcon style={{ fontSize: '22px' }} />
-                        {cartCount > 0 && (
-                            <span className="store-cart-badge animate-pop">{cartCount}</span>
-                        )}
-                    </div>
-                </button>
-            </div>
+          <div className="store-actions">
+            <button
+              className="store-action-btn store-cart-btn"
+              onClick={() => navigate('/cart')}
+              id="store-cart-btn"
+            >
+              <div className="cart-icon-wrapper">
+                <ShoppingCartOutlinedIcon style={{ fontSize: '22px' }} />
+                {cartCount > 0 && (
+                  <span className="store-cart-badge animate-pop">{cartCount}</span>
+                )}
+              </div>
+
+            </button>
+            <button
+              className="store-dashboard-btn"
+              title={token ? "Go to Dashboard" : "Go Home"}
+              onClick={() => navigate(token ? "/dashboard" : "/")}
+            >
+              <span>{token ? 'Go to Dashboard' : 'Go Home'}</span>
+            </button>
+
+            {isAdminNonVetOrStaff && (
+              <button
+                className="btn btn-teal"
+                style={{ padding: '10px 20px', fontSize: '0.85rem' }}
+                onClick={() => setShowAddForm(true)}
+              >
+                + Add Product
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -238,6 +261,16 @@ const PetStorePage = () => {
 
       {selectedProduct && (
         <ProductDetail product={selectedProduct} onClose={handleCloseDetail} onAddToCart={handleAddToCart} />
+      )}
+
+      {showAddForm && (
+        <div className="store-main animate-fade-up" style={{ padding: '40px 10%' }}>
+          <ProductFormCard
+            onClose={() => setShowAddForm(false)}
+            onRefresh={fetchProducts}
+            onToast={(msg) => toast.success(msg)}
+          />
+        </div>
       )}
     </div>
   );

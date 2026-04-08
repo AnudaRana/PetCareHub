@@ -10,6 +10,9 @@ import DoctorAllPets from '../../pet/components/doctor/DoctorAllPets';
 import MyProfile from './profile/MyProfile';
 import ManageStaff from './manageStaff/ManageStaff';
 import VetAppointments from '../../appointment/pages/VetAppointments';
+import ManageOrdersPage from '../../order/pages/ManageOrdersPage';
+import ManageShopPage from '../../store/pages/ManageShopPage';
+import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
 
 // Icons
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -23,6 +26,7 @@ import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import GroupsIcon from '@mui/icons-material/Groups';
 import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 
 const AdminDashboard = () => {
   const { user, loading: authLoading, token, hasRole } = useAuth();
@@ -89,7 +93,10 @@ const AdminDashboard = () => {
     ...(isVet ? [
       { name: 'Patient Records', icon: HealingOutlinedIcon, path: '/dashboard/patients' },
       { name: 'My Appointments', icon: EventNoteOutlinedIcon, path: '/dashboard/vet-appointments' },
-    ] : []),
+    ] : [
+      { name: 'Manage Shop', icon: StoreOutlinedIcon, path: '/dashboard/manage-shop' },
+      { name: 'Manage Orders', icon: ShoppingBagIcon, path: '/dashboard/manage-orders' }
+    ]),
     { name: 'Manage Staff', icon: PeopleAltOutlinedIcon, path: '/dashboard/manage-staff' },
     { name: 'Settings', icon: SettingsOutlinedIcon, path: '/dashboard/settings' }
   ];
@@ -160,6 +167,8 @@ const AdminDashboard = () => {
         <Route path="profile" element={<MyProfile />} />
         <Route path="patients" element={<DoctorAllPets />} />
         <Route path="vet-appointments" element={<VetAppointments />} />
+        <Route path="manage-orders" element={<ManageOrdersPage />} />
+        <Route path="manage-shop" element={<ManageShopPage />} />
         
         {/* Catch-all to redirect back to main dashboard if path is wrong */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

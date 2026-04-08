@@ -11,6 +11,7 @@ import MyProfile from './profile/MyProfile';
 import DoctorChanneling from '../../appointment/pages/DoctorChanneling';
 import MyAppointments from '../../appointment/pages/MyAppointments';
 import PetMedicalRecordPage from '../../medical/pages/PetMedicalRecordPage';
+import OwnerOrdersPage from '../../order/pages/OwnerOrdersPage';
 
 // Icons
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -20,11 +21,12 @@ import PetsOutlinedIcon from '@mui/icons-material/PetsOutlined';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import BookOnlineOutlinedIcon from '@mui/icons-material/BookOnlineOutlined';
 import StoreIcon from '@mui/icons-material/Store';
-import HistoryIcon from '@mui/icons-material/History';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import VaccinesIcon from '@mui/icons-material/Vaccines';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+
 
 import './OwnerDashboard.css';
 
@@ -77,6 +79,7 @@ const OwnerDashboard = () => {
     { name: 'My Appointments', icon: CalendarTodayIcon, path: '/dashboard/appointments' },
     { name: 'Doctor Channeling', icon: BookOnlineOutlinedIcon, path: '/dashboard/doctor-channeling' },
     { name: 'Shop', icon: StoreIcon, path: '/store' },
+    { name: 'My Orders', icon: ShoppingBagIcon, path: '/dashboard/orders' },
     { name: 'Settings', icon: SettingsOutlinedIcon, path: '/dashboard/settings', disabled: true }
   ];
 
@@ -165,7 +168,7 @@ const OwnerDashboard = () => {
         <Route path="appointments" element={<MyAppointments />} />
         <Route path="doctor-channeling" element={<DoctorChanneling />} />
         <Route path="pet-medical-record" element={<PetMedicalRecordPage />} />
-
+        <Route path="orders" element={<OwnerOrdersPage />} />
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

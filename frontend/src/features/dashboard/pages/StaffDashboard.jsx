@@ -9,6 +9,8 @@ import StaffAllPets from '../../pet/components/staff/StaffAllPets';
 import StaffAllAppointments from '../../appointment/pages/StaffAllAppointments';
 import MyProfile from './profile/MyProfile';
 import PetMedicalRecordPage from '../../medical/pages/PetMedicalRecordPage';
+import ManageOrdersPage from '../../order/pages/ManageOrdersPage';
+import ManageShopPage from '../../store/pages/ManageShopPage';
 
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -16,6 +18,7 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import HealingOutlinedIcon from '@mui/icons-material/HealingOutlined';
 import ContentPasteSearchOutlinedIcon from '@mui/icons-material/ContentPasteSearchOutlined';
 import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 
 import '../components/Dashboard.css';
@@ -54,7 +57,8 @@ const StaffDashboard = () => {
     { name: 'My Profile', icon: PersonOutlineOutlinedIcon, path: '/dashboard/profile' },
     { name: 'All Pets', icon: HealingOutlinedIcon, path: '/dashboard/staff-patients' },
     { name: 'Manage Appointments', icon: ContentPasteSearchOutlinedIcon, path: '/dashboard/staff-appointments' },
-    { name: 'Store Management', icon: StoreOutlinedIcon, path: '/dashboard/store', disabled: true },
+    { name: 'Manage Shop', icon: StoreOutlinedIcon, path: '/dashboard/manage-shop'},
+    { name: 'Manage Orders', icon: ShoppingBagIcon, path: '/dashboard/manage-orders'},
     { name: 'Settings', icon: SettingsOutlinedIcon, path: '/dashboard/settings', disabled: true }
   ];
 
@@ -126,6 +130,8 @@ const StaffDashboard = () => {
         <Route path="profile" element={<MyProfile />} />
         <Route path="staff-appointments" element={<StaffAllAppointments />} />
         <Route path="pet-medical-record" element={<PetMedicalRecordPage />} />
+        <Route path="manage-orders" element={<ManageOrdersPage />} />
+        <Route path="manage-shop" element={<ManageShopPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </DashboardLayout>

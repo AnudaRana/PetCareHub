@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS orders (
     order_id                      BIGINT           NOT NULL AUTO_INCREMENT,
     order_number                  VARCHAR(50)      UNIQUE,
     user_id                       BIGINT           NOT NULL,
-    pet_id                        BIGINT           NOT NULL,
+    pet_id                        BIGINT,
     owner_full_name               VARCHAR(150)     NOT NULL,
     owner_email                   VARCHAR(150)     NOT NULL,
     contact_number                VARCHAR(50)      NOT NULL,
@@ -152,5 +152,18 @@ CREATE TABLE IF NOT EXISTS order_items (
     PRIMARY KEY (order_item_id),
     CONSTRAINT fk_order_items_order FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
     CONSTRAINT fk_order_items_product FOREIGN KEY (product_id) REFERENCES product(product_id) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
+-- ORDER CANCELLATIONS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS order_cancellations (
+    cancellation_id BIGINT NOT NULL AUTO_INCREMENT,
+    order_id        BIGINT NOT NULL,
+    reason          VARCHAR(500) NOT NULL,
+    cancelled_by    VARCHAR(100),
+    cancelled_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (cancellation_id),
+    CONSTRAINT fk_cancellation_order FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

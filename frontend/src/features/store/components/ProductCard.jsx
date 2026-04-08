@@ -12,6 +12,17 @@ const ProductCard = ({ product, onClick, onQuickAdd }) => {
     return '🐾';
   };
 
+  const getCategoryTheme = (category) => {
+    const cat = category?.toLowerCase() || '';
+    if (cat.includes('cat')) return { color: '#e0bbe4', glow: 'rgba(224, 187, 228, 0.8)' }; // Pastel Purple
+    if (cat.includes('dog')) return { color: '#b5ead7', glow: 'rgba(181, 234, 215, 0.8)' }; // Pastel Green/Blue
+    if (cat.includes('grooming') || cat.includes('health')) return { color: '#ffb3ba', glow: 'rgba(255, 179, 186, 0.8)' }; // Pastel Pink
+    return { color: '#ffdfba', glow: 'rgba(255, 223, 186, 0.8)' }; // Pastel Orange/Yellow
+  };
+
+  const theme = getCategoryTheme(product.category);
+
+
   return (
     <article
       className="product-card"
@@ -36,7 +47,17 @@ const ProductCard = ({ product, onClick, onQuickAdd }) => {
         <div className="product-card-img-placeholder" style={{ display: product.imageUrl ? 'none' : 'flex' }}>
           <span>{getPlaceholderEmoji()}</span>
         </div>
-        {product.category && <span className="product-card-category-badge">{product.category}</span>}
+        {product.category && (
+          <span
+            className="product-card-category-badge"
+            style={{
+              borderColor: theme.color,
+              boxShadow: `0 0 10px ${theme.glow}, inset 0 0 5px ${theme.glow}`
+            }}
+          >
+            {product.category}
+          </span>
+        )}
       </div>
 
       <div className="product-card-body">

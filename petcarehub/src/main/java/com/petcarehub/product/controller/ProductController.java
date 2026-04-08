@@ -1,5 +1,6 @@
 package com.petcarehub.product.controller;
 
+import com.petcarehub.product.dto.ProductRequest;
 import com.petcarehub.product.dto.ProductResponse;
 import com.petcarehub.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,17 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
         return new ResponseEntity<>(productService.getAllProducts(), HttpStatus.OK);
+    }
+
+    @PostMapping
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
+        return new ResponseEntity<>(productService.createProduct(request), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable("id") Long id,
+            @RequestBody ProductRequest request) {
+        return new ResponseEntity<>(productService.updateProduct(id, request), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

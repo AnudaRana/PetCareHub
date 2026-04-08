@@ -1,8 +1,7 @@
-package com.petcarehub.cart.enums;
+package com.petcarehub.order.entity;
 
 public enum OrderStatus {
-    AWAITING_PAYMENT,
-    PLACED,
+    PENDING,
     READY,
     COMPLETED,
     CANCELLED
