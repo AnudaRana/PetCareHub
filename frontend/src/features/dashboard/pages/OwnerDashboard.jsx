@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import DashboardLayout from '../components/DashboardLayout';
@@ -11,6 +11,8 @@ import MyProfile from './profile/MyProfile';
 import DoctorChanneling from '../../appointment/pages/DoctorChanneling';
 import MyAppointments from '../../appointment/pages/MyAppointments';
 import PetMedicalRecordPage from '../../medical/pages/PetMedicalRecordPage';
+import OwnerBillingPage from '../../billing/pages/OwnerBillingPage';
+import OwnerInvoicePage from '../../billing/pages/OwnerInvoicePage';
 
 // Icons
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -25,6 +27,7 @@ import LocalMallIcon from '@mui/icons-material/LocalMall';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import VaccinesIcon from '@mui/icons-material/Vaccines';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 
 import './OwnerDashboard.css';
 
@@ -76,6 +79,7 @@ const OwnerDashboard = () => {
     { name: 'My Pets', icon: PetsOutlinedIcon, path: '/dashboard/pets' },
     { name: 'My Appointments', icon: CalendarTodayIcon, path: '/dashboard/appointments' },
     { name: 'Doctor Channeling', icon: BookOnlineOutlinedIcon, path: '/dashboard/doctor-channeling' },
+    { name: 'Billing', icon: ReceiptLongOutlinedIcon, path: '/dashboard/billing' },
     { name: 'Shop', icon: StoreIcon, path: '/store' },
     { name: 'Settings', icon: SettingsOutlinedIcon, path: '/dashboard/settings', disabled: true }
   ];
@@ -143,14 +147,14 @@ const OwnerDashboard = () => {
                   <div className="doc-action-label">Book Vet</div>
                   <div className="doc-action-arrow">→</div>
                 </div>
+                <div className="doc-action-card" onClick={() => navigate('/dashboard/billing')}>
+                  <div className="doc-action-icon">🧾</div>
+                  <div className="doc-action-label">Billing</div>
+                  <div className="doc-action-arrow">→</div>
+                </div>
                 <div className="doc-action-card" onClick={() => navigate('/store')}>
                   <div className="doc-action-icon">🛒</div>
                   <div className="doc-action-label">Pet Store</div>
-                  <div className="doc-action-arrow">→</div>
-                </div>
-                <div className="doc-action-card" onClick={() => navigate('/dashboard/profile')}>
-                  <div className="doc-action-icon">⚙️</div>
-                  <div className="doc-action-label">Settings</div>
                   <div className="doc-action-arrow">→</div>
                 </div>
               </div>
@@ -165,6 +169,8 @@ const OwnerDashboard = () => {
         <Route path="appointments" element={<MyAppointments />} />
         <Route path="doctor-channeling" element={<DoctorChanneling />} />
         <Route path="pet-medical-record" element={<PetMedicalRecordPage />} />
+        <Route path="billing" element={<OwnerBillingPage />} />
+        <Route path="billing/invoice/:orderId" element={<OwnerInvoicePage />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
