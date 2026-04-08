@@ -4,11 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="05885ed1-f73e-41ba-8f93-71f5e02110d9" name="Changes" comment="" />
+    <list default="true" id="05885ed1-f73e-41ba-8f93-71f5e02110d9" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/features/dashboard/pages/OwnerDashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/features/dashboard/pages/OwnerDashboard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/features/receipts/pages/StaffReceiptsPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/features/receipts/pages/StaffReceiptsPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/cart/repository/OrderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/cart/repository/OrderRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/invoice/repository/InvoiceRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/petcarehub/src/main/java/com/petcarehub/invoice/repository/InvoiceRepository.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -18,16 +27,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.PetcarehubApplication.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/ranas/OneDrive/Desktop/PetCareHub-css-cart-user-fix/PetCareHub - Copy"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.PetcarehubApplication.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/PET-91-invoice-and-billing-management&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/ranas/OneDrive/Documents/PetCareHub(invoice-and-billing-management)/PetCareHub&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="PetcarehubApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.petcarehub.PetcarehubApplication" />

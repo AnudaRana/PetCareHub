@@ -29,17 +29,48 @@ public class OrderCancellation {
 
     @PrePersist
     protected void onCreate() {
-        this.cancelledAt = LocalDateTime.now();
+        if (cancelledAt == null) {
+            cancelledAt = LocalDateTime.now();
+        }
     }
 
-    public Long getCancellationId() { return cancellationId; }
-    public void setCancellationId(Long cancellationId) { this.cancellationId = cancellationId; }
-    public CustomerOrder getOrder() { return order; }
-    public void setOrder(CustomerOrder order) { this.order = order; }
-    public String getReason() { return reason; }
-    public void setReason(String reason) { this.reason = reason; }
-    public String getCancelledBy() { return cancelledBy; }
-    public void setCancelledBy(String cancelledBy) { this.cancelledBy = cancelledBy; }
-    public LocalDateTime getCancelledAt() { return cancelledAt; }
-    public void setCancelledAt(LocalDateTime cancelledAt) { this.cancelledAt = cancelledAt; }
+    public Long getCancellationId() {
+        return cancellationId;
+    }
+
+    public void setCancellationId(Long cancellationId) {
+        this.cancellationId = cancellationId;
+    }
+
+    public CustomerOrder getOrder() {
+        return order;
+    }
+
+    public void setOrder(CustomerOrder order) {
+        this.order = order;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public String getCancelledBy() {
+        return cancelledBy;
+    }
+
+    public void setCancelledBy(String cancelledBy) {
+        this.cancelledBy = cancelledBy;
+    }
+
+    public LocalDateTime getCancelledAt() {
+        return cancelledAt;
+    }
+
+    public void setCancelledAt(LocalDateTime cancelledAt) {
+        this.cancelledAt = cancelledAt;
+    }
 }

@@ -14,6 +14,8 @@ import com.petcarehub.cart.enums.PaymentMethod;
 import com.petcarehub.cart.enums.PaymentStatus;
 import com.petcarehub.cart.repository.CartRepository;
 import com.petcarehub.cart.repository.OrderRepository;
+import com.petcarehub.cart.repository.OrderCancellationRepository;
+import com.petcarehub.cart.entity.OrderCancellation;
 import com.petcarehub.pet.entity.Pet;
 import com.petcarehub.pet.repository.PetRepository;
 import com.petcarehub.user.entity.User;
@@ -46,17 +48,20 @@ public class CheckoutServiceImpl implements CheckoutService {
     private final PetRepository petRepository;
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
+    private final OrderCancellationRepository orderCancellationRepository;
     private final ShippingPolicy shippingPolicy;
 
     public CheckoutServiceImpl(UserRepository userRepository,
                                PetRepository petRepository,
                                CartRepository cartRepository,
                                OrderRepository orderRepository,
+                               OrderCancellationRepository orderCancellationRepository,
                                ShippingPolicy shippingPolicy) {
         this.userRepository = userRepository;
         this.petRepository = petRepository;
         this.cartRepository = cartRepository;
         this.orderRepository = orderRepository;
+        this.orderCancellationRepository = orderCancellationRepository;
         this.shippingPolicy = shippingPolicy;
     }
 
@@ -153,7 +158,7 @@ public class CheckoutServiceImpl implements CheckoutService {
                     PendingOrderDto dto = new PendingOrderDto();
                     dto.orderId = order.getOrderId();
                     dto.orderNumber = order.getOrderNumber();
-                    dto.petName = order.getPet() != null ? order.getPet().getName() : "No pet specified";
+                    dto.petName = order.getPet() != null ? order.getPet().getName() : null;
                     dto.pickupDate = order.getPickupDate();
                     dto.total = order.getTotal();
                     dto.orderStatus = order.getOrderStatus().name();
@@ -239,7 +244,16 @@ public class CheckoutServiceImpl implements CheckoutService {
     public void cancelOrder(Long userId, Long orderId) {
         CustomerOrder order = orderRepository.findByOrderIdAndUser_UserId(orderId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found: " + orderId));
-        orderRepository.delete(order);
+
+        order.setOrderStatus(OrderStatus.CANCELLED);
+        order.setUpdatedAt(LocalDateTime.now());
+        orderRepository.save(order);
+
+        OrderCancellation cancellation = new OrderCancellation();
+        cancellation.setOrder(order);
+        cancellation.setReason("Cancelled by user");
+        cancellation.setCancelledBy(order.getOwnerEmail() != null ? order.getOwnerEmail() : "Owner");
+        orderCancellationRepository.save(cancellation);
     }
 
     private void validateCreateOrderRequest(CreateOrderRequest request) {
@@ -255,7 +269,10 @@ public class CheckoutServiceImpl implements CheckoutService {
         if (request.contactNumber == null || request.contactNumber.isBlank()) {
             throw new ResponseStatusException(BAD_REQUEST, "Contact number is required");
         }
-
+        // Pet is now optional according to DB schema
+        // if (request.petId == null) {
+        //    throw new ResponseStatusException(BAD_REQUEST, "Please select a pet");
+        // }
         if (request.pickupDate == null) {
             throw new ResponseStatusException(BAD_REQUEST, "Pickup date is required");
         }

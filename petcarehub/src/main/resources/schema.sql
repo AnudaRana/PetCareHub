@@ -155,6 +155,49 @@ CREATE TABLE IF NOT EXISTS order_items (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================================
+-- INVOICE
+-- ============================================================
+CREATE TABLE IF NOT EXISTS invoice (
+    invoice_id           BIGINT           NOT NULL AUTO_INCREMENT,
+    invoice_number       VARCHAR(50)      NOT NULL UNIQUE,
+    order_id             BIGINT           NOT NULL UNIQUE,
+    owner_id             BIGINT           NOT NULL,
+    pet_id               BIGINT,
+    generated_by_staff   BIGINT           NOT NULL,
+    payment_method       VARCHAR(50)      NOT NULL,
+    payment_status       VARCHAR(50)      NOT NULL,
+    payment_reference    VARCHAR(100),
+    subtotal_amount      DECIMAL(10, 2)   NOT NULL,
+    discount_amount      DECIMAL(10, 2)   NOT NULL DEFAULT 0.00,
+    tax_amount           DECIMAL(10, 2)   NOT NULL DEFAULT 0.00,
+    total_amount         DECIMAL(10, 2)   NOT NULL,
+    notes                VARCHAR(255),
+    created_at           TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at           TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (invoice_id),
+    CONSTRAINT fk_invoice_order FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    CONSTRAINT fk_invoice_owner FOREIGN KEY (owner_id) REFERENCES users(user_id),
+    CONSTRAINT fk_invoice_pet FOREIGN KEY (pet_id) REFERENCES pets(pet_id),
+    CONSTRAINT fk_invoice_staff FOREIGN KEY (generated_by_staff) REFERENCES users(user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
+-- INVOICE ITEMS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS invoice_item (
+    invoice_item_id      BIGINT           NOT NULL AUTO_INCREMENT,
+    invoice_id           BIGINT           NOT NULL,
+    product_id           BIGINT           NOT NULL,
+    product_name         VARCHAR(100)     NOT NULL,
+    unit_price           DECIMAL(10, 2)   NOT NULL,
+    quantity             INT              NOT NULL,
+    line_total           DECIMAL(10, 2)   NOT NULL,
+    PRIMARY KEY (invoice_item_id),
+    CONSTRAINT fk_invoice_item_invoice FOREIGN KEY (invoice_id) REFERENCES invoice(invoice_id) ON DELETE CASCADE,
+    CONSTRAINT fk_invoice_item_product FOREIGN KEY (product_id) REFERENCES product(product_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
 -- ORDER CANCELLATIONS
 -- ============================================================
 CREATE TABLE IF NOT EXISTS order_cancellations (
@@ -166,4 +209,3 @@ CREATE TABLE IF NOT EXISTS order_cancellations (
     PRIMARY KEY (cancellation_id),
     CONSTRAINT fk_cancellation_order FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-

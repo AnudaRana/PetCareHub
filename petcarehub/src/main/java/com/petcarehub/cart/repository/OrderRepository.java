@@ -14,5 +14,10 @@ public interface OrderRepository extends JpaRepository<CustomerOrder, Long> {
 
     List<CustomerOrder> findByUser_UserIdAndOrderStatusOrderByCreatedAtDesc(Long userId, OrderStatus orderStatus);
 
+    @EntityGraph(attributePaths = {"pet", "items", "items.product"})
+    List<CustomerOrder> findByOrderStatusOrderByCreatedAtDesc(OrderStatus orderStatus);
+    
+    // Owner billing: Get all orders for a specific owner
+    @EntityGraph(attributePaths = {"pet"})
     List<CustomerOrder> findByUser_UserIdOrderByCreatedAtDesc(Long userId);
 }
