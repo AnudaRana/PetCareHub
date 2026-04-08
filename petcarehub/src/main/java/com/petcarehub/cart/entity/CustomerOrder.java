@@ -5,6 +5,7 @@ import com.petcarehub.user.entity.User;
 import com.petcarehub.cart.enums.OrderStatus;
 import com.petcarehub.cart.enums.PaymentMethod;
 import com.petcarehub.cart.enums.PaymentStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -24,12 +25,14 @@ public class CustomerOrder {
     @Column(name = "order_number", unique = true, length = 50)
     private String orderNumber;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "pet_id")
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
+    @JoinColumn(name = "pet_id", nullable = true)
     private Pet pet;
 
     @Column(name = "owner_full_name", nullable = false, length = 150)

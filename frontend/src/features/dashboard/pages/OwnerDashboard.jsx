@@ -13,6 +13,7 @@ import MyAppointments from '../../appointment/pages/MyAppointments';
 import PetMedicalRecordPage from '../../medical/pages/PetMedicalRecordPage';
 import OwnerBillingPage from '../../billing/pages/OwnerBillingPage';
 import OwnerInvoicePage from '../../billing/pages/OwnerInvoicePage';
+import OwnerOrdersPage from '../../order/pages/OwnerOrdersPage';
 
 // Icons
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -22,7 +23,7 @@ import PetsOutlinedIcon from '@mui/icons-material/PetsOutlined';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import BookOnlineOutlinedIcon from '@mui/icons-material/BookOnlineOutlined';
 import StoreIcon from '@mui/icons-material/Store';
-import HistoryIcon from '@mui/icons-material/History';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import VaccinesIcon from '@mui/icons-material/Vaccines';
@@ -33,6 +34,7 @@ import './OwnerDashboard.css';
 
 const OwnerDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     petCount: 0,
     upcomingCount: 0,
@@ -81,6 +83,7 @@ const OwnerDashboard = () => {
     { name: 'Doctor Channeling', icon: BookOnlineOutlinedIcon, path: '/dashboard/doctor-channeling' },
     { name: 'Billing', icon: ReceiptLongOutlinedIcon, path: '/dashboard/billing' },
     { name: 'Shop', icon: StoreIcon, path: '/store' },
+    { name: 'My Orders', icon: ShoppingBagIcon, path: '/dashboard/orders' },
     { name: 'Settings', icon: SettingsOutlinedIcon, path: '/dashboard/settings', disabled: true }
   ];
 
@@ -171,6 +174,7 @@ const OwnerDashboard = () => {
         <Route path="pet-medical-record" element={<PetMedicalRecordPage />} />
         <Route path="billing" element={<OwnerBillingPage />} />
         <Route path="billing/invoice/:orderId" element={<OwnerInvoicePage />} />
+        <Route path="orders" element={<OwnerOrdersPage />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

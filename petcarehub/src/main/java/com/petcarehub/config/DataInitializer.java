@@ -39,7 +39,7 @@ public class DataInitializer implements CommandLineRunner {
         User owner_1 = seedUser(
                 "Amaya", "Gunasekara",
                 "amayaswgunasekara4@gmail.com",
-                "19112002@Aswg",
+                "ag@1119",
                 "0750343267", "Kosgama",
                 Set.of(Role.ROLE_OWNER)
         );
@@ -76,23 +76,7 @@ public class DataInitializer implements CommandLineRunner {
                 Set.of(Role.ROLE_ADMIN)
         );
 
-        // ── Amaya's pets - REMOVED: Users should add their own pets with images ──────────────────────────────
-        // Hardcoded pets without images were causing display issues
-        // if (owner_1 != null) {
-        //     seedPet("Browny", "Dog", "SL Hound", PetGender.FEMALE,
-        //             LocalDate.of(2016, 11, 23), 15.0, owner_1);
-        //
-        //     seedPet("Lucky", "Dog", "SL Hound", PetGender.MALE,
-        //             LocalDate.of(2017, 8, 20), 17.0, owner_1);
-        //
-        //     seedPet("Anna", "Cat", null, null,
-        //             LocalDate.of(2015, 12, 10), 2.0, owner_1);
-        // }
-        //
-        // if (owner_2 != null) {
-        //     seedPet("Bambi", "Cat", null, PetGender.FEMALE,
-        //             LocalDate.of(2022, 04, 11), 3.2, owner_2);
-        // }
+
 
         // ── Product Store seed ────────────────────────────────────────────────
         seedStoreCatalog();

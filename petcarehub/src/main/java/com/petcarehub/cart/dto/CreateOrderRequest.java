@@ -19,7 +19,6 @@ public class CreateOrderRequest {
     @NotBlank(message = "Contact number is required")
     public String contactNumber;
 
-    @NotNull(message = "Please select a pet")
     public Long petId;
 
     @NotNull(message = "Pickup date is required")

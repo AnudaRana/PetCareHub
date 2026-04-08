@@ -11,6 +11,8 @@ import MyProfile from './profile/MyProfile';
 import PetMedicalRecordPage from '../../medical/pages/PetMedicalRecordPage';
 import StaffReceiptsPage from '../../receipts/pages/StaffReceiptsPage';
 import InvoiceDetailsPage from '../../receipts/pages/InvoiceDetailsPage';
+import ManageOrdersPage from '../../order/pages/ManageOrdersPage';
+import ManageShopPage from '../../store/pages/ManageShopPage';
 
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -19,6 +21,7 @@ import HealingOutlinedIcon from '@mui/icons-material/HealingOutlined';
 import ContentPasteSearchOutlinedIcon from '@mui/icons-material/ContentPasteSearchOutlined';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 
 import '../components/Dashboard.css';
@@ -58,7 +61,8 @@ const StaffDashboard = () => {
     { name: 'All Pets', icon: HealingOutlinedIcon, path: '/dashboard/staff-patients' },
     { name: 'Manage Appointments', icon: ContentPasteSearchOutlinedIcon, path: '/dashboard/staff-appointments' },
     { name: 'Receipts', icon: ReceiptLongOutlinedIcon, path: '/dashboard/receipts' },
-    { name: 'Store Management', icon: StoreOutlinedIcon, path: '/dashboard/store', disabled: true },
+    { name: 'Manage Shop', icon: StoreOutlinedIcon, path: '/dashboard/manage-shop'},
+    { name: 'Manage Orders', icon: ShoppingBagIcon, path: '/dashboard/manage-orders'},
     { name: 'Settings', icon: SettingsOutlinedIcon, path: '/dashboard/settings', disabled: true }
   ];
 
@@ -121,7 +125,7 @@ const StaffDashboard = () => {
                   <div className="staff-action-label">Receipts & Invoices</div>
                   <div className="staff-action-arrow">→</div>
                 </div>
-                <div className="staff-action-card" onClick={() => navigate('/dashboard/store')}>
+                <div className="staff-action-card" onClick={() => navigate('/dashboard/manage-shop')}>
                   <div className="staff-action-icon">🏬</div>
                   <div className="staff-action-label">Shop Inventory</div>
                   <div className="staff-action-arrow">→</div>
@@ -137,6 +141,8 @@ const StaffDashboard = () => {
         <Route path="pet-medical-record" element={<PetMedicalRecordPage />} />
         <Route path="receipts" element={<StaffReceiptsPage />} />
         <Route path="receipts/:invoiceId" element={<InvoiceDetailsPage />} />
+        <Route path="manage-orders" element={<ManageOrdersPage />} />
+        <Route path="manage-shop" element={<ManageShopPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </DashboardLayout>

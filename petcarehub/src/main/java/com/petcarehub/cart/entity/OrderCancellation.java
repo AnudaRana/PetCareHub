@@ -1,6 +1,7 @@
 package com.petcarehub.cart.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 
 @Entity
@@ -12,17 +13,18 @@ public class OrderCancellation {
     @Column(name = "cancellation_id")
     private Long cancellationId;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "order_id", nullable = false)
     private CustomerOrder order;
 
-    @Column(nullable = false, length = 500)
+    @Column(name = "reason", nullable = false, length = 500)
     private String reason;
 
     @Column(name = "cancelled_by", length = 100)
     private String cancelledBy;
 
-    @Column(name = "cancelled_at")
+    @Column(name = "cancelled_at", nullable = false)
     private LocalDateTime cancelledAt;
 
     @PrePersist

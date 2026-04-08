@@ -1,10 +1,11 @@
 package com.petcarehub.cart.entity;
 
 import com.petcarehub.product.entity.Product;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
-@Entity
+@Entity(name = "CartOrderItem")
 @Table(name = "order_items")
 public class OrderItem {
     @Id
@@ -12,6 +13,7 @@ public class OrderItem {
     @Column(name = "order_item_id")
     private Long orderItemId;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "order_id", nullable = false)
     private CustomerOrder order;
