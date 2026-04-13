@@ -2,13 +2,20 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8080';
 
+const getAuthHeaders = () => {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 /**
  * Fetch all medical treatments for a specific pet
  * @param {number} petId - The pet ID
  * @returns {Promise<Array>} Array of treatment records
  */
 export const getTreatmentsByPetId = async (petId) => {
-  const response = await axios.get(`${API_BASE_URL}/api/medical-records/treatments/pet/${petId}`);
+  const response = await axios.get(`${API_BASE_URL}/api/medical-records/treatments/pet/${petId}`, {
+      headers: getAuthHeaders()
+  });
   return response.data;
 };
 
@@ -21,7 +28,8 @@ export const getTreatmentsByPetId = async (petId) => {
 export const createTreatment = async (petId, treatmentData) => {
   const response = await axios.post(
     `${API_BASE_URL}/api/medical-records/treatments/pet/${petId}`,
-    treatmentData
+    treatmentData,
+    { headers: getAuthHeaders() }
   );
   return response.data;
 };
@@ -32,7 +40,9 @@ export const createTreatment = async (petId, treatmentData) => {
  * @returns {Promise<Object>} Treatment record
  */
 export const getTreatmentById = async (treatmentId) => {
-  const response = await axios.get(`${API_BASE_URL}/api/medical-records/treatments/${treatmentId}`);
+  const response = await axios.get(`${API_BASE_URL}/api/medical-records/treatments/${treatmentId}`, {
+      headers: getAuthHeaders()
+  });
   return response.data;
 };
 
@@ -45,7 +55,8 @@ export const getTreatmentById = async (treatmentId) => {
 export const addTreatmentToPet = async (petId, treatmentData) => {
   const response = await axios.post(
     `${API_BASE_URL}/api/medical-records/treatments/pet/${petId}`,
-    treatmentData
+    treatmentData,
+    { headers: getAuthHeaders() }
   );
   return response.data;
 };

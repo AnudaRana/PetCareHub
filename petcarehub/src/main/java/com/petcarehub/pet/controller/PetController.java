@@ -46,6 +46,13 @@ public class PetController {
         return ResponseEntity.ok(ApiResponse.success(pets, "Pets retrieved successfully"));
     }
 
+    @Operation(summary = "Get all pets in the system (Doctor access)")
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<PetResponseDTO>>> getAllPets() {
+        List<PetResponseDTO> pets = petService.getAllPets();
+        return ResponseEntity.ok(ApiResponse.success(pets, "All pets retrieved successfully"));
+    }
+
     @Operation(summary = "Get pet by ID (restricted to owner)")
     @GetMapping("/{petId}")
     public ResponseEntity<ApiResponse<PetResponseDTO>> getPetById(
@@ -76,10 +83,5 @@ public class PetController {
         return ResponseEntity.ok(ApiResponse.success(updatedPet, "Pet profile updated successfully"));
     }
 
-    @Operation(summary = "Get all pets in the system (Doctor access)")
-    @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<PetResponseDTO>>> getAllPets() {
-        List<PetResponseDTO> pets = petService.getAllPets();
-        return ResponseEntity.ok(ApiResponse.success(pets, "All pets retrieved successfully"));
-    }
+
 }
