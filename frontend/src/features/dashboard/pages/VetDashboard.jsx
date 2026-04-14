@@ -6,6 +6,7 @@ import DoctorAllPets from '../../pet/components/doctor/DoctorAllPets';
 import MyProfile from './profile/MyProfile';
 import VetAppointments from '../../appointment/pages/VetAppointments';
 import PetMedicalRecordPage from '../../medical/pages/PetMedicalRecordPage';
+import ManageTimeSlots from '../../appointment/pages/ManageTimeSlots';
 
 // Icons
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -14,6 +15,7 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
 import HealingOutlinedIcon from '@mui/icons-material/HealingOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 
 const VetDashboard = () => {
   const { user, loading } = useAuth();
@@ -25,6 +27,7 @@ const VetDashboard = () => {
     { name: 'My Profile', icon: PersonOutlineOutlinedIcon, path: '/dashboard/profile' },
     { name: 'All Pets', icon: HealingOutlinedIcon, path: '/dashboard/vet-patients' },
     { name: 'My Appointments', icon: EventNoteOutlinedIcon, path: '/dashboard/vet-appointments' },
+    { name: 'Time Slots', icon: AccessTimeOutlinedIcon, path: '/dashboard/manage-slots' },
     { name: 'Settings', icon: SettingsOutlinedIcon, path: '/dashboard/settings', disabled: true }
   ];
 
@@ -95,6 +98,7 @@ const VetDashboard = () => {
         <Route path="vet-patients" element={<DoctorAllPets />} />
         <Route path="profile" element={<MyProfile />} />
         <Route path="vet-appointments" element={<VetAppointments />} />
+        <Route path="manage-slots" element={<ManageTimeSlots />} />
         <Route path="pet-medical-record" element={<PetMedicalRecordPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

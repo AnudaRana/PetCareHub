@@ -102,7 +102,7 @@ public class UserController {
     public ResponseEntity<?> getAllVets() {
         try {
             var vets = userService.getAllVets();
-            return ResponseEntity.ok(Map.of("data", vets));
+            return ResponseEntity.ok(vets);
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body(Map.of("message", "Failed to fetch vets: " + e.getMessage()));

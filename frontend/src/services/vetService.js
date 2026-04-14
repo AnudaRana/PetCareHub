@@ -8,12 +8,14 @@ const getAuthHeaders = () => {
 };
 
 /**
- * Get all vets (users with VET role from user_roles table)
+ * Get all vets (users with VET role from user_roles table).
+ * Returns the array of vet UserResponse objects directly.
  */
 export const getAllVets = async () => {
     const response = await axios.get(API_BASE, {
         headers: getAuthHeaders()
     });
+    // Backend returns the array directly (not wrapped in { data: [...] })
     return response.data;
 };
 

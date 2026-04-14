@@ -3,17 +3,12 @@ import '../../../styles/DoctorChanneling.css';
 import axios from 'axios';
 import { getPetsByOwner } from '../../../services/petService';
 import { getAllVets } from '../../../services/vetService';
+import { getSlotsByVet } from '../../../services/timeSlotService';
 import { useAuth } from '../../auth/contexts/AuthContext';
 
 /* -----------------------------
    Constants
 ----------------------------- */
-const TIME_SLOTS = [
-  '09:00 AM',
-  '11:00 AM',
-  '02:00 PM',
-];
-
 const APPOINTMENT_PRICES = {
   Vaccination: 2500,
   Checkup: 2000,
@@ -80,6 +75,10 @@ const DoctorChanneling = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [loadingVets, setLoadingVets] = useState(true);
+  // Doctor-specific slots fetched from the backend
+  const [doctorSlots, setDoctorSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [slotsError, setSlotsError] = useState('');
 
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -115,7 +114,8 @@ const DoctorChanneling = () => {
     setLoadingVets(true);
     getAllVets()
       .then((res) => {
-        setVets(res.data || res);
+        // Backend now returns the array directly
+        setVets(Array.isArray(res) ? res : (res.data || []));
         setLoadingVets(false);
       })
       .catch((err) => {
@@ -130,11 +130,35 @@ const DoctorChanneling = () => {
       return;
     }
 
+    // Include vetId so we only get booked slots for the selected vet
+    const vetParam = selectedVetId ? `&vetId=${selectedVetId}` : '';
     axios
-      .get(`/api/appointments/booked-slots?date=${selectedDate}`)
+      .get(`/api/appointments/booked-slots?date=${selectedDate}${vetParam}`)
       .then((res) => setBookedSlots(res.data || []))
       .catch((err) => console.error('Failed to load booked slots:', err));
-  }, [selectedDate]);
+  }, [selectedDate, selectedVetId]);
+
+  // Fetch doctor-specific time slots from the backend whenever the selected vet changes
+  useEffect(() => {
+    if (!selectedVetId) {
+      setDoctorSlots([]);
+      setSlotsError('');
+      return;
+    }
+
+    setLoadingSlots(true);
+    setSlotsError('');
+    getSlotsByVet(selectedVetId)
+      .then((data) => {
+        setDoctorSlots(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => {
+        console.error('Failed to load doctor slots:', err);
+        setSlotsError('Could not load time slots for this doctor.');
+        setDoctorSlots([]);
+      })
+      .finally(() => setLoadingSlots(false));
+  }, [selectedVetId]);
 
   const handleAppointmentTypeChange = (value) => {
     setAppointmentType(value);
@@ -151,18 +175,20 @@ const DoctorChanneling = () => {
     setSelectedSlot(null);
   };
 
-  const isSlotBooked = (time, doctor) => {
+  const isSlotBooked = (time, vetId) => {
     return bookedSlots.some(
-      (slot) => slot.timeSlot === time && slot.doctor === doctor
+      (slot) => slot.timeSlot === time && String(slot.vetId) === String(vetId)
     );
   };
 
   const getVisibleSlots = () => {
     if (!selectedDoctorFilter) return [];
-    return TIME_SLOTS.map((time) => ({
-      time,
+    // Build slot objects from the backend-sourced list for this vet
+    return doctorSlots.map((s) => ({
+      time: s.timeSlot,
       doctor: selectedDoctorFilter,
       vetId: selectedVetId,
+      label: s.label || '',
     }));
   };
 
@@ -219,14 +245,16 @@ const DoctorChanneling = () => {
         appointmentType,
         date: selectedDate,
         timeSlot: selectedSlot.time,
-        doctor: selectedSlot.doctor,
+        // 'doctor' is intentionally omitted — the backend derives it from the vet entity
         notes,
         price: Number(priceSummary),
       };
 
       await axios.post('/api/appointments', appointmentData);
 
-      const res = await axios.get(`/api/appointments/booked-slots?date=${selectedDate}`);
+      // Refresh booked slots filtered by the selected vet
+      const vetParam = selectedVetId ? `&vetId=${selectedVetId}` : '';
+      const res = await axios.get(`/api/appointments/booked-slots?date=${selectedDate}${vetParam}`);
       setBookedSlots(res.data || []);
 
       resetForm();
@@ -315,9 +343,22 @@ const DoctorChanneling = () => {
             Select a date and doctor to view availability.
           </p>
 
+          {/* Slot loading / empty / error states */}
+          {loadingSlots && (
+            <p style={{ color: '#64748b', fontSize: '0.88rem' }}>Loading slots…</p>
+          )}
+          {!loadingSlots && slotsError && (
+            <p style={{ color: '#dc2626', fontSize: '0.88rem' }}>{slotsError}</p>
+          )}
+          {!loadingSlots && !slotsError && selectedDoctorFilter && !loadingVets && visibleSlots.length === 0 && (
+            <p style={{ color: '#94a3b8', fontSize: '0.88rem' }}>
+              This doctor has no available time slots configured yet.
+            </p>
+          )}
+
           <div className="slot-grid">
-            {visibleSlots.map((slot, index) => {
-              const booked = isSlotBooked(slot.time, slot.doctor);
+          {visibleSlots.map((slot, index) => {
+              const booked = isSlotBooked(slot.time, slot.vetId);
               const pastTime = isPastTimeSlotToday(slot.time);
               const selected =
                 selectedSlot?.time === slot.time && selectedDoctor === slot.doctor;
