@@ -89,10 +89,12 @@ public class AppointmentController {
         }
     }
 
-    // Returns all booked time slots for a given date
+    // Returns booked time slots for a given date, optionally filtered by vetId
     @GetMapping("/booked-slots")
-    public ResponseEntity<List<Map<String, String>>> getBookedSlots(@RequestParam String date) {
-        List<Map<String, String>> bookedSlots = appointmentService.getBookedSlots(date);
+    public ResponseEntity<List<Map<String, String>>> getBookedSlots(
+            @RequestParam String date,
+            @RequestParam(required = false) Long vetId) {
+        List<Map<String, String>> bookedSlots = appointmentService.getBookedSlots(date, vetId);
         return ResponseEntity.ok(bookedSlots);
     }
 

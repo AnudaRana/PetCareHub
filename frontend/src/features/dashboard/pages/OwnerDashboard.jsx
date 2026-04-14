@@ -39,6 +39,7 @@ const OwnerDashboard = () => {
     petCount: 0,
     upcomingCount: 0,
     totalCount: 0,
+    upcomingAppointments: [],
     loading: true
   });
 
@@ -63,6 +64,7 @@ const OwnerDashboard = () => {
           petCount: pets.length,
           upcomingCount: upcoming.length,
           totalCount: appointments.length,
+          upcomingAppointments: upcoming,
           loading: false
         });
       } catch (error) {
@@ -161,6 +163,56 @@ const OwnerDashboard = () => {
                   <div className="doc-action-arrow">→</div>
                 </div>
               </div>
+            </div>
+
+            {/* ── Upcoming Appointments Section ── */}
+            <div className="owner-upcoming-section">
+              <div className="owner-upcoming-header">
+                <h3>Upcoming Appointments</h3>
+                <button
+                  className="owner-upcoming-view-all"
+                  onClick={() => navigate('/dashboard/appointments')}
+                >
+                  View All →
+                </button>
+              </div>
+
+              {stats.loading ? (
+                <p className="owner-upcoming-empty">Loading appointments...</p>
+              ) : stats.upcomingAppointments.length === 0 ? (
+                <div className="owner-upcoming-empty-state">
+                  <div className="owner-upcoming-empty-icon">📅</div>
+                  <p>No upcoming appointments.</p>
+                  <button
+                    className="owner-upcoming-book-btn"
+                    onClick={() => navigate('/dashboard/doctor-channeling')}
+                  >
+                    Book an Appointment
+                  </button>
+                </div>
+              ) : (
+                <div className="owner-upcoming-list">
+                  {stats.upcomingAppointments.slice(0, 5).map((appt) => (
+                    <div key={appt.id} className="owner-upcoming-card">
+                      <div className="owner-upcoming-card__left">
+                        <div className="owner-upcoming-card__pet">
+                          🐾 {appt.petName || appt.pet?.name || 'Pet'}
+                          <span className="owner-upcoming-card__species">
+                            {appt.petSpecies || appt.pet?.species ? `(${appt.petSpecies || appt.pet?.species})` : ''}
+                          </span>
+                        </div>
+                        <div className="owner-upcoming-card__type">{appt.appointmentType}</div>
+                        <div className="owner-upcoming-card__doctor">Dr. {appt.doctor || 'TBA'}</div>
+                      </div>
+                      <div className="owner-upcoming-card__right">
+                        <div className="owner-upcoming-card__date">📆 {appt.date}</div>
+                        <div className="owner-upcoming-card__time">🕐 {appt.timeSlot}</div>
+                        <span className="owner-upcoming-card__badge">Upcoming</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         } />

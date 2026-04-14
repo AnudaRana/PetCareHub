@@ -9,9 +9,17 @@ import java.util.List;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
+    // Legacy name-based check — kept for backward compatibility with update flow
     boolean existsByDateAndDoctorAndTimeSlot(String date, String doctor, String timeSlot);
 
+    // Relational duplicate check using vetId (used for new appointment creation)
+    boolean existsByDateAndVet_UserIdAndTimeSlot(String date, Long vetId, String timeSlot);
+
+    // Fetch all appointments for a date (global)
     List<Appointment> findByDate(String date);
+
+    // Fetch appointments for a specific vet on a date (for per-vet booked slot filtering)
+    List<Appointment> findByDateAndVet_UserId(String date, Long vetId);
 
     /**
      * Find appointments for an owner.

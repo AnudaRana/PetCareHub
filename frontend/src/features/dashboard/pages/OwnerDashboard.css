@@ -41,3 +41,183 @@
     gap: 25px;
   }
 }
+
+/* ══════════════════════════════════════════
+   Upcoming Appointments — Dashboard Section
+══════════════════════════════════════════ */
+.owner-upcoming-section {
+  margin-top: 32px;
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid #e4edf7;
+  padding: 24px 28px;
+  box-shadow: 0 4px 18px rgba(10, 35, 90, 0.05);
+}
+
+.owner-upcoming-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.owner-upcoming-header h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0a235a;
+}
+
+.owner-upcoming-view-all {
+  background: none;
+  border: none;
+  color: #2dd4bf;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.owner-upcoming-view-all:hover {
+  background: rgba(45, 212, 191, 0.1);
+}
+
+/* Appointment card */
+.owner-upcoming-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.owner-upcoming-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border: 1px solid #e8f0fa;
+  border-radius: 14px;
+  background: #f8fbff;
+  transition: box-shadow 0.18s, border-color 0.18s;
+}
+
+.owner-upcoming-card:hover {
+  border-color: #c3daf5;
+  box-shadow: 0 4px 12px rgba(10, 35, 90, 0.07);
+}
+
+.owner-upcoming-card__left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.owner-upcoming-card__pet {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0a235a;
+}
+
+.owner-upcoming-card__species {
+  margin-left: 6px;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: #64748b;
+}
+
+.owner-upcoming-card__type {
+  font-size: 0.88rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.owner-upcoming-card__doctor {
+  font-size: 0.83rem;
+  color: #64748b;
+}
+
+.owner-upcoming-card__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+}
+
+.owner-upcoming-card__date,
+.owner-upcoming-card__time {
+  font-size: 0.88rem;
+  color: #334155;
+  font-weight: 500;
+}
+
+.owner-upcoming-card__badge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.15);
+  color: #0d9488;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* Empty state */
+.owner-upcoming-empty {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.owner-upcoming-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 0 16px;
+  gap: 10px;
+  color: #64748b;
+  text-align: center;
+}
+
+.owner-upcoming-empty-icon {
+  font-size: 2.5rem;
+}
+
+.owner-upcoming-empty-state p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #64748b;
+}
+
+.owner-upcoming-book-btn {
+  margin-top: 8px;
+  padding: 10px 20px;
+  background: #0a235a;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+
+.owner-upcoming-book-btn:hover {
+  background: #14327a;
+}
+
+@media (max-width: 600px) {
+  .owner-upcoming-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .owner-upcoming-card__right {
+    align-items: flex-start;
+    text-align: left;
+  }
+}

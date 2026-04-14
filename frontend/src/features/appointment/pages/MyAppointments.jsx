@@ -2,8 +2,11 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import "../../../styles/MyAppointments.css";
 import { useAuth } from '../../auth/contexts/AuthContext';
+import { getAllVets } from '../../../services/vetService';
 
 // --- CONSTANTS ---
+const TIME_SLOTS = ['09:00 AM', '11:00 AM', '02:00 PM'];
+
 const INITIAL_UPDATE_FORM = {
   petName: "",
   petType: "",
@@ -11,6 +14,7 @@ const INITIAL_UPDATE_FORM = {
   date: "",
   time: "",
   doctor: "",
+  vetId: null,
   notes: "",
   petId: "",
   price: 0,
@@ -67,6 +71,7 @@ const MyAppointments = () => {
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 
   const [appointments, setAppointments] = useState([]);
+  const [vets, setVets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -96,6 +101,13 @@ const MyAppointments = () => {
     fetchAppointments();
   }, [userId]);
 
+  // Fetch vet list for the doctor dropdown in the update modal
+  useEffect(() => {
+    getAllVets()
+      .then((res) => setVets(Array.isArray(res) ? res : (res.data || [])))
+      .catch((err) => console.error('Failed to load vets:', err));
+  }, []);
+
   const filteredAppointments = useMemo(() => 
     appointments.filter((appt) => {
       const k = searchTerm.toLowerCase();
@@ -119,6 +131,7 @@ const MyAppointments = () => {
 
   const openUpdateModal = (appointment) => {
     setSelectedAppointment(appointment);
+    setUpdateError("");
     setUpdateForm({
       petName: appointment.pet?.name || appointment.petName || "",
       petType: appointment.pet?.species || appointment.petSpecies || "",
@@ -126,6 +139,7 @@ const MyAppointments = () => {
       date: appointment.date || "",
       time: appointment.timeSlot || "",
       doctor: appointment.doctor || "",
+      vetId: appointment.vetId || null,
       notes: appointment.notes || "",
       petId: appointment.pet?.petId || appointment.petId || "",
       price: appointment.price || 0,
@@ -135,12 +149,19 @@ const MyAppointments = () => {
 
   const confirmUpdate = async (e) => {
     e.preventDefault();
+    setUpdateError("");
     try {
-      const res = await axios.put(`/api/appointments/${selectedAppointment.id}`, { ...updateForm, userId, timeSlot: updateForm.time });
+      const res = await axios.put(`/api/appointments/${selectedAppointment.id}`, {
+        ...updateForm,
+        userId,
+        timeSlot: updateForm.time,
+      });
       setAppointments(prev => prev.map(a => a.id === selectedAppointment.id ? res.data : a));
       setShowUpdateModal(false);
       setShowSuccessModal(true);
-    } catch (error) { setUpdateError("Failed to update."); }
+    } catch (error) {
+      setUpdateError(error.response?.data?.message || "Failed to update. Please try again.");
+    }
   };
 
   const confirmCancel = async (e) => {
@@ -214,20 +235,137 @@ const MyAppointments = () => {
       {showUpdateModal && (
         <div className="modal-overlay" onClick={() => setShowUpdateModal(false)}>
           <div className="update-modal" onClick={e => e.stopPropagation()}>
-             <h2>Update Appointment</h2>
-             <form onSubmit={confirmUpdate}>
-                <div className="form-group">
-                  <label>Type</label>
-                  <select value={updateForm.appointmentType} onChange={e => setUpdateForm({...updateForm, appointmentType: e.target.value})}>
+
+            {/* Modal Header */}
+            <div className="update-modal__header">
+              <h2 className="update-modal__title">Update Appointment</h2>
+              <button
+                type="button"
+                className="update-modal__close"
+                onClick={() => setShowUpdateModal(false)}
+                aria-label="Close"
+              >&times;</button>
+            </div>
+
+            <form onSubmit={confirmUpdate} className="update-modal__form">
+
+              {/* Row 1: Pet Name | Pet Type */}
+              <div className="update-modal__row">
+                <div className="update-modal__field">
+                  <label className="update-modal__label">Pet Name</label>
+                  <input
+                    type="text"
+                    className="update-modal__input update-modal__input--readonly"
+                    value={updateForm.petName}
+                    readOnly
+                  />
+                </div>
+                <div className="update-modal__field">
+                  <label className="update-modal__label">Pet Type</label>
+                  <input
+                    type="text"
+                    className="update-modal__input update-modal__input--readonly"
+                    value={updateForm.petType}
+                    readOnly
+                  />
+                </div>
+              </div>
+
+              {/* Row 2: Appointment Type | Doctor */}
+              <div className="update-modal__row">
+                <div className="update-modal__field">
+                  <label className="update-modal__label">Appointment Type</label>
+                  <select
+                    className="update-modal__input"
+                    value={updateForm.appointmentType}
+                    onChange={e => setUpdateForm({ ...updateForm, appointmentType: e.target.value })}
+                    required
+                  >
+                    <option value="">Select type</option>
                     {APPOINTMENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </div>
-                <div className="form-group"><label>Date</label><input type="date" min={today} value={updateForm.date} onChange={e => setUpdateForm({...updateForm, date: e.target.value})} /></div>
-                <div className="modal-actions">
-                  <button type="button" className="btn btn-white" onClick={() => setShowUpdateModal(false)}>Close</button>
-                  <button type="submit" className="btn btn-teal">Save Changes</button>
+                <div className="update-modal__field">
+                  <label className="update-modal__label">Doctor</label>
+                  <select
+                    className="update-modal__input"
+                    value={updateForm.vetId || ""}
+                    onChange={e => {
+                      const selected = vets.find(v => String(v.userId) === e.target.value);
+                      setUpdateForm({
+                        ...updateForm,
+                        vetId: selected ? selected.userId : null,
+                        doctor: selected ? `${selected.firstName} ${selected.lastName}` : "",
+                      });
+                    }}
+                    required
+                  >
+                    <option value="">Select a doctor</option>
+                    {vets.map(v => (
+                      <option key={v.userId} value={v.userId}>
+                        Dr. {v.firstName} {v.lastName}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-             </form>
+              </div>
+
+              {/* Row 3: Date | Time */}
+              <div className="update-modal__row">
+                <div className="update-modal__field">
+                  <label className="update-modal__label">Date</label>
+                  <input
+                    type="date"
+                    className="update-modal__input"
+                    min={today}
+                    value={updateForm.date}
+                    onChange={e => setUpdateForm({ ...updateForm, date: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="update-modal__field">
+                  <label className="update-modal__label">Time</label>
+                  <select
+                    className="update-modal__input"
+                    value={updateForm.time}
+                    onChange={e => setUpdateForm({ ...updateForm, time: e.target.value })}
+                    required
+                  >
+                    <option value="">Select a time</option>
+                    {TIME_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Row 4: Notes (full width) */}
+              <div className="update-modal__field update-modal__field--full">
+                <label className="update-modal__label">Notes</label>
+                <textarea
+                  className="update-modal__textarea"
+                  rows={3}
+                  placeholder="Enter any additional notes..."
+                  value={updateForm.notes}
+                  onChange={e => setUpdateForm({ ...updateForm, notes: e.target.value })}
+                />
+              </div>
+
+              {updateError && <div className="error-box" style={{ marginBottom: '12px' }}>{updateError}</div>}
+
+              {/* Footer Buttons */}
+              <div className="update-modal__footer">
+                <button
+                  type="button"
+                  className="btn btn-white"
+                  onClick={() => setShowUpdateModal(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-teal">
+                  Confirm Update
+                </button>
+              </div>
+
+            </form>
           </div>
         </div>
       )}
@@ -236,27 +374,67 @@ const MyAppointments = () => {
       {showCancelModal && (
         <div className="modal-overlay" onClick={() => setShowCancelModal(false)}>
           <div className="update-modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Cancel Appointment</h2>
-              <button className="close-btn" onClick={() => setShowCancelModal(false)}>&times;</button>
+
+            {/* Modal Header */}
+            <div className="update-modal__header">
+              <h2 className="update-modal__title">Cancel Appointment</h2>
+              <button
+                type="button"
+                className="update-modal__close"
+                onClick={() => setShowCancelModal(false)}
+                aria-label="Close"
+              >&times;</button>
             </div>
-            <form onSubmit={confirmCancel} className="update-form">
-               <div className="form-group">
-                 <label>Select Appointment</label>
-                 <select value={cancelForm.appointmentId} onChange={e => setCancelForm({...cancelForm, appointmentId: e.target.value})} required>
-                   <option value="">Select an appointment</option>
-                   {upcomingAppointments.map(a => <option key={a.id} value={a.id}>{a.pet?.name} - {a.date}</option>)}
-                 </select>
-               </div>
-               <div className="form-group">
-                 <label>Reason for Cancellation</label>
-                 <textarea placeholder="e.g. Pet is feeling better, change of date..." value={cancelForm.reason} onChange={e => setCancelForm({...cancelForm, reason: e.target.value})} required />
-               </div>
-               {cancelError && <div className="error-box">{cancelError}</div>}
-               <div className="modal-actions">
-                 <button type="button" className="btn btn-white" onClick={() => setShowCancelModal(false)}>Close</button>
-                 <button type="submit" className="btn btn-teal">Confirm Cancellation</button>
-               </div>
+
+            <form onSubmit={confirmCancel} className="update-modal__form">
+
+              {/* Select Appointment */}
+              <div className="update-modal__field update-modal__field--full">
+                <label className="update-modal__label">Select Appointment</label>
+                <select
+                  className="update-modal__input"
+                  value={cancelForm.appointmentId}
+                  onChange={e => setCancelForm({ ...cancelForm, appointmentId: e.target.value })}
+                  required
+                >
+                  <option value="">Choose an upcoming appointment</option>
+                  {upcomingAppointments.map(a => (
+                    <option key={a.id} value={a.id}>
+                      {a.pet?.name || a.petName || 'Pet'} — {a.date} at {a.timeSlot} ({a.appointmentType})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Reason */}
+              <div className="update-modal__field update-modal__field--full">
+                <label className="update-modal__label">Reason for Cancellation</label>
+                <textarea
+                  className="update-modal__textarea"
+                  rows={4}
+                  placeholder="e.g. Pet is feeling better, change of plans..."
+                  value={cancelForm.reason}
+                  onChange={e => setCancelForm({ ...cancelForm, reason: e.target.value })}
+                  required
+                />
+              </div>
+
+              {cancelError && <div className="error-box" style={{ marginBottom: '12px' }}>{cancelError}</div>}
+
+              {/* Footer Buttons */}
+              <div className="update-modal__footer">
+                <button
+                  type="button"
+                  className="btn btn-white"
+                  onClick={() => setShowCancelModal(false)}
+                >
+                  Close
+                </button>
+                <button type="submit" className="btn btn-teal">
+                  Confirm Cancellation
+                </button>
+              </div>
+
             </form>
           </div>
         </div>
