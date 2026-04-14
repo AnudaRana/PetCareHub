@@ -3,11 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import '../../../styles/medical.css';
 import MedicalModal from '../components/MedicalModel';
 import TreatmentList from '../components/TreatmentList';
-import VaccinationList from '../components/VaccinationList';
 import ConfirmationModal from '../components/ConfirmationModel';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import { getTreatmentsByPetId, addTreatmentToPet } from '../../../services/medicalApi';
-import { getVaccinationsByPetId, addVaccinationToPet } from '../../../services/vaccinationApi';
 
 const sortByDateDesc = (items) => [...items].sort((a, b) => {
   const dateDiff = new Date(b.date) - new Date(a.date);
@@ -18,16 +16,13 @@ const sortByDateDesc = (items) => [...items].sort((a, b) => {
 const PetMedicalRecordPage = () => {
   const navigate = useNavigate();
   const [treatments, setTreatments] = useState([]);
-  const [vaccinations, setVaccinations] = useState([]);
   const [isTreatmentModalOpen, setTreatmentModalOpen] = useState(false);
-  const [isVaccinationModalOpen, setVaccinationModalOpen] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmAction, setConfirmAction] = useState('treatment');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [successTitle, setSuccessTitle] = useState('');
   const [newTreatment, setNewTreatment] = useState({ date: '', diagnosis: '', notes: '', prescription: '', observation: '', doctorName: '', doctorId: '' });
-  const [newVaccination, setNewVaccination] = useState({ vaccinationDate: '', vaccinationName: '', dose: '', description: '', doctorName: '', doctorId: '' });
   const [editingTreatmentId, setEditingTreatmentId] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -45,7 +40,6 @@ const PetMedicalRecordPage = () => {
         return;
     }
     loadTreatments();
-    loadVaccinations();
   }, [pet]);
 
   const loadTreatments = async () => {
@@ -71,27 +65,7 @@ const PetMedicalRecordPage = () => {
     }
   };
 
-  const loadVaccinations = async () => {
-    if (!pet?.petId) return;
-    try {
-      const apiVaccinations = await getVaccinationsByPetId(pet.petId);
-      const mappedVaccinations = apiVaccinations.map((v) => ({
-        id: v.id,
-        vaccinationDate: v.vaccinationDate,
-        vaccinationName: v.vaccinationName || '',
-        dose: v.dose || '',
-        description: v.description || '',
-        doctorName: v.doctorName || '',
-        doctorId: v.doctorId || '',
-      }));
-      setVaccinations(mappedVaccinations);
-    } catch (err) {
-      console.error('Failed to load vaccinations:', err);
-    }
-  };
-
   const latestTreatments = useMemo(() => sortByDateDesc(treatments), [treatments]);
-  const latestVaccinations = useMemo(() => [...vaccinations].sort((a, b) => new Date(b.vaccinationDate) - new Date(a.vaccinationDate)), [vaccinations]);
 
   const doSaveTreatment = async () => {
     if (!newTreatment.date || !newTreatment.doctorName.trim() || !newTreatment.doctorId.trim()) return;
@@ -133,44 +107,6 @@ const PetMedicalRecordPage = () => {
     }
   };
 
-  const doSaveVaccination = async () => {
-    if (!newVaccination.vaccinationDate || !newVaccination.vaccinationName.trim() || !newVaccination.dose.trim() || !newVaccination.doctorName.trim() || !newVaccination.doctorId.trim()) return;
-
-    if (!pet?.petId) return;
-
-    try {
-      const dto = {
-        vaccinationDate: newVaccination.vaccinationDate,
-        vaccinationName: newVaccination.vaccinationName,
-        dose: newVaccination.dose,
-        description: newVaccination.description,
-        doctorName: newVaccination.doctorName,
-        doctorId: newVaccination.doctorId,
-      };
-
-      const saved = await addVaccinationToPet(pet.petId, dto);
-      const savedVaccination = {
-        id: saved.id,
-        vaccinationDate: saved.vaccinationDate,
-        vaccinationName: saved.vaccinationName || '',
-        dose: saved.dose || '',
-        description: saved.description || '',
-        doctorName: saved.doctorName || '',
-        doctorId: saved.doctorId || '',
-      };
-
-      setVaccinations((old) => [savedVaccination, ...old]);
-      setSuccessTitle('Vaccination Saved');
-      setSuccessMessage('The vaccination record has been successfully finalized and archived.');
-      setShowSuccessModal(true);
-    } catch (err) {
-      console.error('Failed to save vaccination:', err);
-    } finally {
-      setNewVaccination({ vaccinationDate: '', vaccinationName: '', dose: '', description: '', doctorName: '', doctorId: '' });
-      setVaccinationModalOpen(false);
-    }
-  };
-
   const handleSaveRequest = (action = 'treatment') => {
     setConfirmAction(action);
     setShowConfirmModal(true);
@@ -178,11 +114,7 @@ const PetMedicalRecordPage = () => {
 
   const handleConfirmSave = async () => {
     setShowConfirmModal(false);
-    if (confirmAction === 'vaccination') {
-      await doSaveVaccination();
-    } else {
-      await doSaveTreatment();
-    }
+    await doSaveTreatment();
   };
 
   const handleEditTreatment = (id) => {
@@ -247,38 +179,6 @@ const PetMedicalRecordPage = () => {
                 />
             )}
           </section>
-
-          <section className="medical-block">
-            <header className="block-header">
-              <h2>Vaccinations & Immunizations</h2>
-              {canModify && (
-                <button
-                  className="btn btn-teal"
-                  onClick={() => {
-                    setNewVaccination({ 
-                        vaccinationDate: new Date().toISOString().split('T')[0], 
-                        vaccinationName: '', dose: '', description: '', 
-                        doctorName: user?.fullName || '', 
-                        doctorId: `VET-${user?.userId || ''}` 
-                    });
-                    setVaccinationModalOpen(true);
-                  }}
-                >
-                  + Add Vaccination
-                </button>
-              )}
-            </header>
-
-            {vaccinations.length === 0 ? (
-                <div className="empty-state" style={{ padding: '60px 20px' }}>
-                    <span className="empty-state-icon">💉</span>
-                    <h3>No vaccination history available</h3>
-                    <p>This patient does not have any vaccination records yet.</p>
-                </div>
-            ) : (
-                <VaccinationList vaccinations={latestVaccinations} />
-            )}
-          </section>
         </div>
       </div>
 
@@ -337,61 +237,11 @@ const PetMedicalRecordPage = () => {
           </div>
       )}
 
-      {isVaccinationModalOpen && (
-          <div className="modal-overlay" onClick={() => setVaccinationModalOpen(false)}>
-              <div className="modal-container" style={{ maxWidth: '640px' }} onClick={e => e.stopPropagation()}>
-                  <header className="modal-header">
-                      <h2>New Vaccination Record</h2>
-                      <button className="close-btn" onClick={() => setVaccinationModalOpen(false)}>✕</button>
-                  </header>
-
-                  <div className="modal-body" style={{ padding: '24px' }}>
-                      <form className="premium-form" onSubmit={(e) => { e.preventDefault(); handleSaveRequest('vaccination'); }}>
-                          <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                              <label>Vaccination Date
-                                  <input type="date" value={newVaccination.vaccinationDate} onChange={(e) => setNewVaccination({ ...newVaccination, vaccinationDate: e.target.value })} required />
-                              </label>
-                              <label>Patient ID
-                                  <input type="text" value={`HUB-${pet.petId} - ${pet.name}`} disabled />
-                              </label>
-                          </div>
-
-                          <label>Vaccination Name
-                              <input value={newVaccination.vaccinationName} onChange={(e) => setNewVaccination({ ...newVaccination, vaccinationName: e.target.value })} placeholder="e.g. Rabies, DHPP" required />
-                          </label>
-
-                          <label>Dose Administered
-                              <input value={newVaccination.dose} onChange={(e) => setNewVaccination({ ...newVaccination, dose: e.target.value })} placeholder="e.g. 1 mL, 2 doses" required />
-                          </label>
-
-                          <label>Administration Notes
-                              <textarea rows="3" value={newVaccination.description} onChange={(e) => setNewVaccination({ ...newVaccination, description: e.target.value })} placeholder="Describe why this vaccination was given..." />
-                          </label>
-
-                          <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                              <label>Signing Doctor
-                                  <input value={newVaccination.doctorName} onChange={(e) => setNewVaccination({ ...newVaccination, doctorName: e.target.value })} required />
-                              </label>
-                              <label>Doctor ID
-                                  <input value={newVaccination.doctorId} onChange={(e) => setNewVaccination({ ...newVaccination, doctorId: e.target.value })} required />
-                              </label>
-                          </div>
-
-                          <div className="modal-actions" style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
-                              <button type="button" className="btn btn-white" onClick={() => setVaccinationModalOpen(false)} style={{ flex: 1 }}>Discard</button>
-                              <button type="submit" className="btn btn-teal" style={{ flex: 2 }}>Finalize & Archive</button>
-                          </div>
-                      </form>
-                  </div>
-              </div>
-          </div>
-      )}
-
       {showConfirmModal && (
         <div className="confirm-backdrop" role="dialog" aria-modal="true">
           <div className="confirm-box">
             <h3>Final Authorization</h3>
-            <p>Confirm integrity and archive this {confirmAction === 'vaccination' ? 'vaccination' : 'medical treatment'} record to the vault?</p>
+            <p>Confirm integrity and archive this medical treatment record to the vault?</p>
             <div className="confirm-actions">
               <button className="btn btn-white" onClick={() => setShowConfirmModal(false)} style={{ flex: 1 }}>Review</button>
               <button className="btn btn-teal" onClick={handleConfirmSave} style={{ flex: 2 }}>Yes, Archive Record</button>

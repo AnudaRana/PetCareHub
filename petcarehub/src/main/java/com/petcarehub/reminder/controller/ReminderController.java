@@ -1,5 +1,6 @@
 package com.petcarehub.reminder.controller;
 
+import com.petcarehub.reminder.dto.ReminderRequestDTO;
 import com.petcarehub.reminder.dto.ReminderResponseDTO;
 import com.petcarehub.reminder.service.ReminderService;
 import com.petcarehub.user.entity.User;
@@ -38,5 +39,29 @@ public class ReminderController {
         }
 
         return ResponseEntity.ok(reminderService.getRemindersForUser(effectiveUserId));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getReminderById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(reminderService.getReminderById(id));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateReminder(
+            @PathVariable Long id,
+            @RequestBody ReminderRequestDTO requestDTO) {
+        try {
+            return ResponseEntity.ok(reminderService.updateReminder(id, requestDTO));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
     }
 }

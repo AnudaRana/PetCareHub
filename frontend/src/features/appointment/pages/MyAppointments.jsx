@@ -6,31 +6,27 @@ import { getAllVets } from '../../../services/vetService';
 
 // --- CONSTANTS ---
 const TIME_SLOTS = ['09:00 AM', '11:00 AM', '02:00 PM'];
-
-const INITIAL_UPDATE_FORM = {
-  petName: "",
-  petType: "",
-  appointmentType: "",
-  date: "",
-  time: "",
-  doctor: "",
-  vetId: null,
-  notes: "",
-  petId: "",
-  price: 0,
-};
-
-const INITIAL_CANCEL_FORM = {
-  appointmentId: "",
-  reason: "",
-};
-
-const APPOINTMENT_TYPES = ["Checkup", "Vaccination", "Operation", "Consultation"];
+const APPOINTMENT_TYPES = ["Checkup", "Vaccination", "Operation", "Consultation", "Vaccination Reminder"];
 
 // --- SUB-COMPONENTS ---
+const calculateOverdue = (dateStr) => {
+  if (!dateStr) return 0;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const apptDate = new Date(dateStr);
+  apptDate.setHours(0, 0, 0, 0);
+  if (apptDate < today) {
+    const diffTime = Math.abs(today - apptDate);
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+  return 0;
+};
+
 const AppointmentDetails = ({ appointment, showUpdatedTag = false }) => {
   const status = (appointment.status || "").toUpperCase();
   const cancelledBy = (appointment.cancelledBy || "").toUpperCase();
+  const overdueDays = calculateOverdue(appointment.date);
+  const isPendingType = status === 'UPCOMING' || status === 'PENDING';
 
   return (
     <>
@@ -42,9 +38,13 @@ const AppointmentDetails = ({ appointment, showUpdatedTag = false }) => {
       <p><strong>Notes:</strong> {appointment.notes || "-"}</p>
       <p>
         <strong>Status:</strong>{" "}
-        <span className={status === "CANCELLED" ? "status-cancelled" : "status-badge"}>
-          {appointment.status}
-        </span>
+        {isPendingType && overdueDays > 0 ? (
+           <span className="status-badge" style={{ color: '#dc2626', background: 'rgba(239, 68, 68, 0.1)' }}>Overdue by {overdueDays} days</span>
+        ) : (
+           <span className={status === "CANCELLED" ? "status-cancelled" : "status-badge"}>
+             {appointment.status}
+           </span>
+        )}
         {showUpdatedTag && appointment.updated && (
           <span className="updated-tag">Updated</span>
         )}
@@ -71,13 +71,19 @@ const MyAppointments = () => {
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 
   const [appointments, setAppointments] = useState([]);
+  const [reminders, setReminders] = useState([]);
   const [vets, setVets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  
+  // Unified Modal States
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [editForm, setEditForm] = useState({});
+
   const [showCancelModal, setShowCancelModal] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
-  const [updateForm, setUpdateForm] = useState(INITIAL_UPDATE_FORM);
-  const [cancelForm, setCancelForm] = useState(INITIAL_CANCEL_FORM);
+  const [cancelForm, setCancelForm] = useState({ reason: "" });
+
   const [loading, setLoading] = useState(true);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showCancelSuccessModal, setShowCancelSuccessModal] = useState(false);
@@ -88,10 +94,28 @@ const MyAppointments = () => {
     if (!userId) return;
     try {
       setLoading(true);
-      const res = await axios.get(`/api/appointments/user/${userId}`);
-      setAppointments(Array.isArray(res.data) ? res.data : []);
+      const [apptRes, remRes] = await Promise.all([
+         axios.get(`/api/appointments/user/${userId}`),
+         axios.get(`/api/reminders?userId=${userId}`)
+      ]);
+      setAppointments(Array.isArray(apptRes.data) ? apptRes.data : []);
+      
+      const formattedReminders = (Array.isArray(remRes.data) ? remRes.data : []).map(r => ({
+         id: r.reminderId,
+         isReminder: true,
+         petName: r.petName,
+         petSpecies: 'Pet',
+         appointmentType: r.reminderType ? `${r.reminderType} Reminder` : 'Vaccination Reminder',
+         date: r.dueDate,
+         timeSlot: 'All Day',
+         doctor: 'System Generated',
+         notes: r.description,
+         status: r.status,
+         petId: r.petId
+      }));
+      setReminders(formattedReminders);
     } catch (error) {
-      console.error("Failed to fetch appointments:", error);
+      console.error("Failed to fetch data:", error);
     } finally {
       setLoading(false);
     }
@@ -101,74 +125,103 @@ const MyAppointments = () => {
     fetchAppointments();
   }, [userId]);
 
-  // Fetch vet list for the doctor dropdown in the update modal
   useEffect(() => {
     getAllVets()
       .then((res) => setVets(Array.isArray(res) ? res : (res.data || [])))
       .catch((err) => console.error('Failed to load vets:', err));
   }, []);
 
-  const filteredAppointments = useMemo(() => 
-    appointments.filter((appt) => {
+  const allItems = useMemo(() => [...appointments, ...reminders], [appointments, reminders]);
+
+  const filteredItems = useMemo(() => 
+    allItems.filter((item) => {
       const k = searchTerm.toLowerCase();
-      const petName = appt.pet?.name || "";
-      const type = appt.appointmentType || "";
+      const petName = item.pet?.name || item.petName || "";
+      const type = item.appointmentType || "";
       return petName.toLowerCase().includes(k) || type.toLowerCase().includes(k);
-    }), [appointments, searchTerm]
+    }), [allItems, searchTerm]
   );
 
   const upcomingAppointments = useMemo(() => 
-    filteredAppointments.filter(a => (a.status || "").toUpperCase() === "UPCOMING"), [filteredAppointments]
+    filteredItems.filter(a => {
+      const s = (a.status || "").toUpperCase();
+      return s === "UPCOMING" || s === "PENDING";
+    }), [filteredItems]
   );
 
   const pastAppointments = useMemo(() => 
-    filteredAppointments.filter(a => ["PAST", "CANCELLED", "COMPLETED"].includes((a.status || "").toUpperCase())), [filteredAppointments]
+    filteredItems.filter(a => {
+      const s = (a.status || "").toUpperCase();
+      return ["PAST", "CANCELLED", "COMPLETED"].includes(s);
+    }), [filteredItems]
   );
 
   const latestUpcomingAppointment = useMemo(() => 
     (upcomingAppointments.length > 0 ? upcomingAppointments[0] : null), [upcomingAppointments]
   );
 
-  const openUpdateModal = (appointment) => {
-    setSelectedAppointment(appointment);
+  const openDetailsModal = (item) => {
+    setSelectedItem(item);
     setUpdateError("");
-    setUpdateForm({
-      petName: appointment.pet?.name || appointment.petName || "",
-      petType: appointment.pet?.species || appointment.petSpecies || "",
-      appointmentType: appointment.appointmentType || "",
-      date: appointment.date || "",
-      time: appointment.timeSlot || "",
-      doctor: appointment.doctor || "",
-      vetId: appointment.vetId || null,
-      notes: appointment.notes || "",
-      petId: appointment.pet?.petId || appointment.petId || "",
-      price: appointment.price || 0,
+    setIsEditMode(false);
+    setEditForm({
+      petName: item.pet?.name || item.petName || "",
+      petType: item.pet?.species || item.petSpecies || "",
+      appointmentType: item.appointmentType || "",
+      date: item.date || "",
+      time: item.timeSlot || "",
+      doctor: item.doctor || "",
+      vetId: item.vetId || null,
+      notes: item.notes || "",
+      petId: item.pet?.petId || item.petId || "",
     });
-    setShowUpdateModal(true);
+    setShowDetailsModal(true);
   };
 
   const confirmUpdate = async (e) => {
     e.preventDefault();
     setUpdateError("");
     try {
-      const res = await axios.put(`/api/appointments/${selectedAppointment.id}`, {
-        ...updateForm,
-        userId,
-        timeSlot: updateForm.time,
-      });
-      setAppointments(prev => prev.map(a => a.id === selectedAppointment.id ? res.data : a));
-      setShowUpdateModal(false);
+      if (selectedItem.isReminder) {
+         await axios.put(`/api/reminders/${selectedItem.id}`, {
+            dueDate: editForm.date,
+            description: editForm.notes,
+            status: selectedItem.status
+         });
+      } else {
+         await axios.put(`/api/appointments/${selectedItem.id}`, {
+            ...editForm,
+            userId,
+            timeSlot: editForm.time,
+         });
+      }
+      await fetchAppointments();
+      setShowDetailsModal(false);
       setShowSuccessModal(true);
     } catch (error) {
       setUpdateError(error.response?.data?.message || "Failed to update. Please try again.");
     }
   };
 
+  const openCancelPrompt = () => {
+    setCancelForm({ reason: "" });
+    setShowDetailsModal(false);
+    setShowCancelModal(true);
+  };
+
   const confirmCancel = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.patch(`/api/appointments/${cancelForm.appointmentId}/cancel`, { reason: cancelForm.reason });
-      setAppointments(prev => prev.map(a => a.id === Number(cancelForm.appointmentId) ? res.data : a));
+      if (selectedItem.isReminder) {
+         await axios.put(`/api/reminders/${selectedItem.id}`, {
+             dueDate: selectedItem.date,
+             description: selectedItem.notes,
+             status: "CANCELLED"
+         });
+      } else {
+         await axios.patch(`/api/appointments/${selectedItem.id}/cancel`, { reason: cancelForm.reason });
+      }
+      await fetchAppointments();
       setShowCancelModal(false);
       setShowCancelSuccessModal(true);
     } catch (error) { setCancelError("Cancellation failed."); }
@@ -178,9 +231,6 @@ const MyAppointments = () => {
     <div className="appointments-container">
       <div className="appointments-header">
         <h1>My Appointments</h1>
-        <button className="btn btn-teal" onClick={() => setShowCancelModal(true)}>
-          Cancel Appointments
-        </button>
       </div>
 
       <div className="search-wrapper">
@@ -198,7 +248,7 @@ const MyAppointments = () => {
       ) : (
         <>
           {latestUpcomingAppointment && (
-            <div className="latest-appointment-card">
+            <div className="latest-appointment-card" onClick={() => openDetailsModal(latestUpcomingAppointment)} style={{ cursor: 'pointer', border: (calculateOverdue(latestUpcomingAppointment.date) > 0 && (latestUpcomingAppointment.status==='UPCOMING'||latestUpcomingAppointment.status==='PENDING')) ? '2px solid #dc2626' : undefined }}>
               <div className="latest-badge">Latest Upcoming Appointment</div>
               <div className="latest-details">
                 <AppointmentDetails appointment={latestUpcomingAppointment} showUpdatedTag={true} />
@@ -208,22 +258,29 @@ const MyAppointments = () => {
 
           <div className="appointments-grid">
             <div className="appointment-section">
-              <h2>Upcoming Appointments</h2>
-              {upcomingAppointments.length === 0 ? <p className="empty-text">No upcoming appointments.</p> :  
-                upcomingAppointments.map(appt => (
-                  <div className="appointment-box" key={appt.id}>
-                    <AppointmentDetails appointment={appt} showUpdatedTag={true} />
-                    <button className="btn btn-teal" onClick={() => openUpdateModal(appt)}>Update</button>
+              <h2>Upcoming Bookings & Reminders</h2>
+              {upcomingAppointments.length === 0 ? <p className="empty-text">No upcoming schedules.</p> :  
+                upcomingAppointments.map(item => {
+                  const overdueDays = calculateOverdue(item.date);
+                  const isOverdue = overdueDays > 0;
+                  return (
+                  <div 
+                    className="appointment-box" 
+                    key={(item.isReminder ? 'rem-' : 'appt-') + item.id} 
+                    onClick={() => openDetailsModal(item)}
+                    style={{ cursor: 'pointer', border: isOverdue ? '2px solid #dc2626' : undefined }}
+                  >
+                    <AppointmentDetails appointment={item} showUpdatedTag={true} />
                   </div>
-              ))}
+                )})}
             </div>
 
             <div className="appointment-section">
               <h2>Past / Cancelled</h2>
               {pastAppointments.length === 0 ? <p className="empty-text">No history found.</p> :  
-                pastAppointments.map(appt => (
-                  <div className="appointment-box" key={appt.id}>
-                    <AppointmentDetails appointment={appt} />
+                pastAppointments.map(item => (
+                  <div className="appointment-box" key={(item.isReminder ? 'rem-' : 'appt-') + item.id} onClick={() => openDetailsModal(item)} style={{cursor: 'pointer'}}>
+                    <AppointmentDetails appointment={item} />
                   </div>
               ))}
             </div>
@@ -231,140 +288,122 @@ const MyAppointments = () => {
         </>
       )}
 
-      {/* Update Modal */}
-      {showUpdateModal && (
-        <div className="modal-overlay" onClick={() => setShowUpdateModal(false)}>
+      {/* Unified Details & Edit Modal */}
+      {showDetailsModal && selectedItem && (
+        <div className="modal-overlay" onClick={() => setShowDetailsModal(false)}>
           <div className="update-modal" onClick={e => e.stopPropagation()}>
-
-            {/* Modal Header */}
             <div className="update-modal__header">
-              <h2 className="update-modal__title">Update Appointment</h2>
+              <h2 className="update-modal__title">{isEditMode ? "Edit Details" : "Record Details"}</h2>
               <button
                 type="button"
                 className="update-modal__close"
-                onClick={() => setShowUpdateModal(false)}
-                aria-label="Close"
+                onClick={() => setShowDetailsModal(false)}
               >&times;</button>
             </div>
 
             <form onSubmit={confirmUpdate} className="update-modal__form">
-
-              {/* Row 1: Pet Name | Pet Type */}
               <div className="update-modal__row">
                 <div className="update-modal__field">
                   <label className="update-modal__label">Pet Name</label>
-                  <input
-                    type="text"
-                    className="update-modal__input update-modal__input--readonly"
-                    value={updateForm.petName}
-                    readOnly
-                  />
+                  <input type="text" className="update-modal__input update-modal__input--readonly" value={editForm.petName} readOnly />
                 </div>
                 <div className="update-modal__field">
                   <label className="update-modal__label">Pet Type</label>
-                  <input
-                    type="text"
-                    className="update-modal__input update-modal__input--readonly"
-                    value={updateForm.petType}
-                    readOnly
-                  />
+                  <input type="text" className="update-modal__input update-modal__input--readonly" value={editForm.petType} readOnly />
                 </div>
               </div>
 
-              {/* Row 2: Appointment Type | Doctor */}
               <div className="update-modal__row">
                 <div className="update-modal__field">
-                  <label className="update-modal__label">Appointment Type</label>
-                  <select
-                    className="update-modal__input"
-                    value={updateForm.appointmentType}
-                    onChange={e => setUpdateForm({ ...updateForm, appointmentType: e.target.value })}
-                    required
-                  >
-                    <option value="">Select type</option>
-                    {APPOINTMENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                  </select>
+                  <label className="update-modal__label">Type</label>
+                  {!isEditMode || selectedItem.isReminder ? (
+                      <input type="text" className="update-modal__input update-modal__input--readonly" value={editForm.appointmentType} readOnly />
+                  ) : (
+                      <select className="update-modal__input" value={editForm.appointmentType} onChange={e => setEditForm({ ...editForm, appointmentType: e.target.value })} required>
+                        <option value="">Select type</option>
+                        {APPOINTMENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                      </select>
+                  )}
                 </div>
-                <div className="update-modal__field">
-                  <label className="update-modal__label">Doctor</label>
-                  <select
-                    className="update-modal__input"
-                    value={updateForm.vetId || ""}
-                    onChange={e => {
-                      const selected = vets.find(v => String(v.userId) === e.target.value);
-                      setUpdateForm({
-                        ...updateForm,
-                        vetId: selected ? selected.userId : null,
-                        doctor: selected ? `${selected.firstName} ${selected.lastName}` : "",
-                      });
-                    }}
-                    required
-                  >
-                    <option value="">Select a doctor</option>
-                    {vets.map(v => (
-                      <option key={v.userId} value={v.userId}>
-                        Dr. {v.firstName} {v.lastName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {!selectedItem.isReminder && (
+                    <div className="update-modal__field">
+                      <label className="update-modal__label">Doctor</label>
+                      {!isEditMode ? (
+                          <input type="text" className="update-modal__input update-modal__input--readonly" value={editForm.doctor || ''} readOnly />
+                      ) : (
+                          <select className="update-modal__input" value={editForm.vetId || ""} onChange={e => {
+                              const selected = vets.find(v => String(v.userId) === e.target.value);
+                              setEditForm({
+                                ...editForm,
+                                vetId: selected ? selected.userId : null,
+                                doctor: selected ? `${selected.firstName} ${selected.lastName}` : "",
+                              });
+                            }} required>
+                            <option value="">Select a doctor</option>
+                            {vets.map(v => (
+                              <option key={v.userId} value={v.userId}>Dr. {v.firstName} {v.lastName}</option>
+                            ))}
+                          </select>
+                      )}
+                    </div>
+                )}
               </div>
 
-              {/* Row 3: Date | Time */}
               <div className="update-modal__row">
                 <div className="update-modal__field">
-                  <label className="update-modal__label">Date</label>
-                  <input
-                    type="date"
-                    className="update-modal__input"
-                    min={today}
-                    value={updateForm.date}
-                    onChange={e => setUpdateForm({ ...updateForm, date: e.target.value })}
-                    required
-                  />
+                  <label className="update-modal__label">{selectedItem.isReminder ? "Due Date" : "Date"}</label>
+                  <input type="date" className={`update-modal__input ${!isEditMode ? 'update-modal__input--readonly' : ''}`} min={today} value={editForm.date} onChange={e => setEditForm({ ...editForm, date: e.target.value })} readOnly={!isEditMode} required />
                 </div>
-                <div className="update-modal__field">
-                  <label className="update-modal__label">Time</label>
-                  <select
-                    className="update-modal__input"
-                    value={updateForm.time}
-                    onChange={e => setUpdateForm({ ...updateForm, time: e.target.value })}
-                    required
-                  >
-                    <option value="">Select a time</option>
-                    {TIME_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}
-                  </select>
-                </div>
+                {!selectedItem.isReminder && (
+                    <div className="update-modal__field">
+                      <label className="update-modal__label">Time</label>
+                      {!isEditMode ? (
+                          <input type="text" className="update-modal__input update-modal__input--readonly" value={editForm.time || ''} readOnly />
+                      ) : (
+                          <select className="update-modal__input" value={editForm.time} onChange={e => setEditForm({ ...editForm, time: e.target.value })} required>
+                            <option value="">Select a time</option>
+                            {TIME_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}
+                          </select>
+                      )}
+                    </div>
+                )}
               </div>
 
-              {/* Row 4: Notes (full width) */}
               <div className="update-modal__field update-modal__field--full">
-                <label className="update-modal__label">Notes</label>
-                <textarea
-                  className="update-modal__textarea"
-                  rows={3}
-                  placeholder="Enter any additional notes..."
-                  value={updateForm.notes}
-                  onChange={e => setUpdateForm({ ...updateForm, notes: e.target.value })}
-                />
+                <label className="update-modal__label">Notes & Description</label>
+                <textarea className={`update-modal__textarea ${!isEditMode ? 'update-modal__input--readonly' : ''}`} rows={3} value={editForm.notes} onChange={e => setEditForm({ ...editForm, notes: e.target.value })} readOnly={!isEditMode} />
               </div>
 
-              {updateError && <div className="error-box" style={{ marginBottom: '12px' }}>{updateError}</div>}
-
-              {/* Footer Buttons */}
-              <div className="update-modal__footer">
-                <button
-                  type="button"
-                  className="btn btn-white"
-                  onClick={() => setShowUpdateModal(false)}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-teal">
-                  Confirm Update
-                </button>
+              {/* Status Section in Modal */}
+              <div style={{marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px'}}>
+                 <strong>Status:</strong>
+                 {(selectedItem.status === 'UPCOMING' || selectedItem.status === 'PENDING') && calculateOverdue(selectedItem.date) > 0 ? (
+                    <span className="status-badge" style={{ color: '#dc2626', background: 'rgba(239, 68, 68, 0.1)' }}>Overdue by {calculateOverdue(selectedItem.date)} days</span>
+                 ) : (
+                    <span className="status-badge">{selectedItem.status}</span>
+                 )}
               </div>
 
+              {updateError && <div className="error-box" style={{ marginTop: '12px' }}>{updateError}</div>}
+
+              <div className="update-modal__footer" style={{ marginTop: '24px' }}>
+                {!isEditMode ? (
+                   <>
+                     { (selectedItem.status === 'UPCOMING' || selectedItem.status === 'PENDING') && (
+                         <button type="button" className="btn btn-white" onClick={openCancelPrompt} style={{ color: '#dc2626', borderColor: 'rgba(239, 68, 68, 0.2)' }}>Cancel Booking</button>
+                     )}
+                     <div style={{ flex: 1 }}></div>
+                     { (selectedItem.status === 'UPCOMING' || selectedItem.status === 'PENDING') && (
+                         <button type="button" className="btn btn-teal" onClick={() => setIsEditMode(true)}>Update</button>
+                     )}
+                   </>
+                ) : (
+                   <>
+                     <button type="button" className="btn btn-white" onClick={() => setIsEditMode(false)}>Discard</button>
+                     <button type="submit" className="btn btn-teal">Confirm Update</button>
+                   </>
+                )}
+              </div>
             </form>
           </div>
         </div>
@@ -374,78 +413,43 @@ const MyAppointments = () => {
       {showCancelModal && (
         <div className="modal-overlay" onClick={() => setShowCancelModal(false)}>
           <div className="update-modal" onClick={e => e.stopPropagation()}>
-
-            {/* Modal Header */}
             <div className="update-modal__header">
-              <h2 className="update-modal__title">Cancel Appointment</h2>
-              <button
-                type="button"
-                className="update-modal__close"
-                onClick={() => setShowCancelModal(false)}
-                aria-label="Close"
-              >&times;</button>
+              <h2 className="update-modal__title">Cancel Booking</h2>
+              <button type="button" className="update-modal__close" onClick={() => setShowCancelModal(false)}>&times;</button>
             </div>
-
             <form onSubmit={confirmCancel} className="update-modal__form">
-
-              {/* Select Appointment */}
-              <div className="update-modal__field update-modal__field--full">
-                <label className="update-modal__label">Select Appointment</label>
-                <select
-                  className="update-modal__input"
-                  value={cancelForm.appointmentId}
-                  onChange={e => setCancelForm({ ...cancelForm, appointmentId: e.target.value })}
-                  required
-                >
-                  <option value="">Choose an upcoming appointment</option>
-                  {upcomingAppointments.map(a => (
-                    <option key={a.id} value={a.id}>
-                      {a.pet?.name || a.petName || 'Pet'} — {a.date} at {a.timeSlot} ({a.appointmentType})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Reason */}
               <div className="update-modal__field update-modal__field--full">
                 <label className="update-modal__label">Reason for Cancellation</label>
-                <textarea
-                  className="update-modal__textarea"
-                  rows={4}
-                  placeholder="e.g. Pet is feeling better, change of plans..."
-                  value={cancelForm.reason}
-                  onChange={e => setCancelForm({ ...cancelForm, reason: e.target.value })}
-                  required
-                />
+                <textarea className="update-modal__textarea" rows={4} placeholder="e.g. Change of plans..." value={cancelForm.reason} onChange={e => setCancelForm({ ...cancelForm, reason: e.target.value })} required={!selectedItem?.isReminder} />
               </div>
-
               {cancelError && <div className="error-box" style={{ marginBottom: '12px' }}>{cancelError}</div>}
-
-              {/* Footer Buttons */}
               <div className="update-modal__footer">
-                <button
-                  type="button"
-                  className="btn btn-white"
-                  onClick={() => setShowCancelModal(false)}
-                >
-                  Close
-                </button>
-                <button type="submit" className="btn btn-teal">
-                  Confirm Cancellation
-                </button>
+                <button type="button" className="btn btn-white" onClick={() => setShowCancelModal(false)}>Close</button>
+                <button type="submit" className="btn btn-teal">Confirm Cancellation</button>
               </div>
-
             </form>
           </div>
         </div>
       )}
+
       {showCancelSuccessModal && (
         <div className="modal-overlay" onClick={() => setShowCancelSuccessModal(false)}>
           <div className="success-modal" style={{ textAlign: 'center', padding: '2rem' }}>
-            <div className="success-icon" style={{ fontSize: '3rem', color: '#2dd4bf', marginBottom: '1rem' }}>✓</div>
+            <div className="success-icon" style={{ fontSize: '3rem', color: '#2dd4bf', margin: '0 auto 1rem' }}>✓</div>
             <h2>Successfully Cancelled</h2>
-            <p>Your appointment has been removed from the schedule.</p>
+            <p>Your booking has been removed from the schedule.</p>
             <button className="btn btn-teal" onClick={() => setShowCancelSuccessModal(false)} style={{ marginTop: '1.5rem' }}>Done</button>
+          </div>
+        </div>
+      )}
+
+      {showSuccessModal && (
+        <div className="modal-overlay" onClick={() => setShowSuccessModal(false)}>
+          <div className="success-modal" style={{ textAlign: 'center', padding: '2rem' }}>
+            <div className="success-icon" style={{ fontSize: '3rem', color: '#2dd4bf', margin: '0 auto 1rem' }}>✓</div>
+            <h2>Successfully Updated</h2>
+            <p>The details have been saved.</p>
+            <button className="btn btn-teal" onClick={() => setShowSuccessModal(false)} style={{ marginTop: '1.5rem' }}>Done</button>
           </div>
         </div>
       )}

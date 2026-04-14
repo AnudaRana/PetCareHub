@@ -74,10 +74,10 @@ const ViewTimeSlots = () => {
       };
 
       await axios.post('/api/appointments', appointmentData);
-      
+
       const res = await axios.get(`/api/appointments/booked-slots?date=${selectedDate}`);
       setBookedSlots(res.data || []);
-      
+
       setSelectedSlot('');
       setSelectedDoctor('');
       setNotes('');
@@ -126,7 +126,7 @@ const ViewTimeSlots = () => {
           {slots.map((slot, index) => {
             const booked = isSlotBooked(slot.time, slot.doctor);
             const selected = selectedSlot === slot.time && selectedDoctor === slot.doctor;
-            
+
             return (
               <button
                 type="button"
@@ -173,12 +173,12 @@ const ViewTimeSlots = () => {
 
       {showSuccessModal && (
         <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
-          background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, 
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
           animation: 'fadeIn 0.2s ease-in-out'
         }}>
           <div style={{
-            background: '#fff', padding: '32px', borderRadius: '16px', maxWidth: '400px', width: '90%', 
+            background: '#fff', padding: '32px', borderRadius: '16px', maxWidth: '400px', width: '90%',
             textAlign: 'center', boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
           }}>
             <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(46, 204, 113, 0.15)', color: '#2ecc71', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '30px', margin: '0 auto 20px' }}>
@@ -190,7 +190,7 @@ const ViewTimeSlots = () => {
             <p style={{ color: 'var(--color-text-light)', lineHeight: '1.6', marginBottom: '24px' }}>
               An email confirmation has been sent to your registered email address. Thank you for using our services!
             </p>
-            <button 
+            <button
               onClick={() => setShowSuccessModal(false)}
               className="btn btn-teal"
             >

@@ -357,7 +357,7 @@ const DoctorChanneling = () => {
           )}
 
           <div className="slot-grid">
-          {visibleSlots.map((slot, index) => {
+            {visibleSlots.map((slot, index) => {
               const booked = isSlotBooked(slot.time, slot.vetId);
               const pastTime = isPastTimeSlotToday(slot.time);
               const selected =
