@@ -46,4 +46,6 @@ public class Product {
     @Column
     private String category;
 
+    // Explicit getters (Lombok backup)
+    public Long getProductId() { return productId; }
 }

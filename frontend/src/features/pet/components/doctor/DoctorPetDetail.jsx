@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { getImageUrl, API_BASE_URL } from '../../../../services/petService';
-import { getTreatmentsByPetId } from '../../../../services/medicalApi';
+import { getImageUrl } from '../../../../services/petService';
+import { getTreatmentsByPetId, createTreatment } from '../../../../services/medicalApi';
 import { useAuth } from '../../../auth/contexts/AuthContext';
 import '../../../../styles/PetDetail.css';
 import '../../../../styles/medical.css';
@@ -104,8 +103,8 @@ const DoctorPetDetail = ({ pet, onClose }) => {
         setRecordError('');
 
         try {
-            await axios.post(
-                `${API_BASE_URL}/api/medical-records/treatments/pet/${pet.petId}`,
+            await createTreatment(
+                pet.petId,
                 {
                     treatmentDate: recordForm.treatmentDate,
                     diagnosis: recordForm.diagnosis,

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
-import { getImageUrl, API_BASE_URL } from '../../../../services/petService';
+import { getImageUrl, getAllPets } from '../../../../services/petService';
 import { useAuth } from '../../../auth/contexts/AuthContext';
 import DoctorPetDetail from './DoctorPetDetail';
 import '../../../../styles/MyPets.css';
@@ -20,8 +19,8 @@ const DoctorAllPets = () => {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await axios.get(`${API_BASE_URL}/api/pets/all`);
-      const list = data?.data || data || [];
+      const response = await getAllPets();
+      const list = response?.data || response || [];
       setPets(list);
       setFiltered(list);
     } catch (err) {

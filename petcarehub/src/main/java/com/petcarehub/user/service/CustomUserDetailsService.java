@@ -40,7 +40,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private Collection<? extends GrantedAuthority> mapRoles(Set<Role> roles) {
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.name()))
+                .map(role -> {
+                    String name = role.name();
+                    if (!name.startsWith("ROLE_")) {
+                        name = "ROLE_" + name;
+                    }
+                    return new SimpleGrantedAuthority(name);
+                })
                 .collect(Collectors.toSet());
     }
 }
