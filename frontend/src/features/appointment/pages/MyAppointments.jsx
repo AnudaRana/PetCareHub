@@ -3,6 +3,7 @@ import axios from "axios";
 import "../../../styles/MyAppointments.css";
 import { useAuth } from '../../auth/contexts/AuthContext';
 import { getAllVets } from '../../../services/vetService';
+import { createCheckoutSession } from "../../../services/paymentService";
 
 // --- CONSTANTS ---
 const TIME_SLOTS = ['09:00 AM', '11:00 AM', '02:00 PM'];
@@ -174,6 +175,16 @@ const MyAppointments = () => {
     } catch (error) { setCancelError("Cancellation failed."); }
   };
 
+  const handlePayment = async (appointmentId) => {
+    try {
+      const checkoutUrl = await createCheckoutSession(appointmentId, "APPOINTMENT");
+      window.location.href = checkoutUrl;
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert("Failed to start payment. Please try again.");
+    }
+  };
+
   return (
     <div className="appointments-container">
       <div className="appointments-header">
@@ -214,6 +225,7 @@ const MyAppointments = () => {
                   <div className="appointment-box" key={appt.id}>
                     <AppointmentDetails appointment={appt} showUpdatedTag={true} />
                     <button className="btn btn-teal" onClick={() => openUpdateModal(appt)}>Update</button>
+                    <button className="btn btn-teal" onClick={() => handlePayment(appt.id)}>Pay Now</button>
                   </div>
               ))}
             </div>
