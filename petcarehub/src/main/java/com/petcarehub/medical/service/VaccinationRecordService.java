@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
 
 @Service
 public class VaccinationRecordService {
@@ -56,10 +57,22 @@ public class VaccinationRecordService {
         vaccination.setDescription(dto.getDescription());
         vaccination.setDoctorName(dto.getDoctorName());
         vaccination.setDoctorId(dto.getDoctorId());
+        vaccination.setDueDate(dto.getDueDate());
+        vaccination.setReminderStatus(dto.getReminderStatus() != null ? dto.getReminderStatus() : "PENDING");
         vaccination.setPet(pet);
 
         VaccinationRecord saved = vaccinationRecordRepository.save(vaccination);
         return mapToDTO(saved);
+    }
+
+    public List<VaccinationRecordDTO> getUpcomingVaccinations(int daysAhead) {
+        LocalDate today = LocalDate.now();
+        LocalDate futureDate = today.plusDays(daysAhead);
+        
+        return vaccinationRecordRepository.findByDueDateBetweenAndReminderStatus(today, futureDate, "PENDING")
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
     private VaccinationRecordDTO mapToDTO(VaccinationRecord vaccination) {
@@ -71,6 +84,8 @@ public class VaccinationRecordService {
         dto.setDescription(vaccination.getDescription());
         dto.setDoctorName(vaccination.getDoctorName());
         dto.setDoctorId(vaccination.getDoctorId());
+        dto.setDueDate(vaccination.getDueDate());
+        dto.setReminderStatus(vaccination.getReminderStatus());
         dto.setPetId(vaccination.getPet().getPetId());
         return dto;
     }

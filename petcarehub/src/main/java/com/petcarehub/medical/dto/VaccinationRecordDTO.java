@@ -12,6 +12,8 @@ public class VaccinationRecordDTO {
     private String doctorName;
     private String doctorId;
     private Long petId;
+    private LocalDate dueDate;
+    private String reminderStatus;
 
     public VaccinationRecordDTO() {}
 
@@ -77,5 +79,21 @@ public class VaccinationRecordDTO {
 
     public void setPetId(Long petId) {
         this.petId = petId;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public String getReminderStatus() {
+        return reminderStatus;
+    }
+
+    public void setReminderStatus(String reminderStatus) {
+        this.reminderStatus = reminderStatus;
     }
 }

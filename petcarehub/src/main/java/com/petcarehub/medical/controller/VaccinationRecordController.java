@@ -28,4 +28,10 @@ public class VaccinationRecordController {
                                                                @RequestBody VaccinationRecordDTO dto) {
         return ResponseEntity.ok(vaccinationRecordService.addVaccination(petId, dto));
     }
+
+    @GetMapping("/vaccinations/upcoming")
+    public ResponseEntity<List<VaccinationRecordDTO>> getUpcomingVaccinations(
+            @RequestParam(defaultValue = "7") int daysFront) {
+        return ResponseEntity.ok(vaccinationRecordService.getUpcomingVaccinations(daysFront));
+    }
 }
