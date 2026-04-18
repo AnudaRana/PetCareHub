@@ -1,0 +1,342 @@
+/* =============================================
+   Payment Result Pages — Shared Styles
+   Covers: PaymentSuccess.jsx & PaymentCancel.jsx
+   ============================================= */
+
+/* Full-page layout */
+.prp-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background orb blobs */
+.prp-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.18;
+  pointer-events: none;
+  animation: orbFloat 8s ease-in-out infinite;
+}
+
+.prp-orb--1 {
+  width: 420px;
+  height: 420px;
+  top: -100px;
+  right: -80px;
+  animation-delay: 0s;
+}
+
+.prp-orb--2 {
+  width: 300px;
+  height: 300px;
+  bottom: -60px;
+  left: -60px;
+  animation-delay: -4s;
+}
+
+.prp-orb--green { background: #34c759; }
+.prp-orb--red   { background: #ff3b30; }
+
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-30px) scale(1.05); }
+}
+
+/* Main card */
+.prp-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
+  padding: 52px 48px;
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+  animation: cardSlideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes cardSlideUp {
+  from { opacity: 0; transform: translateY(40px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Top accent lines */
+.prp-card--success::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  border-radius: 28px 28px 0 0;
+  background: linear-gradient(90deg, #34c759, #30d158, #00f0ff);
+}
+
+.prp-card--cancel::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  border-radius: 28px 28px 0 0;
+  background: linear-gradient(90deg, #ff3b30, #ff6b6b, #ff9f0a);
+}
+
+/* ---- Icon Wrappers ---- */
+.prp-icon-wrapper {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 28px;
+}
+
+.prp-icon-wrapper--success {
+  background: rgba(52, 199, 89, 0.1);
+  border: 2px solid rgba(52, 199, 89, 0.25);
+}
+
+.prp-icon-wrapper--cancel {
+  background: rgba(255, 59, 48, 0.08);
+  border: 2px solid rgba(255, 59, 48, 0.2);
+}
+
+/* ---- Checkmark SVG animation ---- */
+.prp-checkmark {
+  width: 54px;
+  height: 54px;
+}
+
+.prp-checkmark__circle {
+  stroke: #34c759;
+  stroke-width: 2;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: strokeDraw 0.6s cubic-bezier(0.65, 0, 0.45, 1) 0.2s forwards;
+}
+
+.prp-checkmark__check {
+  stroke: #34c759;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: strokeDraw 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.7s forwards;
+}
+
+/* ---- Crossmark SVG animation ---- */
+.prp-crossmark {
+  width: 54px;
+  height: 54px;
+}
+
+.prp-crossmark__circle {
+  stroke: #ff3b30;
+  stroke-width: 2;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: strokeDraw 0.6s cubic-bezier(0.65, 0, 0.45, 1) 0.2s forwards;
+}
+
+.prp-crossmark__cross {
+  stroke: #ff3b30;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: strokeDraw 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.7s forwards;
+}
+
+@keyframes strokeDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ---- Typography ---- */
+.prp-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+}
+
+.prp-subtitle {
+  font-size: 0.97rem;
+  color: var(--color-text-light);
+  line-height: 1.65;
+  margin-bottom: 24px;
+}
+
+/* ---- Reference pill ---- */
+.prp-reference {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(54, 184, 183, 0.08);
+  border: 1px solid rgba(54, 184, 183, 0.2);
+  border-radius: 50px;
+  padding: 8px 18px;
+  margin-bottom: 24px;
+}
+
+.prp-reference__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.prp-reference__value {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  font-family: monospace;
+  letter-spacing: 0.05em;
+}
+
+/* ---- Details grid ---- */
+.prp-details-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.prp-detail-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  padding: 14px 8px;
+  transition: var(--transition);
+}
+
+.prp-detail-item:hover {
+  background: rgba(54, 184, 183, 0.06);
+  border-color: rgba(54, 184, 183, 0.2);
+  transform: translateY(-2px);
+}
+
+.prp-detail-icon {
+  font-size: 1.4rem;
+}
+
+.prp-detail-text {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-light);
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* ---- Notice box (cancel only) ---- */
+.prp-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255, 159, 10, 0.07);
+  border: 1px solid rgba(255, 159, 10, 0.2);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.prp-notice__icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.prp-notice__text {
+  font-size: 0.86rem;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+/* ---- Action buttons ---- */
+.prp-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.prp-btn {
+  padding: 13px 28px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: var(--transition);
+  font-family: var(--font-family);
+}
+
+.prp-btn--primary {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.prp-btn--primary:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(54, 184, 183, 0.35);
+}
+
+.prp-btn--secondary {
+  background: transparent;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+}
+
+.prp-btn--secondary:hover {
+  background: rgba(54, 184, 183, 0.06);
+  transform: translateY(-2px);
+}
+
+/* ---- Redirect countdown ---- */
+.prp-redirect {
+  font-size: 0.82rem;
+  color: var(--color-text-light);
+}
+
+.prp-redirect strong {
+  color: var(--color-primary);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 480px) {
+  .prp-card {
+    padding: 36px 24px;
+  }
+
+  .prp-details-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .prp-actions {
+    flex-direction: column;
+  }
+
+  .prp-btn {
+    width: 100%;
+  }
+}

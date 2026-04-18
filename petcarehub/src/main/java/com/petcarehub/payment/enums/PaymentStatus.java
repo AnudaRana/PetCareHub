@@ -1,4 +1,4 @@
- package com.petcarehub.payment.enums;
+package com.petcarehub.payment.enums;
 
 public enum PaymentStatus {
     PENDING,

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class StripeService {
 
-    public String createCheckoutSession(Long referenceId, String referenceType, Double amount) {
+    public String[] createCheckoutSession(Long referenceId, String referenceType, Double amount) {
         try {
             long unitAmount = Math.round(amount * 100); // convert LKR to cents
 
@@ -35,7 +35,7 @@ public class StripeService {
                             .build();
 
             Session session = Session.create(params);
-            return session.getUrl();
+            return new String[]{session.getUrl(), session.getId()};
 
         } catch (Exception e) {
             throw new RuntimeException("Stripe session creation failed", e);

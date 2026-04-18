@@ -27,9 +27,9 @@ public class AppointmentService {
 
     // Injects all required dependencies via constructor
     public AppointmentService(AppointmentRepository appointmentRepository,
-                              AppointmentEmailService emailService,
-                              UserRepository userRepository,
-                              PetRepository petRepository) {
+            AppointmentEmailService emailService,
+            UserRepository userRepository,
+            PetRepository petRepository) {
         this.appointmentRepository = appointmentRepository;
         this.emailService = emailService;
         this.userRepository = userRepository;
@@ -47,8 +47,7 @@ public class AppointmentService {
         if (appointmentRepository.existsByDateAndVet_UserIdAndTimeSlot(
                 request.getDate(),
                 request.getVetId(),
-                request.getTimeSlot()
-        )) {
+                request.getTimeSlot())) {
             throw new IllegalStateException("The selected time slot is already booked for this doctor.");
         }
 
@@ -61,7 +60,8 @@ public class AppointmentService {
         Pet pet = petRepository.findById(request.getPetId())
                 .orElseThrow(() -> new IllegalArgumentException("Pet not found"));
 
-        // Derive doctor name from the vet entity — no longer trusting the frontend string
+        // Derive doctor name from the vet entity — no longer trusting the frontend
+        // string
         String doctorName = vet.getFirstName() + " " + vet.getLastName();
 
         Appointment appointment = new Appointment();
@@ -105,14 +105,12 @@ public class AppointmentService {
         // Check for slot conflict only if date/vet/timeSlot changed
         Long newVetId = (vet != null) ? vet.getUserId() : null;
         Long existingVetId = (appointment.getVet() != null) ? appointment.getVet().getUserId() : null;
-        boolean isSlotChanged =
-                !appointment.getDate().equals(request.getDate()) ||
-                        !java.util.Objects.equals(existingVetId, newVetId) ||
-                        !appointment.getTimeSlot().equals(request.getTimeSlot());
+        boolean isSlotChanged = !appointment.getDate().equals(request.getDate()) ||
+                !java.util.Objects.equals(existingVetId, newVetId) ||
+                !appointment.getTimeSlot().equals(request.getTimeSlot());
 
         if (isSlotChanged && newVetId != null && appointmentRepository.existsByDateAndVet_UserIdAndTimeSlot(
-                request.getDate(), newVetId, request.getTimeSlot()
-        )) {
+                request.getDate(), newVetId, request.getTimeSlot())) {
             throw new IllegalStateException("The selected time slot is already booked for this doctor.");
         }
 
@@ -250,8 +248,7 @@ public class AppointmentService {
         }
 
         // owner: prefer the dedicated owner field, fall back to user
-        com.petcarehub.user.entity.User owner =
-                a.getOwner() != null ? a.getOwner() : a.getUser();
+        com.petcarehub.user.entity.User owner = a.getOwner() != null ? a.getOwner() : a.getUser();
         if (owner != null) {
             dto.setOwnerId(owner.getUserId());
             dto.setOwnerFirstName(owner.getFirstName());
@@ -272,7 +269,8 @@ public class AppointmentService {
         return appointmentRepository.findByVet_UserId(vetId);
     }
 
-    // Returns non-cancelled booked time slots for a given date, optionally filtered by vetId
+    // Returns non-cancelled booked time slots for a given date, optionally filtered
+    // by vetId
     public List<Map<String, String>> getBookedSlots(String date, Long vetId) {
         List<Appointment> appointments = (vetId != null)
                 ? appointmentRepository.findByDateAndVet_UserId(date, vetId)
@@ -283,7 +281,7 @@ public class AppointmentService {
                 .map(a -> {
                     java.util.Map<String, String> slot = new java.util.HashMap<>();
                     slot.put("timeSlot", a.getTimeSlot());
-                    slot.put("doctor",   a.getDoctor() != null ? a.getDoctor() : "");
+                    slot.put("doctor", a.getDoctor() != null ? a.getDoctor() : "");
                     if (a.getVet() != null) {
                         slot.put("vetId", String.valueOf(a.getVet().getUserId()));
                     }

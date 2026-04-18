@@ -109,7 +109,7 @@ const MyAppointments = () => {
       .catch((err) => console.error('Failed to load vets:', err));
   }, []);
 
-  const filteredAppointments = useMemo(() => 
+  const filteredAppointments = useMemo(() =>
     appointments.filter((appt) => {
       const k = searchTerm.toLowerCase();
       const petName = appt.pet?.name || "";
@@ -118,15 +118,15 @@ const MyAppointments = () => {
     }), [appointments, searchTerm]
   );
 
-  const upcomingAppointments = useMemo(() => 
+  const upcomingAppointments = useMemo(() =>
     filteredAppointments.filter(a => (a.status || "").toUpperCase() === "UPCOMING"), [filteredAppointments]
   );
 
-  const pastAppointments = useMemo(() => 
+  const pastAppointments = useMemo(() =>
     filteredAppointments.filter(a => ["PAST", "CANCELLED", "COMPLETED"].includes((a.status || "").toUpperCase())), [filteredAppointments]
   );
 
-  const latestUpcomingAppointment = useMemo(() => 
+  const latestUpcomingAppointment = useMemo(() =>
     (upcomingAppointments.length > 0 ? upcomingAppointments[0] : null), [upcomingAppointments]
   );
 
@@ -220,24 +220,24 @@ const MyAppointments = () => {
           <div className="appointments-grid">
             <div className="appointment-section">
               <h2>Upcoming Appointments</h2>
-              {upcomingAppointments.length === 0 ? <p className="empty-text">No upcoming appointments.</p> :  
+              {upcomingAppointments.length === 0 ? <p className="empty-text">No upcoming appointments.</p> :
                 upcomingAppointments.map(appt => (
                   <div className="appointment-box" key={appt.id}>
                     <AppointmentDetails appointment={appt} showUpdatedTag={true} />
                     <button className="btn btn-teal" onClick={() => openUpdateModal(appt)}>Update</button>
                     <button className="btn btn-teal" onClick={() => handlePayment(appt.id)}>Pay Now</button>
                   </div>
-              ))}
+                ))}
             </div>
 
             <div className="appointment-section">
               <h2>Past / Cancelled</h2>
-              {pastAppointments.length === 0 ? <p className="empty-text">No history found.</p> :  
+              {pastAppointments.length === 0 ? <p className="empty-text">No history found.</p> :
                 pastAppointments.map(appt => (
                   <div className="appointment-box" key={appt.id}>
                     <AppointmentDetails appointment={appt} />
                   </div>
-              ))}
+                ))}
             </div>
           </div>
         </>

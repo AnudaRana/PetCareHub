@@ -1,4 +1,4 @@
- package com.petcarehub.payment.config;
+package com.petcarehub.payment.config;
 
 import com.stripe.Stripe;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,11 +9,11 @@ import jakarta.annotation.PostConstruct;
 @Configuration
 public class StripeConfig {
 
-    @Value("${stripe.secret.key}")
-    private String secretKey;
+@Value("${stripe.secret.key}")
+private String stripeSecretKey;
 
     @PostConstruct
     public void init() {
-        Stripe.apiKey = secretKey;
+        Stripe.apiKey = stripeSecretKey;
     }
 }
