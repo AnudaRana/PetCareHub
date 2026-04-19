@@ -31,9 +31,16 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/api/forgotPassword/**", "/v3/api-docs/**", "/swagger-ui/**",
-                                "/swagger-ui.html", "/uploads/**", "/error", "/api/payments/create-checkout-session")
-                        .permitAll()
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/api/forgotPassword/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/uploads/**",
+                                "/error",
+                                "/api/payments/**"
+                        ).permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products/*/image").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/products/**").hasAnyRole("ADMIN", "STAFF")

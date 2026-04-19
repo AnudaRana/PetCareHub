@@ -2,7 +2,7 @@ package com.petcarehub.payment.enums;
 
 public enum PaymentStatus {
     PENDING,
-    SUCCESS,
+    PAID,
     FAILED,
     CANCELLED
 }

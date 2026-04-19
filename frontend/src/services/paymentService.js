@@ -1,10 +1,28 @@
 import axios from "axios";
 
-export const createCheckoutSession = async (referenceId, referenceType) => {
-  const response = await axios.post("http://localhost:8083/api/payments/create-checkout-session", {
-    referenceId,
-    referenceType,
-  });
+const PAYMENT_BASE_URL = "http://localhost:8083/api/payments";
 
-  return response.data.checkoutUrl;
+export const createCheckoutSession = async (referenceId, referenceType) => {
+  try {
+    const response = await axios.post(`${PAYMENT_BASE_URL}/create-checkout-session`, {
+      referenceId,
+      referenceType,
+    });
+
+    return response.data.checkoutUrl;
+  } catch (error) {
+    console.error("Failed to create checkout session:", error);
+    throw error;
+  }
+};
+
+export const confirmPayment = async (sessionId) => {
+  try {
+    await axios.post(`${PAYMENT_BASE_URL}/confirm`, null, {
+      params: { sessionId },
+    });
+  } catch (error) {
+    console.error("Failed to confirm payment:", error);
+    throw error;
+  }
 };

@@ -23,7 +23,8 @@ public class AppointmentEmailService {
     private String senderEmail;
 
     public void sendAppointmentConfirmation(String to, Appointment appointment) {
-        if (!isMailAvailable()) return;
+        if (!isMailAvailable())
+            return;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(senderEmail);
@@ -41,7 +42,8 @@ public class AppointmentEmailService {
     }
 
     public void sendAppointmentUpdateEmail(String to, Appointment appointment) {
-        if (!isMailAvailable()) return;
+        if (!isMailAvailable())
+            return;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(senderEmail);
@@ -59,7 +61,8 @@ public class AppointmentEmailService {
     }
 
     public void sendAppointmentCancelEmail(String to, Appointment appointment) {
-        if (!isMailAvailable()) return;
+        if (!isMailAvailable())
+            return;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(senderEmail);
@@ -78,7 +81,8 @@ public class AppointmentEmailService {
 
     /** Used by auth password-reset flow. */
     public void sendSimpleMessage(MailBody mailBody) {
-        if (!isMailAvailable()) return;
+        if (!isMailAvailable())
+            return;
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(mailBody.to());
         message.setFrom(senderEmail);
@@ -103,4 +107,3 @@ public class AppointmentEmailService {
         }
     }
 }
-

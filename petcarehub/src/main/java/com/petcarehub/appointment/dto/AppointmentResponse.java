@@ -18,6 +18,10 @@ public class AppointmentResponse {
     private String cancellationReason;
     private String cancelledBy;
 
+    // Payment fields
+    private boolean paid;
+    private String paymentStatus;
+
     // Pet fields (flat)
     private Long petId;
     private String petName;
@@ -80,6 +84,14 @@ public class AppointmentResponse {
 
     public String getCancelledBy() {
         return cancelledBy;
+    }
+
+    public boolean isPaid() {
+        return paid;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
     }
 
     public Long getPetId() {
@@ -162,6 +174,14 @@ public class AppointmentResponse {
 
     public void setCancelledBy(String cancelledBy) {
         this.cancelledBy = cancelledBy;
+    }
+
+    public void setPaid(boolean paid) {
+        this.paid = paid;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
     public void setPetId(Long petId) {

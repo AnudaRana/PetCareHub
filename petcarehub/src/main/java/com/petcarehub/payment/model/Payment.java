@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "payment")
 public class Payment {
 
     @Id
@@ -13,14 +14,19 @@ public class Payment {
     private Long paymentId;
 
     private Long referenceId;
+
     private String referenceType;
+
     private Double amount;
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
+    @Column(unique = true)
     private String stripeSessionId;
+
     private String stripePaymentIntentId;
+
     private LocalDateTime createdAt;
 
     public Payment() {
@@ -30,6 +36,10 @@ public class Payment {
 
     public Long getPaymentId() {
         return paymentId;
+    }
+
+    public void setPaymentId(Long paymentId) {
+        this.paymentId = paymentId;
     }
 
     public Long getReferenceId() {
@@ -82,5 +92,9 @@ public class Payment {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }
