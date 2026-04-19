@@ -7,6 +7,8 @@ import com.petcarehub.payment.enums.PaymentStatus;
 import com.petcarehub.payment.model.Payment;
 import com.petcarehub.payment.repository.PaymentRepository;
 import com.stripe.model.checkout.Session;
+import com.petcarehub.cart.entity.CustomerOrder;
+import com.petcarehub.cart.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,15 +18,18 @@ public class PaymentService {
     private final StripeService stripeService;
     private final AppointmentRepository appointmentRepository;
     private final AppointmentEmailService appointmentEmailService;
+    private final OrderRepository orderRepository;
 
     public PaymentService(PaymentRepository paymentRepository,
                           StripeService stripeService,
                           AppointmentRepository appointmentRepository,
-                          AppointmentEmailService appointmentEmailService) {
+                          AppointmentEmailService appointmentEmailService,
+                          OrderRepository orderRepository) {
         this.paymentRepository = paymentRepository;
         this.stripeService = stripeService;
         this.appointmentRepository = appointmentRepository;
         this.appointmentEmailService = appointmentEmailService;
+        this.orderRepository = orderRepository;
     }
 
     public String createCheckoutSession(Long referenceId, String referenceType) {
@@ -46,6 +51,10 @@ public class PaymentService {
                     .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
             amount = appointment.getPrice();
+        } else if ("ORDER".equalsIgnoreCase(referenceType)) {
+            CustomerOrder order = orderRepository.findById(referenceId)
+                    .orElseThrow(() -> new RuntimeException("Order not found"));
+            amount = order.getTotal().doubleValue();
         } else {
             throw new RuntimeException("Unsupported reference type: " + referenceType);
         }
@@ -145,6 +154,12 @@ public class PaymentService {
                 } else {
                     System.out.println("No valid email found for appointment owner.");
                 }
+            } else if ("ORDER".equalsIgnoreCase(payment.getReferenceType())) {
+                CustomerOrder order = orderRepository.findById(payment.getReferenceId())
+                        .orElseThrow(() -> new RuntimeException("Order not found"));
+                order.setPaymentStatus(com.petcarehub.cart.enums.PaymentStatus.PAID);
+                orderRepository.save(order);
+                System.out.println("Order marked as PAID for orderId=" + order.getOrderId());
             }
 
         } catch (Exception e) {

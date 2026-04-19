@@ -6,6 +6,7 @@ import CartStepper from "../components/CartStepper";
 import CheckoutOrderSummary from "../components/CheckoutOrderSummary";
 import ConfirmationModal from "../components/ConfirmationModal";
 import { orderService } from "../services/orderService";
+import { createCheckoutSession } from "../../../services/paymentService";
 
 const PAYMENT_OPTIONS = {
   CASH_ON_PICKUP: {
@@ -20,8 +21,8 @@ const PAYMENT_OPTIONS = {
   },
   CARD: {
     label: "Card (Credit/Debit)",
-    description: "Coming soon",
-    selectable: false
+    description: "Pay securely online",
+    selectable: true
   }
 };
 
@@ -105,12 +106,24 @@ export default function PaymentPage() {
 
     try {
       const data = await orderService.submitPayment(userId, orderId, selectedMethod, receiptFile);
-      setOrder(data);
+
+      if (selectedMethod === "CARD") {
+        const checkoutUrl = await createCheckoutSession(orderId, "ORDER");
+        window.location.href = checkoutUrl;
+      } else {
+        setOrder(data);
+      }
     } catch (err) {
-      console.error(err);
-      setError(err?.response?.data?.message || "Failed to place the order.");
+      if (err.response?.status === 409) {
+        setError("This order has already been paid.");
+      } else {
+        console.error(err);
+        setError(err?.response?.data?.message || err?.message || "Failed to place the order or initialize payment.");
+      }
     } finally {
-      setSubmitting(false);
+      if (selectedMethod !== "CARD") {
+        setSubmitting(false);
+      }
     }
   };
 

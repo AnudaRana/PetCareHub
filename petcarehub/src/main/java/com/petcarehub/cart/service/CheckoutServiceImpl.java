@@ -196,12 +196,19 @@ public class CheckoutServiceImpl implements CheckoutService {
             throw new ResponseStatusException(BAD_REQUEST, "This order has already been placed");
         }
 
-        if (paymentMethod == PaymentMethod.CARD) {
-            throw new ResponseStatusException(BAD_REQUEST, "Card payments are not available yet");
-        }
-
         order.setPaymentMethod(paymentMethod);
         order.setUpdatedAt(LocalDateTime.now());
+
+        if (paymentMethod == PaymentMethod.CARD) {
+            order.setPaymentStatus(PaymentStatus.PENDING);
+            order.setBankName(null);
+            order.setBankAccountName(null);
+            order.setBankAccountNumber(null);
+            order.setBankBranch(null);
+            order.setPaymentReceipt(null);
+            order.setPaymentReceiptFileName(null);
+            order.setPaymentReceiptContentType(null);
+        }
 
         if (paymentMethod == PaymentMethod.CASH_ON_PICKUP) {
             order.setPaymentStatus(PaymentStatus.PAY_ON_PICKUP);
