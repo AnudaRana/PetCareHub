@@ -2,6 +2,7 @@ package com.petcarehub.payment.service;
 
 import com.petcarehub.appointment.entity.Appointment;
 import com.petcarehub.appointment.repository.AppointmentRepository;
+import com.petcarehub.appointment.service.AppointmentEmailService;
 import com.petcarehub.payment.enums.PaymentStatus;
 import com.petcarehub.payment.model.Payment;
 import com.petcarehub.payment.repository.PaymentRepository;
@@ -14,13 +15,16 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final StripeService stripeService;
     private final AppointmentRepository appointmentRepository;
+    private final AppointmentEmailService appointmentEmailService;
 
     public PaymentService(PaymentRepository paymentRepository,
                           StripeService stripeService,
-                          AppointmentRepository appointmentRepository) {
+                          AppointmentRepository appointmentRepository,
+                          AppointmentEmailService appointmentEmailService) {
         this.paymentRepository = paymentRepository;
         this.stripeService = stripeService;
         this.appointmentRepository = appointmentRepository;
+        this.appointmentEmailService = appointmentEmailService;
     }
 
     public String createCheckoutSession(Long referenceId, String referenceType) {
@@ -116,6 +120,32 @@ public class PaymentService {
             paymentRepository.save(payment);
 
             System.out.println("Payment updated successfully to PAID. paymentId=" + payment.getPaymentId());
+
+            if ("APPOINTMENT".equalsIgnoreCase(payment.getReferenceType())) {
+                Appointment appointment = appointmentRepository.findById(payment.getReferenceId())
+                        .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+                String recipientEmail = null;
+
+                if (appointment.getOwner() != null && appointment.getOwner().getEmail() != null
+                        && !appointment.getOwner().getEmail().isBlank()) {
+                    recipientEmail = appointment.getOwner().getEmail();
+                } else if (appointment.getUser() != null && appointment.getUser().getEmail() != null
+                        && !appointment.getUser().getEmail().isBlank()) {
+                    recipientEmail = appointment.getUser().getEmail();
+                }
+
+                if (recipientEmail != null) {
+                    appointmentEmailService.sendPaymentConfirmationEmail(
+                            recipientEmail,
+                            appointment,
+                            payment.getAmount()
+                    );
+                    System.out.println("Payment confirmation email sent to: " + recipientEmail);
+                } else {
+                    System.out.println("No valid email found for appointment owner.");
+                }
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
