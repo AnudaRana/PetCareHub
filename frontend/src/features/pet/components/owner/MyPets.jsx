@@ -32,7 +32,7 @@ const MyPets = () => {
             } else {
                 response = await getPetsByOwner(userId);
             }
-            setPets(response.data || []);
+            setPets(Array.isArray(response) ? response : response.data || []);
         } catch (err) {
             if (err.response?.status === 401) {
                 window.location.href = '/login';

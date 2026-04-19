@@ -75,6 +75,17 @@ public class VaccinationRecordService {
                 .collect(Collectors.toList());
     }
 
+    public List<VaccinationRecordDTO> getUpcomingVaccinationsByOwner(Long userId, int daysAhead) {
+        LocalDate today = LocalDate.now();
+        LocalDate futureDate = today.plusDays(daysAhead);
+
+        return vaccinationRecordRepository
+                .findByPet_Owner_UserIdAndDueDateBetweenAndReminderStatus(userId, today, futureDate, "PENDING")
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
     private VaccinationRecordDTO mapToDTO(VaccinationRecord vaccination) {
         VaccinationRecordDTO dto = new VaccinationRecordDTO();
         dto.setId(vaccination.getId());

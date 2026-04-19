@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL != null
+  ? import.meta.env.VITE_API_BASE_URL
+  : '';
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -29,6 +31,14 @@ export const addVaccinationToPet = async (petId, vaccinationData) => {
   const response = await axios.post(
     `${API_BASE_URL}/api/medical-records/vaccinations/pet/${petId}`,
     vaccinationData,
+    { headers: getAuthHeaders() }
+  );
+  return response.data;
+};
+
+export const getUpcomingVaccinationsByOwner = async (userId, daysAhead = 30) => {
+  const response = await axios.get(
+    `${API_BASE_URL}/api/medical-records/vaccinations/upcoming/user/${userId}?daysFront=${daysAhead}`,
     { headers: getAuthHeaders() }
   );
   return response.data;

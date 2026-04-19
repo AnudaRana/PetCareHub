@@ -26,8 +26,8 @@ const ViewTimeSlots = () => {
   useEffect(() => {
     if (userId) {
       getPetsByOwner(userId)
-        .then(res => setPets(res.data))
-        .catch(err => console.error('Failed to load pets:', err));
+        .then((res) => setPets(Array.isArray(res) ? res : res.data || []))
+        .catch((err) => console.error('Failed to load pets:', err));
     }
   }, [userId]);
 

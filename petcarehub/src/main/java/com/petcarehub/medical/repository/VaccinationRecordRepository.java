@@ -11,4 +11,6 @@ public interface VaccinationRecordRepository extends JpaRepository<VaccinationRe
     List<VaccinationRecord> findByPetPetIdOrderByVaccinationDateDesc(Long petId);
 
     List<VaccinationRecord> findByDueDateBetweenAndReminderStatus(java.time.LocalDate start, java.time.LocalDate end, String status);
+
+    List<VaccinationRecord> findByPet_Owner_UserIdAndDueDateBetweenAndReminderStatus(Long userId, java.time.LocalDate startDate, java.time.LocalDate endDate, String status);
 }

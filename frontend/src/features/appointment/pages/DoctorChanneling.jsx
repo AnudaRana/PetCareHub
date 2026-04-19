@@ -106,7 +106,7 @@ const DoctorChanneling = () => {
     if (!userId) return;
 
     getPetsByOwner(userId)
-      .then((res) => setPets(res.data))
+      .then((res) => setPets(Array.isArray(res) ? res : res.data || []))
       .catch((err) => console.error('Failed to load pets:', err));
   }, [userId]);
 

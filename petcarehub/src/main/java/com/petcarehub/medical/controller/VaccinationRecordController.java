@@ -34,4 +34,11 @@ public class VaccinationRecordController {
             @RequestParam(defaultValue = "7") int daysFront) {
         return ResponseEntity.ok(vaccinationRecordService.getUpcomingVaccinations(daysFront));
     }
+
+    @GetMapping("/vaccinations/upcoming/user/{userId}")
+    public ResponseEntity<List<VaccinationRecordDTO>> getUpcomingVaccinationsByOwner(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "30") int daysFront) {
+        return ResponseEntity.ok(vaccinationRecordService.getUpcomingVaccinationsByOwner(userId, daysFront));
+    }
 }

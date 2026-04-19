@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import DashboardLayout from '../components/DashboardLayout';
 import { getPetsByOwner } from '../../../services/petService';
+import { getUpcomingVaccinationsByOwner } from '../../../services/vaccinationApi';
 
 // Import the actual page content components
 import MyPets from '../../pet/components/owner/MyPets';
@@ -39,6 +40,7 @@ const OwnerDashboard = () => {
     petCount: 0,
     upcomingCount: 0,
     totalCount: 0,
+    vaccinationCount: 0,
     upcomingAppointments: [],
     loading: true
   });
@@ -51,19 +53,36 @@ const OwnerDashboard = () => {
         setStats(prev => ({ ...prev, loading: true }));
 
         // Fetch Pets
-        const petsRes = await getPetsByOwner(user.userId);
-        const pets = Array.isArray(petsRes.data) ? petsRes.data : (Array.isArray(petsRes) ? petsRes : []);
+        const petsResult = await getPetsByOwner(user.userId);
+        const pets = Array.isArray(petsResult)
+          ? petsResult
+          : Array.isArray(petsResult?.data)
+          ? petsResult.data
+          : [];
 
         // Fetch Appointments
         const appointmentsRes = await axios.get(`/api/appointments/user/${user.userId}`);
         const appointments = Array.isArray(appointmentsRes.data) ? appointmentsRes.data : [];
+        const vaccinationRecordsRes = await getUpcomingVaccinationsByOwner(user.userId);
+        const vaccinationRecords = Array.isArray(vaccinationRecordsRes)
+          ? vaccinationRecordsRes
+          : Array.isArray(vaccinationRecordsRes?.data)
+          ? vaccinationRecordsRes.data
+          : [];
 
         const upcoming = appointments.filter(a => (a.status || '').toUpperCase() === 'UPCOMING');
+        const upcomingAppointmentCount = upcoming.filter(
+          a => (a.appointmentType || '').toLowerCase() !== 'vaccination'
+        ).length;
+        const upcomingVaccinationAppointments = upcoming.filter(
+          a => (a.appointmentType || '').toLowerCase() === 'vaccination'
+        ).length;
 
         setStats({
           petCount: pets.length,
-          upcomingCount: upcoming.length,
+          upcomingCount: upcomingAppointmentCount,
           totalCount: appointments.length,
+          vaccinationCount: upcomingVaccinationAppointments + vaccinationRecords.length,
           upcomingAppointments: upcoming,
           loading: false
         });
@@ -133,7 +152,7 @@ const OwnerDashboard = () => {
 
               <div className="doc-stat-card" style={{ '--accent': '#f59e0b' }}>
                 <div className="doc-stat-icon">💊</div>
-                <div className="doc-stat-value">0</div>
+                <div className="doc-stat-value">{stats.loading ? '...' : stats.vaccinationCount}</div>
                 <div className="doc-stat-label">Vaccinations</div>
                 <div className="doc-stat-sub">Due in 30 days</div>
               </div>
