@@ -2,6 +2,7 @@ package com.petcarehub.appointment.service;
 
 import com.petcarehub.auth.dto.MailBody;
 import com.petcarehub.appointment.entity.Appointment;
+import com.petcarehub.cart.entity.CustomerOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +95,23 @@ public class AppointmentEmailService {
                         "Time: " + appointment.getTimeSlot() + "\n" +
                         "Amount Paid: LKR " + amount + "\n\n" +
                         "Thank you for choosing PetCareHub."
+        );
+        send(message);
+    }
+
+    public void sendOrderPaymentConfirmationEmail(String to, CustomerOrder order, Double amount) {
+        if (!isMailAvailable()) return;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(senderEmail);
+        message.setTo(to);
+        message.setSubject("Order Payment Successful - PetCareHub");
+        message.setText(
+                "Your product order payment was successful.\n\n" +
+                        "Order Number: " + order.getOrderNumber() + "\n" +
+                        "Pickup Date: " + order.getPickupDate() + "\n" +
+                        "Amount Paid: LKR " + amount + "\n\n" +
+                        "Thank you for your purchase from PetCareHub."
         );
         send(message);
     }

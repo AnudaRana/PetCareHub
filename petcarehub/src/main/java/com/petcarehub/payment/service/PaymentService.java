@@ -160,6 +160,24 @@ public class PaymentService {
                 order.setPaymentStatus(com.petcarehub.cart.enums.PaymentStatus.PAID);
                 orderRepository.save(order);
                 System.out.println("Order marked as PAID for orderId=" + order.getOrderId());
+
+                String recipientEmail = null;
+                if (order.getOwnerEmail() != null && !order.getOwnerEmail().isBlank()) {
+                    recipientEmail = order.getOwnerEmail();
+                } else if (order.getUser() != null && order.getUser().getEmail() != null && !order.getUser().getEmail().isBlank()) {
+                    recipientEmail = order.getUser().getEmail();
+                }
+
+                if (recipientEmail != null) {
+                    appointmentEmailService.sendOrderPaymentConfirmationEmail(
+                            recipientEmail,
+                            order,
+                            payment.getAmount()
+                    );
+                    System.out.println("Order payment confirmation email sent to: " + recipientEmail);
+                } else {
+                    System.out.println("No valid email found for order.");
+                }
             }
 
         } catch (Exception e) {
