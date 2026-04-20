@@ -10,6 +10,10 @@ import com.stripe.model.checkout.Session;
 import com.petcarehub.cart.entity.CustomerOrder;
 import com.petcarehub.cart.repository.OrderRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Scheduled;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class PaymentService {
@@ -62,12 +66,22 @@ public class PaymentService {
         String[] sessionData = stripeService.createCheckoutSession(referenceId, referenceType, amount);
         String checkoutUrl = sessionData[0];
         String stripeSessionId = sessionData[1];
+        String paymentIntentId = sessionData.length > 2 ? sessionData[2] : null;
+
+        List<Payment> previousPendingPayments = paymentRepository.findByReferenceIdAndReferenceTypeAndStatus(
+                referenceId, referenceType, PaymentStatus.PENDING);
+                
+        for (Payment p : previousPendingPayments) {
+            p.setStatus(PaymentStatus.FAILED);
+            p.setFailureReason("Abandoned due to newer payment attempt initiated.");
+            paymentRepository.save(p);
+        }
 
         Payment payment = paymentRepository
                 .findTopByReferenceIdAndReferenceTypeOrderByPaymentIdDesc(referenceId, referenceType)
                 .orElse(null);
 
-        if (payment == null || payment.getStatus() == PaymentStatus.PAID) {
+        if (payment == null || payment.getStatus() == PaymentStatus.PAID || payment.getStatus() == PaymentStatus.FAILED || payment.getStatus() == PaymentStatus.CANCELLED) {
             payment = new Payment();
             payment.setReferenceId(referenceId);
             payment.setReferenceType(referenceType);
@@ -75,6 +89,9 @@ public class PaymentService {
 
         payment.setAmount(amount);
         payment.setStripeSessionId(stripeSessionId);
+        if (paymentIntentId != null) {
+            payment.setStripePaymentIntentId(paymentIntentId);
+        }
         payment.setStatus(PaymentStatus.PENDING);
 
         paymentRepository.save(payment);
@@ -125,6 +142,9 @@ public class PaymentService {
             }
 
             payment.setStripeSessionId(sessionId);
+            if (stripeSession.getPaymentIntent() != null) {
+                payment.setStripePaymentIntentId(stripeSession.getPaymentIntent());
+            }
             payment.setStatus(PaymentStatus.PAID);
             paymentRepository.save(payment);
 
@@ -158,6 +178,8 @@ public class PaymentService {
                 CustomerOrder order = orderRepository.findById(payment.getReferenceId())
                         .orElseThrow(() -> new RuntimeException("Order not found"));
                 order.setPaymentStatus(com.petcarehub.cart.enums.PaymentStatus.PAID);
+                order.setOrderStatus(com.petcarehub.cart.enums.OrderStatus.PLACED);
+                order.setPlacedAt(java.time.LocalDateTime.now());
                 orderRepository.save(order);
                 System.out.println("Order marked as PAID for orderId=" + order.getOrderId());
 
@@ -186,6 +208,19 @@ public class PaymentService {
         }
     }
 
+    public void failPayment(Long referenceId, String referenceType, String reason) {
+        Payment payment = paymentRepository
+                .findTopByReferenceIdAndReferenceTypeOrderByPaymentIdDesc(referenceId, referenceType)
+                .orElse(null);
+
+        if (payment != null && payment.getStatus() == PaymentStatus.PENDING) {
+            payment.setStatus(PaymentStatus.FAILED);
+            payment.setFailureReason(reason);
+            paymentRepository.save(payment);
+            System.out.println("Payment marked as FAILED for referenceId=" + referenceId + ", type=" + referenceType + ". reason: " + reason);
+        }
+    }
+
     public boolean isAppointmentPaid(Long appointmentId) {
         return paymentRepository.existsByReferenceIdAndReferenceTypeAndStatus(
                 appointmentId,
@@ -199,5 +234,17 @@ public class PaymentService {
                 .findTopByReferenceIdAndReferenceTypeOrderByPaymentIdDesc(appointmentId, "APPOINTMENT")
                 .map(Payment::getStatus)
                 .orElse(null);
+    }
+
+    @Scheduled(fixedRate = 900000) // Every 15 minutes
+    public void cleanupAbandonedPayments() {
+        LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
+        List<Payment> abandoned = paymentRepository.findByStatusAndCreatedAtBefore(PaymentStatus.PENDING, oneHourAgo);
+        for (Payment p : abandoned) {
+            p.setStatus(PaymentStatus.FAILED);
+            p.setFailureReason("Abandoned or expired checkout session.");
+            paymentRepository.save(p);
+            System.out.println("Cleaned up abandoned payment via scheduled task, paymentId=" + p.getPaymentId());
+        }
     }
 }

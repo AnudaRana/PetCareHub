@@ -241,8 +241,10 @@ public class CheckoutServiceImpl implements CheckoutService {
             }
         }
 
-        order.setOrderStatus(OrderStatus.PLACED);
-        order.setPlacedAt(LocalDateTime.now());
+        if (paymentMethod != PaymentMethod.CARD) {
+            order.setOrderStatus(OrderStatus.PLACED);
+            order.setPlacedAt(LocalDateTime.now());
+        }
         CustomerOrder saved = orderRepository.save(order);
         return toOrderSummary(saved);
     }

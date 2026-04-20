@@ -14,7 +14,7 @@ public class StripeService {
             SessionCreateParams params = SessionCreateParams.builder()
                     .setMode(SessionCreateParams.Mode.PAYMENT)
                     .setSuccessUrl("http://localhost:3000/payment-success?session_id={CHECKOUT_SESSION_ID}")
-                    .setCancelUrl("http://localhost:3000/payment-cancel")
+                    .setCancelUrl("http://localhost:3000/payment-cancel?refId=" + referenceId + "&type=" + referenceType)
                     .putMetadata("referenceId", String.valueOf(referenceId))
                     .putMetadata("referenceType", referenceType)
                     .addLineItem(
@@ -36,7 +36,7 @@ public class StripeService {
                     .build();
 
             Session session = Session.create(params);
-            return new String[]{session.getUrl(), session.getId()};
+            return new String[]{session.getUrl(), session.getId(), session.getPaymentIntent()};
 
         } catch (Exception e) {
             throw new RuntimeException("Stripe session creation failed", e);

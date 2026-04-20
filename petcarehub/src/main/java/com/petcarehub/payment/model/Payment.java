@@ -27,6 +27,8 @@ public class Payment {
 
     private String stripePaymentIntentId;
 
+    private String failureReason;
+
     private LocalDateTime createdAt;
 
     public Payment() {
@@ -88,6 +90,14 @@ public class Payment {
 
     public void setStripePaymentIntentId(String stripePaymentIntentId) {
         this.stripePaymentIntentId = stripePaymentIntentId;
+    }
+
+    public String getFailureReason() {
+        return failureReason;
+    }
+
+    public void setFailureReason(String failureReason) {
+        this.failureReason = failureReason;
     }
 
     public LocalDateTime getCreatedAt() {

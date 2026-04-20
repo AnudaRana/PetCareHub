@@ -34,4 +34,10 @@ public class PaymentController {
         paymentService.confirmPayment(sessionId);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/fail")
+    public ResponseEntity<?> failPayment(@RequestBody com.petcarehub.payment.dto.PaymentFailRequest request) {
+        paymentService.failPayment(request.getReferenceId(), request.getReferenceType(), request.getReason());
+        return ResponseEntity.ok().build();
+    }
 }

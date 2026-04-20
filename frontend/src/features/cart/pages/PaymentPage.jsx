@@ -243,7 +243,7 @@ export default function PaymentPage() {
               <div className="form-actions">
                 <button type="button" className="secondary-pill-btn" onClick={() => navigate("/cart")}>Back to Cart</button>
                 <button type="button" className="cart-primary" disabled={!canSubmit || submitting} onClick={handlePlaceOrder}>
-                  {submitting ? "Placing Order..." : "Place Order"}
+                  {submitting ? (selectedMethod === "CARD" ? "Redirecting..." : "Placing Order...") : (order?.paymentMethod === "CARD" && selectedMethod === "CARD" ? "Retry Payment" : "Place Order")}
                 </button>
               </div>
             </>

@@ -20,4 +20,15 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
             String referenceType,
             PaymentStatus status
     );
+
+    java.util.List<Payment> findByReferenceIdAndReferenceTypeAndStatus(
+            Long referenceId,
+            String referenceType,
+            PaymentStatus status
+    );
+
+    java.util.List<Payment> findByStatusAndCreatedAtBefore(
+            PaymentStatus status,
+            java.time.LocalDateTime dateTime
+    );
 }

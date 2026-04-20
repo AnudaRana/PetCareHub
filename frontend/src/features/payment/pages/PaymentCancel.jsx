@@ -1,9 +1,27 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import "./PaymentResultPages.css";
+import { failPayment } from "../../../services/paymentService";
 
 export default function PaymentCancel() {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const refId = params.get("refId");
+  const type = params.get("type");
+
+  useEffect(() => {
+    if (refId && type) {
+      failPayment(refId, type, "Payment unsuccessful or cancelled by user").catch(console.error);
+    }
+  }, [refId, type]);
+
+  const handleRetry = () => {
+    if (type === "ORDER") {
+      navigate(`/checkout/payment/${refId}`);
+    } else if (type === "APPOINTMENT" || !type) {
+      navigate("/dashboard/my-appointments");
+    }
+  };
 
   return (
     <div className="prp-page">
@@ -20,9 +38,9 @@ export default function PaymentCancel() {
           </svg>
         </div>
 
-        <h1 className="prp-title prp-title--cancel">Payment Cancelled</h1>
+        <h1 className="prp-title prp-title--cancel">Payment unsuccessful. Please try again.</h1>
         <p className="prp-subtitle">
-          Your payment was not completed. Your appointment has not been confirmed.
+          Your payment was not completed. Your appointment or order has not been confirmed.
           No charges have been made.
         </p>
 
@@ -52,9 +70,9 @@ export default function PaymentCancel() {
         <div className="prp-actions">
           <button
             className="prp-btn prp-btn--primary"
-            onClick={() => navigate("/dashboard/my-appointments")}
+            onClick={handleRetry}
           >
-            Try Again
+            Retry Payment
           </button>
           <button
             className="prp-btn prp-btn--secondary"

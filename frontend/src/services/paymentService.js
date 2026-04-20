@@ -26,3 +26,16 @@ export const confirmPayment = async (sessionId) => {
     throw error;
   }
 };
+
+export const failPayment = async (referenceId, referenceType, reason) => {
+  try {
+    await axios.post(`${PAYMENT_BASE_URL}/fail`, {
+      referenceId,
+      referenceType,
+      reason,
+    });
+  } catch (error) {
+    console.error("Failed to mark payment as failed:", error);
+    throw error;
+  }
+};

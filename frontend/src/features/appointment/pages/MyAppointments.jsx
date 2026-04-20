@@ -64,14 +64,26 @@ const AppointmentDetails = ({ appointment, showUpdatedTag = false }) => {
         {showUpdatedTag && appointment.updated && <span className="updated-tag">Updated</span>}
       </p>
 
-      {isPaid && (
-        <p>
-          <strong>Payment:</strong>{" "}
+      <p>
+        <strong>Payment:</strong>{" "}
+        {isPaid ? (
           <span className="updated-tag" style={{ backgroundColor: "#dcfce7", color: "#166534" }}>
             PAID
           </span>
-        </p>
-      )}
+        ) : paymentStatus === "FAILED" ? (
+          <span className="updated-tag" style={{ backgroundColor: "#fee2e2", color: "#b91c1c" }}>
+            FAILED
+          </span>
+        ) : paymentStatus === "PENDING" ? (
+          <span className="updated-tag" style={{ backgroundColor: "#fef3c7", color: "#b45309" }}>
+            PENDING
+          </span>
+        ) : (
+          <span className="updated-tag" style={{ backgroundColor: "#f3f4f6", color: "#374151" }}>
+            UNPAID
+          </span>
+        )}
+      </p>
 
       {status === "CANCELLED" && (
         <div className="cancel-info-box">
@@ -335,7 +347,7 @@ const MyAppointments = () => {
                         </button>
                       ) : (
                         <button className="btn btn-teal" onClick={() => handlePayment(appt)}>
-                          Pay Now
+                          {paymentStatus === "FAILED" || paymentStatus === "PENDING" ? "Retry Payment" : "Pay Now"}
                         </button>
                       )}
                     </div>
