@@ -32,7 +32,7 @@ public class ReminderScheduler {
         this.emailService = emailService;
     }
 
-    @Scheduled(cron = "0 0 8 * * ?")
+    @Scheduled(cron = "0 0 7 * * ?")
     @Transactional
     public void sendDailyReminders() {
         log.info("Running daily reminder scheduler...");
@@ -41,9 +41,10 @@ public class ReminderScheduler {
     }
 
     private void sendVaccinationDueReminders() {
-        LocalDate reminderDate = LocalDate.now().plusDays(7);
+        LocalDate today = LocalDate.now();
+        LocalDate sevenDays = today.plusDays(7);
         List<VaccinationRecord> dueVaccinations = vaccinationRecordRepository
-                .findByDueDateBetweenAndReminderStatus(reminderDate, reminderDate, "PENDING");
+                .findByDueDateBetweenAndReminderStatus(today, sevenDays, "PENDING");
 
         for (VaccinationRecord vaccination : dueVaccinations) {
             Pet pet = vaccination.getPet();
@@ -60,6 +61,9 @@ public class ReminderScheduler {
 
             emailService.sendVaccinationReminder(owner.getEmail(), pet.getName(), vaccination.getVaccinationName(), vaccination.getDueDate());
             log.info("Sent vaccination reminder to {} for pet {} due on {}", owner.getEmail(), pet.getName(), vaccination.getDueDate());
+            
+            vaccination.setReminderStatus("SENT");
+            vaccinationRecordRepository.save(vaccination);
         }
     }
 

@@ -65,6 +65,32 @@ public class VaccinationRecordService {
         return mapToDTO(saved);
     }
 
+    public VaccinationRecordDTO updateVaccination(Long id, VaccinationRecordDTO dto) {
+        VaccinationRecord vaccination = vaccinationRecordRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vaccination not found"));
+
+        if (dto.getVaccinationDate() != null) vaccination.setVaccinationDate(dto.getVaccinationDate());
+        if (dto.getVaccinationName() != null && !dto.getVaccinationName().isBlank()) vaccination.setVaccinationName(dto.getVaccinationName());
+        if (dto.getDose() != null && !dto.getDose().isBlank()) vaccination.setDose(dto.getDose());
+        if (dto.getDescription() != null) vaccination.setDescription(dto.getDescription());
+        if (dto.getDoctorName() != null && !dto.getDoctorName().isBlank()) vaccination.setDoctorName(dto.getDoctorName());
+        if (dto.getDoctorId() != null && !dto.getDoctorId().isBlank()) vaccination.setDoctorId(dto.getDoctorId());
+        
+        // Handle due date changes and potentially reset reminder status
+        if (dto.getDueDate() != null) {
+            if (!dto.getDueDate().equals(vaccination.getDueDate())) {
+                vaccination.setReminderStatus("PENDING");
+            }
+            vaccination.setDueDate(dto.getDueDate());
+        } else {
+            vaccination.setDueDate(null);
+            vaccination.setReminderStatus("PENDING");
+        }
+
+        VaccinationRecord updated = vaccinationRecordRepository.save(vaccination);
+        return mapToDTO(updated);
+    }
+
     public List<VaccinationRecordDTO> getUpcomingVaccinations(int daysAhead) {
         LocalDate today = LocalDate.now();
         LocalDate futureDate = today.plusDays(daysAhead);

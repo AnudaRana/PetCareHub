@@ -56,8 +56,18 @@ export const getReminders = async (userId = null) => {
   return response.data;
 };
 
+export const updateVaccination = async (id, vaccinationData) => {
+  const response = await axios.put(
+    `${API_BASE_URL}/api/medical-records/vaccinations/${id}`,
+    vaccinationData,
+    { headers: getAuthHeaders() }
+  );
+  return response.data;
+};
+
 export default {
   getVaccinationsByPetId,
   addVaccinationToPet,
+  updateVaccination,
   getReminders,
 };
