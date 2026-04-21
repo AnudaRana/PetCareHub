@@ -103,15 +103,15 @@ const VetAppointments = () => {
             {appointments.map((a) => (
               <div key={a.id} className="vet-appointment-item">
                 <h3>
-                  <span>{a.pet?.species === 'Dog' ? '🐕' : a.pet?.species === 'Cat' ? '🐈' : '🐾'}</span>
-                  {a.pet?.name}
+                  <span>{a.petSpecies === 'Dog' ? '🐕' : a.petSpecies === 'Cat' ? '🐈' : '🐾'}</span>
+                  {a.petName}
                 </h3>
 
                 <div className="vet-appointment-details">
                   <p><strong>Clinical Reason:</strong> <span>{a.appointmentType}</span></p>
                   <p><strong>Scheduled Date:</strong> <span>{new Date(a.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span></p>
                   <p><strong>Time Slot:</strong> <span>{a.timeSlot}</span></p>
-                  <p><strong>Primary Owner:</strong> <span>{a.owner?.firstName} {a.owner?.lastName}</span></p>
+                  <p><strong>Primary Owner:</strong> <span>{a.ownerFirstName} {a.ownerLastName}</span></p>
                   
                   <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
                     <p style={{ marginBottom: '8px' }}><strong>Note for Clinician:</strong></p>
@@ -123,6 +123,13 @@ const VetAppointments = () => {
                   <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <strong>Status</strong>
                     <span className={getStatusClass(a.status)}>{a.status}</span>
+                  </div>
+
+                  <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <strong>Payment</strong>
+                    <span className="status-badge" style={{ backgroundColor: a.paymentStatus === 'PAID' ? '#dcfce7' : '#fef9c3', color: a.paymentStatus === 'PAID' ? '#16a34a' : '#ca8a04' }}>
+                      {a.paymentStatus || 'PENDING'}
+                    </span>
                   </div>
 
                   {a.status === "CANCELLED" && (

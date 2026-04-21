@@ -145,6 +145,7 @@ const StaffAllAppointments = () => {
                 <th>Procedure</th>
                 <th>Clinical Date</th>
                 <th>Registry Status</th>
+                <th>Payment</th>
                 <th>Notes</th>
               </tr>
             </thead>
@@ -171,6 +172,11 @@ const StaffAllAppointments = () => {
                   <td>
                     <span className={`staff-appointment-status ${getStatusClass(appointment.status)}`}>
                       {appointment.status || 'N/A'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className="staff-appointment-status" style={{ backgroundColor: appointment.paymentStatus === 'PAID' ? '#dcfce7' : '#fef9c3', color: appointment.paymentStatus === 'PAID' ? '#16a34a' : '#ca8a04' }}>
+                      {appointment.paymentStatus === 'PAID' ? 'PAID' : (appointment.paymentStatus || 'PENDING')}
                     </span>
                   </td>
                   <td className="staff-appointment-notes">

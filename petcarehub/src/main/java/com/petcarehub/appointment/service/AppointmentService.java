@@ -266,8 +266,8 @@ public class AppointmentService {
         return dto;
     }
 
-    public List<Appointment> getAppointmentsByVet(Long vetId) {
-        return appointmentRepository.findByVet_UserId(vetId);
+    public List<AppointmentResponse> getAppointmentsByVet(Long vetId) {
+        return appointmentRepository.findByVet_UserId(vetId).stream().map(this::toDto).toList();
     }
 
     public List<Map<String, String>> getBookedSlots(String date, Long vetId) {
