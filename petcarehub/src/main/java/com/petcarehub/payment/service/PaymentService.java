@@ -72,9 +72,22 @@ public class PaymentService {
                 referenceId, referenceType, PaymentStatus.PENDING);
                 
         for (Payment p : previousPendingPayments) {
-            p.setStatus(PaymentStatus.FAILED);
-            p.setFailureReason("Abandoned due to newer payment attempt initiated.");
-            paymentRepository.save(p);
+            verifyPaymentWithStripe(p);
+            if (p.getStatus() == PaymentStatus.PAID) {
+                throw new RuntimeException("PAID");
+            } else if (p.getStatus() == PaymentStatus.PENDING) {
+                try {
+                    Session stripeSession = Session.retrieve(p.getStripeSessionId());
+                    if ("open".equalsIgnoreCase(stripeSession.getStatus())) {
+                        stripeSession.expire();
+                    }
+                } catch (Exception e) {
+                    System.out.println("Failed to expire old session: " + e.getMessage());
+                }
+                p.setStatus(PaymentStatus.FAILED);
+                p.setFailureReason("Abandoned due to newer payment attempt initiated.");
+                paymentRepository.save(p);
+            }
         }
 
         Payment payment = paymentRepository
@@ -133,78 +146,104 @@ public class PaymentService {
                                     "Payment record not found for referenceId=" + referenceId + ", referenceType=" + referenceType
                             )));
 
-            System.out.println("Matched payment row id: " + payment.getPaymentId());
-            System.out.println("Matched payment status before update: " + payment.getStatus());
-
-            if (payment.getStatus() == PaymentStatus.PAID) {
-                System.out.println("Payment already marked as PAID.");
-                return;
-            }
-
-            payment.setStripeSessionId(sessionId);
-            if (stripeSession.getPaymentIntent() != null) {
-                payment.setStripePaymentIntentId(stripeSession.getPaymentIntent());
-            }
-            payment.setStatus(PaymentStatus.PAID);
-            paymentRepository.save(payment);
-
-            System.out.println("Payment updated successfully to PAID. paymentId=" + payment.getPaymentId());
-
-            if ("APPOINTMENT".equalsIgnoreCase(payment.getReferenceType())) {
-                Appointment appointment = appointmentRepository.findById(payment.getReferenceId())
-                        .orElseThrow(() -> new RuntimeException("Appointment not found"));
-
-                String recipientEmail = null;
-
-                if (appointment.getOwner() != null && appointment.getOwner().getEmail() != null
-                        && !appointment.getOwner().getEmail().isBlank()) {
-                    recipientEmail = appointment.getOwner().getEmail();
-                } else if (appointment.getUser() != null && appointment.getUser().getEmail() != null
-                        && !appointment.getUser().getEmail().isBlank()) {
-                    recipientEmail = appointment.getUser().getEmail();
-                }
-
-                if (recipientEmail != null) {
-                    appointmentEmailService.sendPaymentConfirmationEmail(
-                            recipientEmail,
-                            appointment,
-                            payment.getAmount()
-                    );
-                    System.out.println("Payment confirmation email sent to: " + recipientEmail);
-                } else {
-                    System.out.println("No valid email found for appointment owner.");
-                }
-            } else if ("ORDER".equalsIgnoreCase(payment.getReferenceType())) {
-                CustomerOrder order = orderRepository.findById(payment.getReferenceId())
-                        .orElseThrow(() -> new RuntimeException("Order not found"));
-                order.setPaymentStatus(com.petcarehub.cart.enums.PaymentStatus.PAID);
-                order.setOrderStatus(com.petcarehub.cart.enums.OrderStatus.PLACED);
-                order.setPlacedAt(java.time.LocalDateTime.now());
-                orderRepository.save(order);
-                System.out.println("Order marked as PAID for orderId=" + order.getOrderId());
-
-                String recipientEmail = null;
-                if (order.getOwnerEmail() != null && !order.getOwnerEmail().isBlank()) {
-                    recipientEmail = order.getOwnerEmail();
-                } else if (order.getUser() != null && order.getUser().getEmail() != null && !order.getUser().getEmail().isBlank()) {
-                    recipientEmail = order.getUser().getEmail();
-                }
-
-                if (recipientEmail != null) {
-                    appointmentEmailService.sendOrderPaymentConfirmationEmail(
-                            recipientEmail,
-                            order,
-                            payment.getAmount()
-                    );
-                    System.out.println("Order payment confirmation email sent to: " + recipientEmail);
-                } else {
-                    System.out.println("No valid email found for order.");
-                }
-            }
+            confirmPaymentLogic(stripeSession, payment);
 
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to confirm payment: " + e.getMessage(), e);
+        }
+    }
+
+    private void confirmPaymentLogic(Session stripeSession, Payment payment) {
+        System.out.println("Matched payment row id: " + payment.getPaymentId());
+        System.out.println("Matched payment status before update: " + payment.getStatus());
+
+        if (payment.getStatus() == PaymentStatus.PAID) {
+            System.out.println("Payment already marked as PAID.");
+            return;
+        }
+
+        payment.setStripeSessionId(stripeSession.getId());
+        if (stripeSession.getPaymentIntent() != null) {
+            payment.setStripePaymentIntentId(stripeSession.getPaymentIntent());
+        }
+        payment.setStatus(PaymentStatus.PAID);
+        paymentRepository.save(payment);
+
+        System.out.println("Payment updated successfully to PAID. paymentId=" + payment.getPaymentId());
+
+        if ("APPOINTMENT".equalsIgnoreCase(payment.getReferenceType())) {
+            Appointment appointment = appointmentRepository.findById(payment.getReferenceId())
+                    .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+            String recipientEmail = null;
+
+            if (appointment.getOwner() != null && appointment.getOwner().getEmail() != null
+                    && !appointment.getOwner().getEmail().isBlank()) {
+                recipientEmail = appointment.getOwner().getEmail();
+            } else if (appointment.getUser() != null && appointment.getUser().getEmail() != null
+                    && !appointment.getUser().getEmail().isBlank()) {
+                recipientEmail = appointment.getUser().getEmail();
+            }
+
+            if (recipientEmail != null) {
+                appointmentEmailService.sendPaymentConfirmationEmail(
+                        recipientEmail,
+                        appointment,
+                        payment.getAmount()
+                );
+                System.out.println("Payment confirmation email sent to: " + recipientEmail);
+            } else {
+                System.out.println("No valid email found for appointment owner.");
+            }
+        } else if ("ORDER".equalsIgnoreCase(payment.getReferenceType())) {
+            CustomerOrder order = orderRepository.findById(payment.getReferenceId())
+                    .orElseThrow(() -> new RuntimeException("Order not found"));
+            order.setPaymentStatus(com.petcarehub.cart.enums.PaymentStatus.PAID);
+            order.setOrderStatus(com.petcarehub.cart.enums.OrderStatus.PLACED);
+            order.setPlacedAt(java.time.LocalDateTime.now());
+            orderRepository.save(order);
+            System.out.println("Order marked as PAID for orderId=" + order.getOrderId());
+
+            String recipientEmail = null;
+            if (order.getOwnerEmail() != null && !order.getOwnerEmail().isBlank()) {
+                recipientEmail = order.getOwnerEmail();
+            } else if (order.getUser() != null && order.getUser().getEmail() != null && !order.getUser().getEmail().isBlank()) {
+                recipientEmail = order.getUser().getEmail();
+            }
+
+            if (recipientEmail != null) {
+                appointmentEmailService.sendOrderPaymentConfirmationEmail(
+                        recipientEmail,
+                        order,
+                        payment.getAmount()
+                );
+                System.out.println("Order payment confirmation email sent to: " + recipientEmail);
+            } else {
+                System.out.println("No valid email found for order.");
+            }
+        }
+    }
+
+    public void verifyPaymentWithStripe(Payment payment) {
+        if (payment == null || payment.getStatus() != PaymentStatus.PENDING || payment.getStripeSessionId() == null) {
+            return;
+        }
+
+        try {
+            Session stripeSession = Session.retrieve(payment.getStripeSessionId());
+            String stripePaymentStatus = stripeSession.getPaymentStatus();
+            String sessionStatus = stripeSession.getStatus();
+
+            if ("paid".equalsIgnoreCase(stripePaymentStatus)) {
+                confirmPaymentLogic(stripeSession, payment);
+            } else if ("expired".equalsIgnoreCase(sessionStatus)) {
+                payment.setStatus(PaymentStatus.FAILED);
+                payment.setFailureReason("Stripe session expired");
+                paymentRepository.save(payment);
+            }
+        } catch (Exception e) {
+            System.out.println("Failed to verify Stripe session for paymentId=" + payment.getPaymentId() + ": " + e.getMessage());
         }
     }
 
@@ -214,10 +253,11 @@ public class PaymentService {
                 .orElse(null);
 
         if (payment != null && payment.getStatus() == PaymentStatus.PENDING) {
-            payment.setStatus(PaymentStatus.FAILED);
-            payment.setFailureReason(reason);
-            paymentRepository.save(payment);
-            System.out.println("Payment marked as FAILED for referenceId=" + referenceId + ", type=" + referenceType + ". reason: " + reason);
+            verifyPaymentWithStripe(payment);
+
+            if (payment.getStatus() == PaymentStatus.PENDING) {
+                System.out.println("Payment kept as PENDING. Not modifying state. referenceId=" + referenceId + ", type=" + referenceType);
+            }
         }
     }
 
@@ -241,10 +281,20 @@ public class PaymentService {
         LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
         List<Payment> abandoned = paymentRepository.findByStatusAndCreatedAtBefore(PaymentStatus.PENDING, oneHourAgo);
         for (Payment p : abandoned) {
-            p.setStatus(PaymentStatus.FAILED);
-            p.setFailureReason("Abandoned or expired checkout session.");
-            paymentRepository.save(p);
-            System.out.println("Cleaned up abandoned payment via scheduled task, paymentId=" + p.getPaymentId());
+            verifyPaymentWithStripe(p);
+            if (p.getStatus() == PaymentStatus.PENDING) {
+                try {
+                    Session stripeSession = Session.retrieve(p.getStripeSessionId());
+                    if ("open".equalsIgnoreCase(stripeSession.getStatus())) {
+                        stripeSession.expire();
+                    }
+                } catch (Exception e) {}
+                
+                p.setStatus(PaymentStatus.FAILED);
+                p.setFailureReason("Abandoned or expired checkout session.");
+                paymentRepository.save(p);
+                System.out.println("Cleaned up abandoned payment via scheduled task, paymentId=" + p.getPaymentId());
+            }
         }
     }
 }
