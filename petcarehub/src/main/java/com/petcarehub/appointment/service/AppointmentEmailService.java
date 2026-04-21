@@ -2,6 +2,7 @@ package com.petcarehub.appointment.service;
 
 import com.petcarehub.auth.dto.MailBody;
 import com.petcarehub.appointment.entity.Appointment;
+import com.petcarehub.cart.entity.CustomerOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ public class AppointmentEmailService {
 
     private static final Logger log = LoggerFactory.getLogger(AppointmentEmailService.class);
 
-    // optional=true so the app starts even if mail config is incomplete
     @Autowired(required = false)
     private JavaMailSender mailSender;
 
@@ -36,7 +36,8 @@ public class AppointmentEmailService {
                         "Doctor: " + appointment.getDoctor() + "\n" +
                         "Date: " + appointment.getDate() + "\n" +
                         "Time: " + appointment.getTimeSlot() + "\n" +
-                        "Price: LKR " + appointment.getPrice());
+                        "Price: LKR " + appointment.getPrice()
+        );
         send(message);
     }
 
@@ -54,7 +55,8 @@ public class AppointmentEmailService {
                         "Doctor: " + appointment.getDoctor() + "\n" +
                         "Date: " + appointment.getDate() + "\n" +
                         "Time: " + appointment.getTimeSlot() + "\n\n" +
-                        "Please check your updated appointment details.");
+                        "Please check your updated appointment details."
+        );
         send(message);
     }
 
@@ -72,13 +74,51 @@ public class AppointmentEmailService {
                         "Doctor: " + appointment.getDoctor() + "\n" +
                         "Date: " + appointment.getDate() + "\n" +
                         "Time: " + appointment.getTimeSlot() + "\n\n" +
-                        "If this was a mistake, please rebook your appointment.");
+                        "If this was a mistake, please rebook your appointment."
+        );
         send(message);
     }
 
-    /** Used by auth password-reset flow. */
+    public void sendPaymentConfirmationEmail(String to, Appointment appointment, Double amount) {
+        if (!isMailAvailable()) return;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(senderEmail);
+        message.setTo(to);
+        message.setSubject("Payment Successful - PetCareHub");
+        message.setText(
+                "Your appointment payment was successful.\n\n" +
+                        "Pet: " + appointment.getPet().getName() + " (" + appointment.getPet().getSpecies() + ")\n" +
+                        "Type: " + appointment.getAppointmentType() + "\n" +
+                        "Doctor: " + appointment.getDoctor() + "\n" +
+                        "Date: " + appointment.getDate() + "\n" +
+                        "Time: " + appointment.getTimeSlot() + "\n" +
+                        "Amount Paid: LKR " + amount + "\n\n" +
+                        "Thank you for choosing PetCareHub."
+        );
+        send(message);
+    }
+
+    public void sendOrderPaymentConfirmationEmail(String to, CustomerOrder order, Double amount) {
+        if (!isMailAvailable()) return;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(senderEmail);
+        message.setTo(to);
+        message.setSubject("Order Payment Successful - PetCareHub");
+        message.setText(
+                "Your product order payment was successful.\n\n" +
+                        "Order Number: " + order.getOrderNumber() + "\n" +
+                        "Pickup Date: " + order.getPickupDate() + "\n" +
+                        "Amount Paid: LKR " + amount + "\n\n" +
+                        "Thank you for your purchase from PetCareHub."
+        );
+        send(message);
+    }
+
     public void sendSimpleMessage(MailBody mailBody) {
         if (!isMailAvailable()) return;
+
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(mailBody.to());
         message.setFrom(senderEmail);
@@ -96,11 +136,11 @@ public class AppointmentEmailService {
     }
 
     private void send(SimpleMailMessage message) {
-        try {
-            mailSender.send(message);
-        } catch (Exception ex) {
-            log.error("Failed to send email to {}: {}", message.getTo(), ex.getMessage());
-        }
+    try {
+        mailSender.send(message);
+        log.info("Email sent successfully to {}", String.join(",", message.getTo()));
+    } catch (Exception ex) {
+        log.error("Failed to send email to {}: {}", message.getTo(), ex.getMessage());
     }
 }
-
+}

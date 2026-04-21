@@ -102,7 +102,7 @@ public class AppointmentController {
     @GetMapping("/vet/{vetId}")
     public ResponseEntity<?> getAppointmentsByVet(@PathVariable Long vetId) {
         try {
-            List<Appointment> appointments = appointmentService.getAppointmentsByVet(vetId);
+            List<AppointmentResponse> appointments = appointmentService.getAppointmentsByVet(vetId);
             return ResponseEntity.ok(appointments);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("message", e.getMessage()));

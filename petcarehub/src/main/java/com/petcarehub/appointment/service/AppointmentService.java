@@ -4,6 +4,8 @@ import com.petcarehub.appointment.dto.AppointmentRequest;
 import com.petcarehub.appointment.dto.AppointmentResponse;
 import com.petcarehub.appointment.entity.Appointment;
 import com.petcarehub.appointment.repository.AppointmentRepository;
+import com.petcarehub.payment.enums.PaymentStatus;
+import com.petcarehub.payment.service.PaymentService;
 import com.petcarehub.pet.entity.Pet;
 import com.petcarehub.pet.repository.PetRepository;
 import com.petcarehub.user.entity.User;
@@ -24,31 +26,29 @@ public class AppointmentService {
     private final AppointmentEmailService emailService;
     private final UserRepository userRepository;
     private final PetRepository petRepository;
+    private final PaymentService paymentService;
 
-    // Injects all required dependencies via constructor
     public AppointmentService(AppointmentRepository appointmentRepository,
                               AppointmentEmailService emailService,
                               UserRepository userRepository,
-                              PetRepository petRepository) {
+                              PetRepository petRepository,
+                              PaymentService paymentService) {
         this.appointmentRepository = appointmentRepository;
         this.emailService = emailService;
         this.userRepository = userRepository;
         this.petRepository = petRepository;
+        this.paymentService = paymentService;
     }
 
-    // Creates and saves a new appointment; sends confirmation email to the owner
     public Appointment createAppointment(AppointmentRequest request) {
-        // vetId is now required — frontend always selects from DB-driven vet list
         if (request.getVetId() == null) {
             throw new IllegalArgumentException("A doctor (vetId) must be selected to book an appointment.");
         }
 
-        // Relational duplicate check: same date + vet + timeSlot
         if (appointmentRepository.existsByDateAndVet_UserIdAndTimeSlot(
                 request.getDate(),
                 request.getVetId(),
-                request.getTimeSlot()
-        )) {
+                request.getTimeSlot())) {
             throw new IllegalStateException("The selected time slot is already booked for this doctor.");
         }
 
@@ -61,7 +61,6 @@ public class AppointmentService {
         Pet pet = petRepository.findById(request.getPetId())
                 .orElseThrow(() -> new IllegalArgumentException("Pet not found"));
 
-        // Derive doctor name from the vet entity — no longer trusting the frontend string
         String doctorName = vet.getFirstName() + " " + vet.getLastName();
 
         Appointment appointment = new Appointment();
@@ -87,14 +86,13 @@ public class AppointmentService {
         return saved;
     }
 
-    // Updates an existing appointment's details; sends update email to the owner
     public Appointment updateAppointment(Long appointmentId, AppointmentRequest request) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
 
-        // Resolve vet — required for updates too
         User vet = null;
-        String doctorName = appointment.getDoctor(); // fallback to existing name
+        String doctorName = appointment.getDoctor();
+
         if (request.getVetId() != null) {
             vet = userRepository.findById(request.getVetId()).orElse(null);
             if (vet != null) {
@@ -102,17 +100,15 @@ public class AppointmentService {
             }
         }
 
-        // Check for slot conflict only if date/vet/timeSlot changed
         Long newVetId = (vet != null) ? vet.getUserId() : null;
         Long existingVetId = (appointment.getVet() != null) ? appointment.getVet().getUserId() : null;
-        boolean isSlotChanged =
-                !appointment.getDate().equals(request.getDate()) ||
-                        !java.util.Objects.equals(existingVetId, newVetId) ||
-                        !appointment.getTimeSlot().equals(request.getTimeSlot());
+
+        boolean isSlotChanged = !appointment.getDate().equals(request.getDate()) ||
+                !java.util.Objects.equals(existingVetId, newVetId) ||
+                !appointment.getTimeSlot().equals(request.getTimeSlot());
 
         if (isSlotChanged && newVetId != null && appointmentRepository.existsByDateAndVet_UserIdAndTimeSlot(
-                request.getDate(), newVetId, request.getTimeSlot()
-        )) {
+                request.getDate(), newVetId, request.getTimeSlot())) {
             throw new IllegalStateException("The selected time slot is already booked for this doctor.");
         }
 
@@ -140,7 +136,6 @@ public class AppointmentService {
         return updated;
     }
 
-    // Cancels an appointment by the owner and notifies the vet via email
     public Appointment cancelAppointment(Long appointmentId, String reason) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
@@ -163,7 +158,6 @@ public class AppointmentService {
         return cancelled;
     }
 
-    // Cancels an appointment by the vet and notifies the owner via email
     public Appointment cancelAppointmentByVet(Long appointmentId, Long vetId, String reason) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
@@ -190,7 +184,6 @@ public class AppointmentService {
         return cancelled;
     }
 
-    // Marks an appointment as COMPLETED; only allowed when status is UPCOMING
     public AppointmentResponse completeAppointment(Long appointmentId) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
@@ -214,23 +207,19 @@ public class AppointmentService {
         return toDto(saved);
     }
 
-    // Fetches all appointments and maps them to DTOs
     public List<AppointmentResponse> getAllAppointments() {
         return appointmentRepository.findAll().stream().map(this::toDto).toList();
     }
 
-    // Fetches all appointments for a specific owner by user ID
     public List<AppointmentResponse> getAppointmentsByUser(Long userId) {
         List<Appointment> results = appointmentRepository.findByOwnerUserId(userId);
         log.info("[getAppointmentsByUser] userId={} → {} appointment(s) found", userId, results.size());
         return results.stream().map(this::toDto).toList();
     }
 
-    // ── Private mapper ───────────────────────────────────────────────────────
-
-    // Maps an Appointment entity to a flat AppointmentResponse DTO
     private AppointmentResponse toDto(Appointment a) {
         AppointmentResponse dto = new AppointmentResponse();
+
         dto.setId(a.getId());
         dto.setAppointmentType(a.getAppointmentType());
         dto.setDoctor(a.getDoctor());
@@ -249,9 +238,7 @@ public class AppointmentService {
             dto.setPetSpecies(a.getPet().getSpecies());
         }
 
-        // owner: prefer the dedicated owner field, fall back to user
-        com.petcarehub.user.entity.User owner =
-                a.getOwner() != null ? a.getOwner() : a.getUser();
+        User owner = a.getOwner() != null ? a.getOwner() : a.getUser();
         if (owner != null) {
             dto.setOwnerId(owner.getUserId());
             dto.setOwnerFirstName(owner.getFirstName());
@@ -264,15 +251,25 @@ public class AppointmentService {
             dto.setVetLastName(a.getVet().getLastName());
         }
 
+        try {
+            boolean paid = paymentService.isAppointmentPaid(a.getId());
+            PaymentStatus paymentStatus = paymentService.getAppointmentPaymentStatus(a.getId());
+
+            dto.setPaid(paid);
+            dto.setPaymentStatus(paymentStatus != null ? paymentStatus.name() : null);
+        } catch (Exception e) {
+            dto.setPaid(false);
+            dto.setPaymentStatus(null);
+            log.error("Payment lookup failed for appointment id {}", a.getId(), e);
+        }
+
         return dto;
     }
 
-    // Fetches all appointments assigned to a specific vet
-    public List<Appointment> getAppointmentsByVet(Long vetId) {
-        return appointmentRepository.findByVet_UserId(vetId);
+    public List<AppointmentResponse> getAppointmentsByVet(Long vetId) {
+        return appointmentRepository.findByVet_UserId(vetId).stream().map(this::toDto).toList();
     }
 
-    // Returns non-cancelled booked time slots for a given date, optionally filtered by vetId
     public List<Map<String, String>> getBookedSlots(String date, Long vetId) {
         List<Appointment> appointments = (vetId != null)
                 ? appointmentRepository.findByDateAndVet_UserId(date, vetId)
@@ -283,7 +280,7 @@ public class AppointmentService {
                 .map(a -> {
                     java.util.Map<String, String> slot = new java.util.HashMap<>();
                     slot.put("timeSlot", a.getTimeSlot());
-                    slot.put("doctor",   a.getDoctor() != null ? a.getDoctor() : "");
+                    slot.put("doctor", a.getDoctor() != null ? a.getDoctor() : "");
                     if (a.getVet() != null) {
                         slot.put("vetId", String.valueOf(a.getVet().getUserId()));
                     }

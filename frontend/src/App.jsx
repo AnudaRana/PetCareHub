@@ -12,6 +12,8 @@ import PetStorePage from './features/store/pages/PetStorePage';
 import Cart from './features/cart/pages/Cart.jsx';
 import OrderDetails from './features/cart/pages/OrderDetails.jsx';
 import PaymentPage from './features/cart/pages/PaymentPage.jsx';
+import PaymentSuccess from './features/payment/pages/PaymentSuccess';
+import PaymentCancel from './features/payment/pages/PaymentCancel';
 
 const Protected = ({ children }) => {
   const { token, loading } = useAuth();
@@ -61,6 +63,8 @@ const App = () => (
           </Protected>
         }
       />
+      <Route path="/payment-success" element={<PaymentSuccess />} />
+      <Route path="/payment-cancel" element={<PaymentCancel />} />
       <Route
         path="/dashboard/*"
         element={
