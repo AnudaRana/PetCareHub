@@ -13,6 +13,7 @@ import VetAppointments from '../../appointment/pages/VetAppointments';
 import ManageOrdersPage from '../../order/pages/ManageOrdersPage';
 import ManageShopPage from '../../store/pages/ManageShopPage';
 import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
+import FeedbackManagement from '../../feedback/pages/FeedbackManagement';
 
 // Icons
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -27,6 +28,7 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
+import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
 
 const AdminDashboard = () => {
   const { user, loading: authLoading, token, hasRole } = useAuth();
@@ -94,6 +96,7 @@ const AdminDashboard = () => {
     { name: 'My Profile', icon: PersonOutlineOutlinedIcon, path: '/dashboard/profile' },
     { name: 'Manage Shop', icon: StoreOutlinedIcon, path: '/dashboard/manage-shop' },
     { name: 'Manage Orders', icon: ShoppingBagIcon, path: '/dashboard/manage-orders' },
+    { name: 'Feedback Management', icon: FeedbackOutlinedIcon, path: '/dashboard/feedbacks' },
     ...(isVet ? [
       { name: 'Patient Records', icon: HealingOutlinedIcon, path: '/dashboard/patients' },
       { name: 'My Appointments', icon: EventNoteOutlinedIcon, path: '/dashboard/vet-appointments' },
@@ -190,6 +193,7 @@ const AdminDashboard = () => {
         <Route path="vet-appointments" element={<VetAppointments />} />
         <Route path="manage-orders" element={<ManageOrdersPage />} />
         <Route path="manage-shop" element={<ManageShopPage />} />
+        <Route path="feedbacks" element={<FeedbackManagement />} />
         
         {/* Catch-all to redirect back to main dashboard if path is wrong */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

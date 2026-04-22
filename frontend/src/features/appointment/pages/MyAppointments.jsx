@@ -3,6 +3,7 @@ import axios from "axios";
 import "../../../styles/MyAppointments.css";
 import { useAuth } from '../../auth/contexts/AuthContext';
 import { getAllVets } from '../../../services/vetService';
+import { submitFeedback } from '../../../services/feedbackApi';
 
 // --- CONSTANTS ---
 const TIME_SLOTS = ['09:00 AM', '11:00 AM', '02:00 PM'];
@@ -62,6 +63,18 @@ const AppointmentDetails = ({ appointment, showUpdatedTag = false }) => {
   );
 };
 
+const StarRating = ({ rating, setRating }) => {
+  return (
+    <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', fontSize: '2rem', cursor: 'pointer', color: '#fbbf24' }}>
+      {[1, 2, 3, 4, 5].map(star => (
+        <span key={star} onClick={() => { if(setRating) setRating(star) }}>
+          {star <= rating ? '★' : '☆'}
+        </span>
+      ))}
+    </div>
+  );
+};
+
 // --- MAIN COMPONENT ---
 const MyAppointments = () => {
   const { user } = useAuth();
@@ -89,6 +102,11 @@ const MyAppointments = () => {
   const [showCancelSuccessModal, setShowCancelSuccessModal] = useState(false);
   const [cancelError, setCancelError] = useState("");
   const [updateError, setUpdateError] = useState("");
+
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackForm, setFeedbackForm] = useState({ rating: 0, comment: "" });
+  const [feedbackError, setFeedbackError] = useState("");
+  const [showFeedbackSuccess, setShowFeedbackSuccess] = useState(false);
 
   const fetchAppointments = async () => {
     if (!userId) return;
@@ -225,6 +243,39 @@ const MyAppointments = () => {
       setShowCancelModal(false);
       setShowCancelSuccessModal(true);
     } catch (error) { setCancelError("Cancellation failed."); }
+  };
+
+  const openFeedbackModal = (item) => {
+    setSelectedItem(item);
+    setFeedbackForm({ rating: 0, comment: "" });
+    setFeedbackError("");
+    setShowDetailsModal(false);
+    setShowFeedbackModal(true);
+  };
+
+  const handleFeedbackSubmit = async (e) => {
+    e.preventDefault();
+    if (feedbackForm.rating < 1 || feedbackForm.rating > 5) {
+      setFeedbackError("Please select a rating between 1 and 5 stars.");
+      return;
+    }
+    setFeedbackError("");
+    try {
+      await submitFeedback({
+        rating: feedbackForm.rating,
+        comment: feedbackForm.comment,
+        appointmentId: selectedItem.id,
+        ownerId: userId
+      });
+      setShowFeedbackModal(false);
+      setShowFeedbackSuccess(true);
+    } catch (error) {
+       const respData = error.response?.data;
+       const errMessage = typeof respData === 'object' && respData !== null 
+          ? (respData.message || "Failed to submit feedback.")
+          : (respData || "Failed to submit feedback.");
+       setFeedbackError(errMessage);
+    }
   };
 
   return (
@@ -392,6 +443,9 @@ const MyAppointments = () => {
                      { (selectedItem.status === 'UPCOMING' || selectedItem.status === 'PENDING') && (
                          <button type="button" className="btn btn-white" onClick={openCancelPrompt} style={{ color: '#dc2626', borderColor: 'rgba(239, 68, 68, 0.2)' }}>Cancel Booking</button>
                      )}
+                     { (selectedItem.status === 'COMPLETED') && (
+                         <button type="button" className="btn btn-white" onClick={() => openFeedbackModal(selectedItem)} style={{ color: '#4f46e5', borderColor: 'rgba(79, 70, 229, 0.2)' }}>Leave Feedback</button>
+                     )}
                      <div style={{ flex: 1 }}></div>
                      { (selectedItem.status === 'UPCOMING' || selectedItem.status === 'PENDING') && (
                          <button type="button" className="btn btn-teal" onClick={() => setIsEditMode(true)}>Update</button>
@@ -450,6 +504,47 @@ const MyAppointments = () => {
             <h2>Successfully Updated</h2>
             <p>The details have been saved.</p>
             <button className="btn btn-teal" onClick={() => setShowSuccessModal(false)} style={{ marginTop: '1.5rem' }}>Done</button>
+          </div>
+        </div>
+      )}
+
+      {/* Feedback Modal */}
+      {showFeedbackModal && (
+        <div className="modal-overlay" onClick={() => setShowFeedbackModal(false)}>
+          <div className="update-modal" onClick={e => e.stopPropagation()}>
+            <div className="update-modal__header">
+              <h2 className="update-modal__title">Leave Feedback</h2>
+              <button type="button" className="update-modal__close" onClick={() => setShowFeedbackModal(false)}>&times;</button>
+            </div>
+            <form onSubmit={handleFeedbackSubmit} className="update-modal__form">
+              <div className="update-modal__field update-modal__field--full">
+                <label className="update-modal__label">Rating (1-5 stars)</label>
+                <StarRating rating={feedbackForm.rating} setRating={(r) => setFeedbackForm({...feedbackForm, rating: r})} />
+              </div>
+
+              <div className="update-modal__field update-modal__field--full">
+                <label className="update-modal__label">Comment (Optional)</label>
+                <textarea className="update-modal__textarea" rows={4} placeholder="Share your experience..." value={feedbackForm.comment} onChange={e => setFeedbackForm({ ...feedbackForm, comment: e.target.value })} />
+              </div>
+              
+              {feedbackError && <div className="error-box" style={{ marginBottom: '12px' }}>{feedbackError}</div>}
+              
+              <div className="update-modal__footer">
+                <button type="button" className="btn btn-white" onClick={() => setShowFeedbackModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-teal">Submit Feedback</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showFeedbackSuccess && (
+        <div className="modal-overlay" onClick={() => setShowFeedbackSuccess(false)}>
+          <div className="success-modal" style={{ textAlign: 'center', padding: '2rem' }}>
+            <div className="success-icon" style={{ fontSize: '3rem', color: '#2dd4bf', margin: '0 auto 1rem' }}>✓</div>
+            <h2>Feedback Submitted Successfully</h2>
+            <p>Thank you for your valuable feedback!</p>
+            <button className="btn btn-teal" onClick={() => setShowFeedbackSuccess(false)} style={{ marginTop: '1.5rem' }}>Close</button>
           </div>
         </div>
       )}
