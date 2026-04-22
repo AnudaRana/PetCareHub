@@ -67,6 +67,12 @@ public class FeedbackService {
                 .collect(Collectors.toList());
     }
 
+    public FeedbackResponse getFeedbackById(Long id) {
+        Feedback feedback = feedbackRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Feedback not found"));
+        return mapToResponse(feedback);
+    }
+
     private FeedbackResponse mapToResponse(Feedback feedback) {
         FeedbackResponse response = new FeedbackResponse();
         response.setId(feedback.getId());

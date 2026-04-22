@@ -37,3 +37,12 @@ export const getFeedbackByAppointment = async (appointmentId) => {
         throw error;
     }
 };
+
+export const getFeedbackById = async (id) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/${id}`, { headers: getAuthHeaders() });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};

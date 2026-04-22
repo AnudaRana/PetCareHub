@@ -1,15 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { getAllFeedbacks } from '../../../services/feedbackApi';
+import { getAllFeedbacks, getFeedbackById } from '../../../services/feedbackApi';
 import '../styles/FeedbackManagement.css';
 
 const FeedbackManagement = () => {
     const [feedbacks, setFeedbacks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedFeedback, setSelectedFeedback] = useState(null);
+    const [loadingDetails, setLoadingDetails] = useState(false);
 
     useEffect(() => {
         fetchFeedbacks();
     }, []);
+
+    const handleFeedbackClick = async (id) => {
+        try {
+            setLoadingDetails(true);
+            const data = await getFeedbackById(id);
+            setSelectedFeedback(data);
+        } catch (err) {
+            console.error('Failed to fetch feedback details', err);
+        } finally {
+            setLoadingDetails(false);
+        }
+    };
+
+    const closePopup = () => {
+        setSelectedFeedback(null);
+    };
 
     const fetchFeedbacks = async () => {
         try {
@@ -49,23 +67,56 @@ const FeedbackManagement = () => {
             ) : (
                 <div className="feedback-list">
                     {feedbacks.map((feedback) => (
-                        <div key={feedback.id} className="feedback-card">
+                        <div key={feedback.id} className="feedback-card clickable" onClick={() => handleFeedbackClick(feedback.id)}>
                             <div className="feedback-card-header">
                                 {renderStars(feedback.rating)}
                                 <span className="feedback-date">
                                     {new Date(feedback.createdDate).toLocaleDateString()}
                                 </span>
                             </div>
-                            <div className="feedback-comment">
-                                {feedback.comment ? `"${feedback.comment}"` : <i>No comment provided</i>}
-                            </div>
-                            <div className="feedback-details">
-                                <p><strong>Owner:</strong> {feedback.ownerName}</p>
+                            <div className="feedback-details list-details">
                                 <p><strong>Appointment:</strong> {feedback.appointmentType} with {feedback.appointmentDoctor}</p>
-                                <p><strong>Date:</strong> {feedback.appointmentDate}</p>
                             </div>
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* Popup Modal */}
+            {selectedFeedback && (
+                <div className="feedback-modal-overlay" onClick={closePopup}>
+                    <div className="feedback-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <button className="close-modal-btn" onClick={closePopup}>&times;</button>
+                        <h3>Feedback Summary</h3>
+                        
+                        <div className="modal-header-section">
+                            {renderStars(selectedFeedback.rating)}
+                            <span className="modal-date">{new Date(selectedFeedback.createdDate).toLocaleDateString()}</span>
+                        </div>
+                        
+                        <div className="modal-comment-section">
+                            <h4>Comment</h4>
+                            <p className="feedback-comment full-comment">
+                                {selectedFeedback.comment ? `"${selectedFeedback.comment}"` : <i>No comment provided</i>}
+                            </p>
+                        </div>
+
+                        <div className="modal-details-section">
+                            <h4>Pet Owner Information</h4>
+                            <p><strong>Name:</strong> {selectedFeedback.ownerName}</p>
+                            
+                            <h4 className="mt-3">Appointment Details</h4>
+                            <p><strong>Type:</strong> {selectedFeedback.appointmentType}</p>
+                            <p><strong>Doctor:</strong> {selectedFeedback.appointmentDoctor}</p>
+                            <p><strong>Scheduled Date:</strong> {selectedFeedback.appointmentDate}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {loadingDetails && (
+                <div className="feedback-modal-overlay">
+                    <div className="loading-state modal-loading">Loading details...</div>
                 </div>
             )}
         </div>

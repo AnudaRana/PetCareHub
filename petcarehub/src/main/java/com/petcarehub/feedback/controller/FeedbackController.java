@@ -39,4 +39,10 @@ public class FeedbackController {
     public ResponseEntity<List<FeedbackResponse>> getFeedbackByAppointment(@PathVariable Long appointmentId) {
         return ResponseEntity.ok(feedbackService.getFeedbackByAppointment(appointmentId));
     }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<FeedbackResponse> getFeedbackById(@PathVariable Long id) {
+        return ResponseEntity.ok(feedbackService.getFeedbackById(id));
+    }
 }
