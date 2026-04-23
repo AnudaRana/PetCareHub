@@ -4,6 +4,8 @@ import "../../../styles/MyAppointments.css";
 import { useAuth } from "../../auth/contexts/AuthContext";
 import { getAllVets } from "../../../services/vetService";
 import { createCheckoutSession } from "../../../services/paymentService";
+import AddFeedbackForm from "../../feedback/components/AddFeedbackForm";
+import { getFeedbackByAppointment } from "../../../services/feedbackApi";
 
 // --- CONSTANTS ---
 const TIME_SLOTS = ["09:00 AM", "11:00 AM", "02:00 PM"];
@@ -136,12 +138,40 @@ const MyAppointments = () => {
     type: "info",
   });
 
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [appointmentForFeedback, setAppointmentForFeedback] = useState(null);
+  const [existingFeedback, setExistingFeedback] = useState(null);
+  const [showFeedbackSuccess, setShowFeedbackSuccess] = useState(false);
+
   const fetchAppointments = async () => {
     if (!userId) return;
     try {
       setLoading(true);
       const res = await axios.get(`/api/appointments/user/${userId}`);
-      setAppointments(Array.isArray(res.data) ? res.data : []);
+      const appts = Array.isArray(res.data) ? res.data : [];
+
+      // Fetch upcoming vaccinations and merge them
+      const { getUpcomingVaccinationsByOwner } = await import("../../../services/vaccinationApi");
+      const vacRes = await getUpcomingVaccinationsByOwner(userId);
+      const vacs = Array.isArray(vacRes) ? vacRes : (Array.isArray(vacRes?.data) ? vacRes.data : []);
+
+      const mappedVacs = vacs.map(v => ({
+         id: `vac-${v.id}`,
+         pet: { name: v.petName, species: v.petSpecies, petId: v.petId },
+         petName: v.petName,
+         petSpecies: v.petSpecies,
+         appointmentType: "Vaccination: " + v.vaccinationName,
+         doctor: v.doctorName || "Staff",
+         date: v.dueDate,
+         timeSlot: "Pending",
+         status: new Date(v.dueDate) < new Date(today) ? "OVERDUE" : "UPCOMING",
+         paid: true,
+         paymentStatus: "PAID", // Vaccinations are paid at clinic
+         isVaccination: true
+      }));
+
+      setAppointments([...appts, ...mappedVacs]);
     } catch (error) {
       console.error("Failed to fetch appointments:", error);
     } finally {
@@ -171,7 +201,10 @@ const MyAppointments = () => {
   );
 
   const upcomingAppointments = useMemo(
-    () => filteredAppointments.filter((a) => (a.status || "").toUpperCase() === "UPCOMING"),
+    () => filteredAppointments.filter((a) => {
+        const s = (a.status || "").toUpperCase();
+        return s === "UPCOMING" || s === "OVERDUE";
+    }),
     [filteredAppointments]
   );
 
@@ -292,6 +325,42 @@ const MyAppointments = () => {
     }
   };
 
+  const openAppointmentDetails = async (appointment) => {
+    setSelectedAppointment(appointment);
+    setExistingFeedback(null);
+    setShowDetailModal(true);
+
+    // Check if feedback already exists for this completed appointment
+    const status = (appointment.status || "").toUpperCase();
+    if (status === "COMPLETED" && !appointment.isVaccination) {
+      try {
+        const feedbacks = await getFeedbackByAppointment(appointment.id);
+        if (feedbacks && feedbacks.length > 0) {
+          setExistingFeedback(feedbacks[0]);
+        }
+      } catch (err) {
+        console.error("Error checking feedback:", err);
+      }
+    }
+  };
+
+  const handleOpenFeedbackForm = (appointment) => {
+    setAppointmentForFeedback(appointment);
+    setShowFeedbackForm(true);
+  };
+
+  const handleFeedbackSuccess = () => {
+    setShowFeedbackForm(false);
+    setAppointmentForFeedback(null);
+    setShowFeedbackSuccess(true);
+    
+    // Refresh feedback status
+    setTimeout(() => {
+      openAppointmentDetails(selectedAppointment);
+      setShowFeedbackSuccess(false);
+    }, 2000);
+  };
+
   return (
     <div className="appointments-container">
       <div className="appointments-header">
@@ -361,11 +430,26 @@ const MyAppointments = () => {
               {pastAppointments.length === 0 ? (
                 <p className="empty-text">No history found.</p>
               ) : (
-                pastAppointments.map((appt) => (
-                  <div className="appointment-box" key={appt.id}>
-                    <AppointmentDetails appointment={appt} />
-                  </div>
-                ))
+                pastAppointments.map((appt) => {
+                  const status = (appt.status || "").toUpperCase();
+                  const isCompleted = status === "COMPLETED";
+                  
+                  return (
+                    <div 
+                      key={appt.id}
+                      className={`appointment-box ${isCompleted ? 'clickable' : ''}`}
+                      onClick={() => isCompleted && openAppointmentDetails(appt)}
+                      style={{ cursor: isCompleted ? 'pointer' : 'default' }}
+                    >
+                      <AppointmentDetails appointment={appt} />
+                      {isCompleted && (
+                        <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: '#6b7280' }}>
+                          Click to add feedback
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
               )}
             </div>
           </div>
@@ -651,6 +735,101 @@ const MyAppointments = () => {
               style={{ marginTop: "1.5rem" }}
             >
               OK
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Appointment Details Modal */}
+      {showDetailModal && selectedAppointment && (
+        <div className="modal-overlay" onClick={() => setShowDetailModal(false)}>
+          <div className="update-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="update-modal__header">
+              <h2 className="update-modal__title">Appointment Details</h2>
+              <button
+                type="button"
+                className="update-modal__close"
+                onClick={() => setShowDetailModal(false)}
+                aria-label="Close"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="update-modal__form" style={{ padding: "1.5rem" }}>
+              <AppointmentDetails appointment={selectedAppointment} />
+
+              {/* Feedback Section */}
+              {(selectedAppointment.status || "").toUpperCase() === "COMPLETED" && !selectedAppointment.isVaccination && (
+                <div style={{ marginTop: "1.5rem", borderTop: "1px solid #e5e7eb", paddingTop: "1.5rem" }}>
+                  {existingFeedback ? (
+                    <div style={{ backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "6px", padding: "1rem" }}>
+                      <p style={{ margin: "0 0 0.5rem 0", color: "#166534", fontWeight: "600" }}>
+                        ✓ Your feedback has been submitted
+                      </p>
+                      <div className="feedback-stars" style={{ marginBottom: "0.5rem" }}>
+                        {[1, 2, 3, 4, 5].map(star => (
+                          <span key={star} className={star <= existingFeedback.rating ? 'star filled' : 'star'} style={{ color: '#fbbf24', marginRight: '0.25rem' }}>★</span>
+                        ))}
+                      </div>
+                      {existingFeedback.comment && (
+                        <p style={{ margin: "0.5rem 0 0 0", color: "#374151", fontStyle: "italic" }}>
+                          "{existingFeedback.comment}"
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn btn-teal"
+                      onClick={() => handleOpenFeedbackForm(selectedAppointment)}
+                      style={{ width: "100%" }}
+                    >
+                      Add Feedback
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <div className="update-modal__footer" style={{ marginTop: "1.5rem" }}>
+                <button
+                  type="button"
+                  className="btn btn-white"
+                  onClick={() => setShowDetailModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Feedback Form Modal */}
+      {showFeedbackForm && appointmentForFeedback && (
+        <AddFeedbackForm
+          appointment={appointmentForFeedback}
+          ownerId={userId}
+          onClose={() => setShowFeedbackForm(false)}
+          onSubmitSuccess={handleFeedbackSuccess}
+        />
+      )}
+
+      {/* Feedback Success Modal */}
+      {showFeedbackSuccess && (
+        <div className="modal-overlay" onClick={() => setShowFeedbackSuccess(false)}>
+          <div className="success-modal" style={{ textAlign: "center", padding: "2rem" }}>
+            <div className="success-icon" style={{ fontSize: "3rem", color: "#22c55e", marginBottom: "1rem" }}>
+              ✓
+            </div>
+            <h2>Feedback Submitted</h2>
+            <p>Thank you for your feedback!</p>
+            <button
+              className="btn btn-teal"
+              onClick={() => setShowFeedbackSuccess(false)}
+              style={{ marginTop: "1.5rem" }}
+            >
+              Done
             </button>
           </div>
         </div>

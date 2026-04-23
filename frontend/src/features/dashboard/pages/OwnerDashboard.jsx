@@ -70,7 +70,10 @@ const OwnerDashboard = () => {
           ? vaccinationRecordsRes.data
           : [];
 
-        const upcoming = appointments.filter(a => (a.status || '').toUpperCase() === 'UPCOMING');
+        const upcoming = appointments.filter(a => {
+            const s = (a.status || '').toUpperCase();
+            return s === 'UPCOMING' || s === 'OVERDUE';
+        });
         const upcomingAppointmentCount = upcoming.filter(
           a => (a.appointmentType || '').toLowerCase() !== 'vaccination'
         ).length;
@@ -78,12 +81,33 @@ const OwnerDashboard = () => {
           a => (a.appointmentType || '').toLowerCase() === 'vaccination'
         ).length;
 
+        const todayDate = new Date();
+        todayDate.setHours(0, 0, 0, 0);
+
+        const formattedVaccinations = vaccinationRecords.map(v => {
+            const dueDate = new Date(v.dueDate);
+            dueDate.setHours(0, 0, 0, 0);
+            return {
+                id: `vac-${v.id}`,
+                petName: v.petName || 'Pet',
+                petSpecies: v.petSpecies || '',
+                appointmentType: `Vaccination: ${v.vaccinationName}`,
+                doctor: v.doctorName || 'Vet',
+                date: v.dueDate,
+                timeSlot: 'Pending',
+                status: dueDate < todayDate ? 'OVERDUE' : 'UPCOMING'
+            };
+        });
+
+        const mergedUpcoming = [...upcoming, ...formattedVaccinations]
+           .sort((a, b) => new Date(a.date) - new Date(b.date));
+
         setStats({
           petCount: pets.length,
           upcomingCount: upcomingAppointmentCount,
           totalCount: appointments.length,
           vaccinationCount: upcomingVaccinationAppointments + vaccinationRecords.length,
-          upcomingAppointments: upcoming,
+          upcomingAppointments: mergedUpcoming,
           loading: false
         });
       } catch (error) {
@@ -226,7 +250,7 @@ const OwnerDashboard = () => {
                       <div className="owner-upcoming-card__right">
                         <div className="owner-upcoming-card__date">📆 {appt.date}</div>
                         <div className="owner-upcoming-card__time">🕐 {appt.timeSlot}</div>
-                        <span className="owner-upcoming-card__badge">Upcoming</span>
+                        <span className={`owner-upcoming-card__badge ${appt.status === 'OVERDUE' ? 'overdue-badge' : ''}`}>{appt.status || 'Upcoming'}</span>
                       </div>
                     </div>
                   ))}

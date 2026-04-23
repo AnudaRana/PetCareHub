@@ -95,6 +95,19 @@
    background: var(--color-white);
  }
 
+ .appointment-box.clickable {
+   cursor: pointer;
+   transition: all 0.3s ease;
+   border-color: #2dd4bf;
+   box-shadow: 0 2px 8px rgba(45, 212, 191, 0.1);
+ }
+
+ .appointment-box.clickable:hover {
+   border-color: #1da99f;
+   box-shadow: 0 4px 12px rgba(45, 212, 191, 0.2);
+   transform: translateY(-2px);
+ }
+
  .appointment-box p {
    margin: 8px 0;
    font-size: 15px;

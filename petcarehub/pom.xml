@@ -18,7 +18,7 @@
     <java.version>21</java.version>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
-    <lombok.version>1.18.36</lombok.version>
+      <lombok.version>1.18.36</lombok.version>
   </properties>
 
   <dependencies>
@@ -65,20 +65,12 @@
       <artifactId>spring-boot-starter-mail</artifactId>
     </dependency>
 
- feature/PET-94-vaccination-reminder-system
 		<!-- H2 for integration tests -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
- development
 
     <dependency>
       <groupId>com.mysql</groupId>
@@ -89,12 +81,9 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
- feature/PET-94-vaccination-reminder-system
-      <scope>provided</scope>
-
       <version>1.18.34</version>
       <optional>true</optional>
- development
+      <scope>provided</scope>
     </dependency>
 
     <dependency>

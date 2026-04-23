@@ -95,7 +95,7 @@ public class VaccinationRecordService {
         LocalDate today = LocalDate.now();
         LocalDate futureDate = today.plusDays(daysAhead);
         
-        return vaccinationRecordRepository.findByDueDateBetweenAndReminderStatus(today, futureDate, "PENDING")
+        return vaccinationRecordRepository.findByDueDateLessThanEqualAndReminderStatus(futureDate, "PENDING")
                 .stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
@@ -106,7 +106,7 @@ public class VaccinationRecordService {
         LocalDate futureDate = today.plusDays(daysAhead);
 
         return vaccinationRecordRepository
-                .findByPet_Owner_UserIdAndDueDateBetweenAndReminderStatus(userId, today, futureDate, "PENDING")
+                .findByPet_Owner_UserIdAndDueDateLessThanEqualAndReminderStatus(userId, futureDate, "PENDING")
                 .stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
@@ -123,7 +123,11 @@ public class VaccinationRecordService {
         dto.setDoctorId(vaccination.getDoctorId());
         dto.setDueDate(vaccination.getDueDate());
         dto.setReminderStatus(vaccination.getReminderStatus());
-        dto.setPetId(vaccination.getPet().getPetId());
+        if (vaccination.getPet() != null) {
+            dto.setPetId(vaccination.getPet().getPetId());
+            dto.setPetName(vaccination.getPet().getName());
+            dto.setPetSpecies(vaccination.getPet().getSpecies());
+        }
         return dto;
     }
 }
