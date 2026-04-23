@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_BASE_URL != null
+  ? import.meta.env.VITE_API_BASE_URL
+  : '';
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -34,6 +36,14 @@ export const addVaccinationToPet = async (petId, vaccinationData) => {
   return response.data;
 };
 
+export const getUpcomingVaccinationsByOwner = async (userId, daysAhead = 30) => {
+  const response = await axios.get(
+    `${API_BASE_URL}/api/medical-records/vaccinations/upcoming/user/${userId}?daysFront=${daysAhead}`,
+    { headers: getAuthHeaders() }
+  );
+  return response.data;
+};
+
 /**
  * Fetch all reminders for the currently authenticated user
  * @returns {Promise<Array>} Array of reminder records
@@ -46,8 +56,18 @@ export const getReminders = async (userId = null) => {
   return response.data;
 };
 
+export const updateVaccination = async (id, vaccinationData) => {
+  const response = await axios.put(
+    `${API_BASE_URL}/api/medical-records/vaccinations/${id}`,
+    vaccinationData,
+    { headers: getAuthHeaders() }
+  );
+  return response.data;
+};
+
 export default {
   getVaccinationsByPetId,
   addVaccinationToPet,
+  updateVaccination,
   getReminders,
 };

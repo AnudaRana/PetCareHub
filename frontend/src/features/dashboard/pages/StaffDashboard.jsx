@@ -13,6 +13,7 @@ import StaffReceiptsPage from '../../receipts/pages/StaffReceiptsPage';
 import InvoiceDetailsPage from '../../receipts/pages/InvoiceDetailsPage';
 import ManageOrdersPage from '../../order/pages/ManageOrdersPage';
 import ManageShopPage from '../../store/pages/ManageShopPage';
+import FeedbackManagement from '../../feedback/pages/FeedbackManagement';
 
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -23,6 +24,7 @@ import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
 
 import '../components/Dashboard.css';
 
@@ -63,6 +65,7 @@ const StaffDashboard = () => {
     { name: 'Receipts', icon: ReceiptLongOutlinedIcon, path: '/dashboard/receipts' },
     { name: 'Manage Shop', icon: StoreOutlinedIcon, path: '/dashboard/manage-shop'},
     { name: 'Manage Orders', icon: ShoppingBagIcon, path: '/dashboard/manage-orders'},
+    { name: 'Feedback Management', icon: FeedbackOutlinedIcon, path: '/dashboard/feedbacks' },
     { name: 'Settings', icon: SettingsOutlinedIcon, path: '/dashboard/settings', disabled: true }
   ];
 
@@ -130,6 +133,11 @@ const StaffDashboard = () => {
                   <div className="staff-action-label">Shop Inventory</div>
                   <div className="staff-action-arrow">→</div>
                 </div>
+                <div className="staff-action-card" onClick={() => navigate('/dashboard/feedbacks')}>
+                  <div className="staff-action-icon">⭐</div>
+                  <div className="staff-action-label">Feedback Center</div>
+                  <div className="staff-action-arrow">→</div>
+                </div>
               </div>
             </div>
           </div>
@@ -143,6 +151,7 @@ const StaffDashboard = () => {
         <Route path="receipts/:invoiceId" element={<InvoiceDetailsPage />} />
         <Route path="manage-orders" element={<ManageOrdersPage />} />
         <Route path="manage-shop" element={<ManageShopPage />} />
+        <Route path="feedbacks" element={<FeedbackManagement />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </DashboardLayout>

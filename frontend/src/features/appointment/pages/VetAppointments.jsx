@@ -32,6 +32,27 @@ const VetAppointments = () => {
     }
   };
 
+  const calculateOverdue = (dateStr) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const apptDate = new Date(dateStr);
+    apptDate.setHours(0, 0, 0, 0);
+    if (apptDate < today) {
+      const diffTime = Math.abs(today - apptDate);
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+    return 0;
+  };
+
+  const handleDone = async (id) => {
+    try {
+      await axios.patch(`/api/appointments/${id}/complete`);
+      await fetchAppointments();
+    } catch (error) {
+      console.error("Failed to complete appointment:", error);
+    }
+  };
+
   const getStatusClass = (status) => {
     if (status === "CANCELLED") return "status-badge status-cancelled";
     if (status === "UPDATED") return "status-badge status-updated";
@@ -101,7 +122,7 @@ const VetAppointments = () => {
         ) : (
           <div className="vet-appointments-grid">
             {appointments.map((a) => (
-              <div key={a.id} className="vet-appointment-item">
+              <div key={a.id} className="vet-appointment-item" style={a.status === 'UPCOMING' && calculateOverdue(a.date) > 0 ? { border: '2px solid #dc2626' } : {}}>
                 <h3>
                   <span>{a.petSpecies === 'Dog' ? '🐕' : a.petSpecies === 'Cat' ? '🐈' : '🐾'}</span>
                   {a.petName}
@@ -120,9 +141,13 @@ const VetAppointments = () => {
                     </p>
                   </div>
 
-                  <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <strong>Status</strong>
-                    <span className={getStatusClass(a.status)}>{a.status}</span>
+                    {a.status === 'UPCOMING' && calculateOverdue(a.date) > 0 ? (
+                        <span className="status-badge" style={{ color: '#dc2626', background: 'rgba(239, 68, 68, 0.1)' }}>Overdue by {calculateOverdue(a.date)} days</span>
+                    ) : (
+                        <span className={getStatusClass(a.status)}>{a.status}</span>
+                    )}
                   </div>
 
                   <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -141,15 +166,25 @@ const VetAppointments = () => {
                   )}
                 </div>
 
-                {a.status !== "CANCELLED" && (
-                  <button
-                    className="btn btn-white"
-                    style={{ marginTop: 'auto', color: '#dc2626', borderColor: 'rgba(239, 68, 68, 0.2)' }}
-                    onClick={() => openCancelModal(a)}
-                    type="button"
-                  >
-                    Cancel Session
-                  </button>
+                {a.status === "UPCOMING" && (
+                  <div style={{ display: 'flex', gap: '8px', marginTop: 'auto', paddingTop: '16px' }}>
+                    <button
+                      className="btn btn-teal"
+                      style={{ flex: 1, padding: '8px' }}
+                      onClick={(e) => { e.stopPropagation(); handleDone(a.id); }}
+                      type="button"
+                    >
+                      Done
+                    </button>
+                    <button
+                      className="btn btn-white"
+                      style={{ flex: 1, color: '#dc2626', borderColor: 'rgba(239, 68, 68, 0.2)', padding: '8px' }}
+                      onClick={(e) => { e.stopPropagation(); openCancelModal(a); }}
+                      type="button"
+                    >
+                      Cancel Session
+                    </button>
+                  </div>
                 )}
               </div>
             ))}

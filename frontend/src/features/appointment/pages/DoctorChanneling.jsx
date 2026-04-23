@@ -106,7 +106,7 @@ const DoctorChanneling = () => {
     if (!userId) return;
 
     getPetsByOwner(userId)
-      .then((res) => setPets(res.data))
+      .then((res) => setPets(Array.isArray(res) ? res : res.data || []))
       .catch((err) => console.error('Failed to load pets:', err));
   }, [userId]);
 
@@ -357,7 +357,7 @@ const DoctorChanneling = () => {
           )}
 
           <div className="slot-grid">
-          {visibleSlots.map((slot, index) => {
+            {visibleSlots.map((slot, index) => {
               const booked = isSlotBooked(slot.time, slot.vetId);
               const pastTime = isPastTimeSlotToday(slot.time);
               const selected =

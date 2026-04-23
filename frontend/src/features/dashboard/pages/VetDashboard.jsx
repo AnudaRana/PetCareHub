@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import DashboardLayout from '../components/DashboardLayout';
 import DoctorAllPets from '../../pet/components/doctor/DoctorAllPets';
@@ -7,6 +8,7 @@ import MyProfile from './profile/MyProfile';
 import VetAppointments from '../../appointment/pages/VetAppointments';
 import PetMedicalRecordPage from '../../medical/pages/PetMedicalRecordPage';
 import ManageTimeSlots from '../../appointment/pages/ManageTimeSlots';
+import { getAllPets } from '../../../services/petService';
 
 // Icons
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -20,6 +22,42 @@ import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 const VetDashboard = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [stats, setStats] = useState({
+    totalPatients: 0,
+    dailySchedule: 0,
+    admissions: 0,
+    loading: true
+  });
+
+  useEffect(() => {
+    if (!user?.userId) return;
+
+    const fetchVetStats = async () => {
+      try {
+        setStats(prev => ({ ...prev, loading: true }));
+        const petsResponse = await getAllPets();
+        const pets = Array.isArray(petsResponse.data) ? petsResponse.data : (Array.isArray(petsResponse) ? petsResponse : []);
+
+        const appointmentsRes = await axios.get(`/api/appointments/vet/${user.userId}`);
+        const appointments = Array.isArray(appointmentsRes.data) ? appointmentsRes.data : [];
+        const today = new Date().toISOString().split('T')[0];
+        const scheduleToday = appointments.filter(a => a.date === today && (a.status || '').toUpperCase() !== 'CANCELLED').length;
+        const upcomingCount = appointments.filter(a => (a.status || '').toUpperCase() === 'UPCOMING').length;
+
+        setStats({
+          totalPatients: pets.length,
+          dailySchedule: scheduleToday,
+          admissions: upcomingCount,
+          loading: false
+        });
+      } catch (error) {
+        console.error('Failed to fetch vet dashboard stats:', error);
+        setStats(prev => ({ ...prev, loading: false }));
+      }
+    };
+
+    fetchVetStats();
+  }, [user?.userId]);
 
   const vetMenu = [
     { name: 'Home', icon: HomeOutlinedIcon, path: '/' },
@@ -52,21 +90,21 @@ const VetDashboard = () => {
             <div className="doc-stats-grid">
               <div className="doc-stat-card" style={{ '--accent': 'var(--color-primary)' }}>
                 <div className="doc-stat-icon">🐕</div>
-                <div className="doc-stat-value">—</div>
+                <div className="doc-stat-value">{stats.loading ? '...' : stats.totalPatients}</div>
                 <div className="doc-stat-label">Total Patients</div>
                 <div className="doc-stat-sub">Clinic active database</div>
               </div>
 
               <div className="doc-stat-card" style={{ '--accent': '#2dd4bf' }}>
                 <div className="doc-stat-icon">📅</div>
-                <div className="doc-stat-value">—</div>
+                <div className="doc-stat-value">{stats.loading ? '...' : stats.dailySchedule}</div>
                 <div className="doc-stat-label">Daily Schedule</div>
                 <div className="doc-stat-sub">Today's appointments</div>
               </div>
 
               <div className="doc-stat-card" style={{ '--accent': '#6366f1' }}>
                 <div className="doc-stat-icon">🏥</div>
-                <div className="doc-stat-value">—</div>
+                <div className="doc-stat-value">{stats.loading ? '...' : stats.admissions}</div>
                 <div className="doc-stat-label">Admissions</div>
                 <div className="doc-stat-sub">Current inpatient cases</div>
               </div>

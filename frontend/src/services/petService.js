@@ -56,7 +56,7 @@ export const getPetsByOwner = async (ownerId) => {
         params: { ownerId },
         headers: getAuthHeaders()
     });
-    return response.data;
+    return response?.data ?? response;
 };
 
 /**
@@ -78,7 +78,7 @@ export const searchPetsByOwner = async (ownerId, name) => {
         params: { ownerId, name },
         headers: getAuthHeaders()
     });
-    return response.data;
+    return response?.data ?? response;
 };
 
 /**
@@ -88,7 +88,7 @@ export const getAllPets = async () => {
     const response = await axios.get(`${API_BASE_URL}${API_BASE}/all`, {
         headers: getAuthHeaders()
     });
-    return response.data;
+    return response?.data ?? response;
 };
 
 /**

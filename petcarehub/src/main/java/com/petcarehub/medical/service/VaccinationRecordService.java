@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
 
 @Service
 public class VaccinationRecordService {
@@ -56,10 +57,59 @@ public class VaccinationRecordService {
         vaccination.setDescription(dto.getDescription());
         vaccination.setDoctorName(dto.getDoctorName());
         vaccination.setDoctorId(dto.getDoctorId());
+        vaccination.setDueDate(dto.getDueDate());
+        vaccination.setReminderStatus(dto.getReminderStatus() != null ? dto.getReminderStatus() : "PENDING");
         vaccination.setPet(pet);
 
         VaccinationRecord saved = vaccinationRecordRepository.save(vaccination);
         return mapToDTO(saved);
+    }
+
+    public VaccinationRecordDTO updateVaccination(Long id, VaccinationRecordDTO dto) {
+        VaccinationRecord vaccination = vaccinationRecordRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vaccination not found"));
+
+        if (dto.getVaccinationDate() != null) vaccination.setVaccinationDate(dto.getVaccinationDate());
+        if (dto.getVaccinationName() != null && !dto.getVaccinationName().isBlank()) vaccination.setVaccinationName(dto.getVaccinationName());
+        if (dto.getDose() != null && !dto.getDose().isBlank()) vaccination.setDose(dto.getDose());
+        if (dto.getDescription() != null) vaccination.setDescription(dto.getDescription());
+        if (dto.getDoctorName() != null && !dto.getDoctorName().isBlank()) vaccination.setDoctorName(dto.getDoctorName());
+        if (dto.getDoctorId() != null && !dto.getDoctorId().isBlank()) vaccination.setDoctorId(dto.getDoctorId());
+        
+        // Handle due date changes and potentially reset reminder status
+        if (dto.getDueDate() != null) {
+            if (!dto.getDueDate().equals(vaccination.getDueDate())) {
+                vaccination.setReminderStatus("PENDING");
+            }
+            vaccination.setDueDate(dto.getDueDate());
+        } else {
+            vaccination.setDueDate(null);
+            vaccination.setReminderStatus("PENDING");
+        }
+
+        VaccinationRecord updated = vaccinationRecordRepository.save(vaccination);
+        return mapToDTO(updated);
+    }
+
+    public List<VaccinationRecordDTO> getUpcomingVaccinations(int daysAhead) {
+        LocalDate today = LocalDate.now();
+        LocalDate futureDate = today.plusDays(daysAhead);
+        
+        return vaccinationRecordRepository.findByDueDateBetweenAndReminderStatus(today, futureDate, "PENDING")
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<VaccinationRecordDTO> getUpcomingVaccinationsByOwner(Long userId, int daysAhead) {
+        LocalDate today = LocalDate.now();
+        LocalDate futureDate = today.plusDays(daysAhead);
+
+        return vaccinationRecordRepository
+                .findByPet_Owner_UserIdAndDueDateBetweenAndReminderStatus(userId, today, futureDate, "PENDING")
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
     private VaccinationRecordDTO mapToDTO(VaccinationRecord vaccination) {
@@ -71,6 +121,8 @@ public class VaccinationRecordService {
         dto.setDescription(vaccination.getDescription());
         dto.setDoctorName(vaccination.getDoctorName());
         dto.setDoctorId(vaccination.getDoctorId());
+        dto.setDueDate(vaccination.getDueDate());
+        dto.setReminderStatus(vaccination.getReminderStatus());
         dto.setPetId(vaccination.getPet().getPetId());
         return dto;
     }

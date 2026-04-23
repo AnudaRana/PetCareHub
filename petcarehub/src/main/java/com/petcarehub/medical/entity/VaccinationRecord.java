@@ -38,6 +38,12 @@ public class VaccinationRecord {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "due_date")
+    private LocalDate dueDate;
+
+    @Column(name = "reminder_status")
+    private String reminderStatus;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -115,5 +121,21 @@ public class VaccinationRecord {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDate getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public String getReminderStatus() {
+        return reminderStatus;
+    }
+
+    public void setReminderStatus(String reminderStatus) {
+        this.reminderStatus = reminderStatus;
     }
 }
