@@ -7,6 +7,7 @@ import com.petcarehub.user.entity.Role;
 import com.petcarehub.user.entity.User;
 import com.petcarehub.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +28,13 @@ public class DataInitializer implements CommandLineRunner {
     private final com.petcarehub.product.repository.ProductRepository productRepository;
     private final com.petcarehub.product.repository.ProductAttributeRepository productAttributeRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${ADMIN_EMAIL}")
+    private String aEmail;
+
+    @Value("${ADMIN_PASSWORD}")
+    private String aPassword;
+
 
     @Override
     @Transactional
@@ -202,8 +210,8 @@ public class DataInitializer implements CommandLineRunner {
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private void seedAdminUser() {
-        final String adminEmail = "prasannapradeepkumara90@gmail.com";
-        final String adminPassword = "ytfv bafc osjp qcvs"; // same as spring.mail.password
+        final String adminEmail = aEmail;
+        final String adminPassword = aPassword;
 
         if (userRepository.existsByEmail(adminEmail)) {
             User existing = userRepository.findByEmail(adminEmail).get();

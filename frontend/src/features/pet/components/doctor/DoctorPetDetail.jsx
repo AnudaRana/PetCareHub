@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getImageUrl } from '../../../../services/petService';
 import { getTreatmentsByPetId, createTreatment } from '../../../../services/medicalApi';
+import { getVaccinationsByPetId, addVaccinationToPet } from '../../../../services/vaccinationApi';
 import { useAuth } from '../../../auth/contexts/AuthContext';
 import '../../../../styles/PetDetail.css';
 import '../../../../styles/medical.css';
@@ -30,16 +31,36 @@ const INITIAL_RECORD_FORM = {
     physicalObservation: '',
 };
 
+const INITIAL_VACCINE_FORM = {
+    vaccinationDate: '',
+    vaccinationName: '',
+    dose: '',
+    description: '',
+    doctorName: '',
+    doctorId: '',
+    dueDate: '',
+};
+
 const DoctorPetDetail = ({ pet, onClose }) => {
     const { user } = useAuth();
     const navigate = useNavigate();
+
+    // Treatment Record States
     const [showRecordModal, setShowRecordModal] = useState(false);
     const [recordForm, setRecordForm] = useState(INITIAL_RECORD_FORM);
     const [recordError, setRecordError] = useState('');
     const [recordSuccess, setRecordSuccess] = useState(false);
+
+    // Vaccination Record States
+    const [showVaccineModal, setShowVaccineModal] = useState(false);
+    const [vaccineForm, setVaccineForm] = useState(INITIAL_VACCINE_FORM);
+    const [vaccineError, setVaccineError] = useState('');
+    const [vaccineSuccess, setVaccineSuccess] = useState(false);
+
     const [submitting, setSubmitting] = useState(false);
-    
+
     const [treatments, setTreatments] = useState([]);
+    const [vaccinations, setVaccinations] = useState([]);
     const [loadingHistory, setLoadingHistory] = useState(false);
 
     useEffect(() => {
@@ -51,8 +72,12 @@ const DoctorPetDetail = ({ pet, onClose }) => {
     const fetchHistory = async () => {
         try {
             setLoadingHistory(true);
-            const data = await getTreatmentsByPetId(pet.petId);
-            setTreatments(data || []);
+            const [treatData, vacData] = await Promise.all([
+                getTreatmentsByPetId(pet.petId),
+                getVaccinationsByPetId(pet.petId)
+            ]);
+            setTreatments(treatData || []);
+            setVaccinations(vacData || []);
         } catch (err) {
             console.error('Failed to load history:', err);
         } finally {
@@ -86,6 +111,31 @@ const DoctorPetDetail = ({ pet, onClose }) => {
         const { name, value } = e.target;
         setRecordForm((prev) => ({ ...prev, [name]: value }));
         setRecordError('');
+    };
+
+    const openVaccineModal = () => {
+        setVaccineForm({
+            ...INITIAL_VACCINE_FORM,
+            doctorName: user?.fullName || '',
+            doctorId: `VET-${user?.userId || ''}`,
+            vaccinationDate: new Date().toISOString().split('T')[0]
+        });
+        setVaccineError('');
+        setVaccineSuccess(false);
+        setShowVaccineModal(true);
+    };
+
+    const closeVaccineModal = () => {
+        setShowVaccineModal(false);
+        setVaccineForm(INITIAL_VACCINE_FORM);
+        setVaccineError('');
+        setVaccineSuccess(false);
+    };
+
+    const handleVaccineChange = (e) => {
+        const { name, value } = e.target;
+        setVaccineForm((prev) => ({ ...prev, [name]: value }));
+        setVaccineError('');
     };
 
     const submitRecord = async (e) => {
@@ -124,6 +174,46 @@ const DoctorPetDetail = ({ pet, onClose }) => {
         }
     };
 
+    const submitVaccine = async (e) => {
+        e.preventDefault();
+        if (!vaccineForm.vaccinationDate) {
+            setVaccineError('Vaccination date is required.');
+            return;
+        }
+        if (!vaccineForm.vaccinationName.trim()) {
+            setVaccineError('Vaccine name is required.');
+            return;
+        }
+        if (!vaccineForm.dose.trim()) {
+            setVaccineError('Dose information is required.');
+            return;
+        }
+
+        setSubmitting(true);
+        setVaccineError('');
+
+        try {
+            await addVaccinationToPet(
+                pet.petId,
+                {
+                    vaccinationDate: vaccineForm.vaccinationDate,
+                    vaccinationName: vaccineForm.vaccinationName,
+                    dose: vaccineForm.dose,
+                    description: vaccineForm.description,
+                    doctorName: vaccineForm.doctorName,
+                    doctorId: vaccineForm.doctorId,
+                    dueDate: vaccineForm.dueDate || null,
+                }
+            );
+            setVaccineSuccess(true);
+            fetchHistory();
+        } catch (err) {
+            setVaccineError(err.response?.data?.message || 'Failed to save vaccine. Please try again.');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
     return (
         <div className="pet-detail-overlay" onClick={onClose} role="dialog" aria-modal="true">
             <div className="pet-detail-panel doc-pet-detail-panel" onClick={e => e.stopPropagation()}>
@@ -135,9 +225,6 @@ const DoctorPetDetail = ({ pet, onClose }) => {
                             <span className="placeholder-icon">🐾</span>
                         </div>
                     )}
-                    <div className="doc-sidebar-role-badge" style={{ position: 'absolute', top: '20px', left: '20px', margin: 0, background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)' }}>
-                        READ-ONLY ACCESS
-                    </div>
                     <button className="pet-detail-back-btn" onClick={onClose} aria-label="Close">✕</button>
                 </header>
 
@@ -187,48 +274,67 @@ const DoctorPetDetail = ({ pet, onClose }) => {
                     </div>
 
                     <div className="doc-medical-section">
-                        <div className="doc-medical-title">
-                            <span>📋</span> LATEST CLINICAL RECORD
-                        </div>
-                        {loadingHistory ? (
-                            <div className="doc-medical-loading">Accessing clinic database...</div>
-                        ) : treatments.length === 0 ? (
-                            <div className="doc-medical-empty">
-                                <span>🩺</span>
-                                <p>No records found.</p>
-                                <small>Add a new treatment record to track health status.</small>
-                            </div>
-                        ) : (
-                            <div className="doc-treatment-list">
-                                {(() => {
-                                    const latest = [...treatments].sort((a,b) => new Date(b.treatmentDate) - new Date(a.treatmentDate))[0];
-                                    return (
-                                        <div className="doc-treatment-item">
-                                            <div className="doc-treatment-meta">
-                                                <span className="doc-treatment-date">{new Date(latest.treatmentDate).toLocaleDateString('en-GB')}</span>
-                                                <span className="doc-treatment-doc">Dr. {latest.doctorName}</span>
-                                            </div>
-                                            <div className="doc-treatment-main">
-                                                <strong>{latest.diagnosis}</strong>
-                                                <p>{latest.treatmentNotes}</p>
-                                            </div>
+                        <div className="doc-medical-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                            <div className="doc-medical-column">
+                                <div className="doc-medical-title">
+                                    <span>📋</span> LATEST CLINICAL ENTRY
+                                </div>
+                                {loadingHistory ? (
+                                    <div className="doc-medical-loading">Syncing...</div>
+                                ) : treatments.length === 0 ? (
+                                    <div className="doc-medical-empty">
+                                        <span>🩺</span>
+                                        <p>No treatment records found.</p>
+                                    </div>
+                                ) : (
+                                    <div className="doc-treatment-item">
+                                        <div className="doc-treatment-meta">
+                                            <span className="doc-treatment-date">{new Date([...treatments].sort((a, b) => new Date(b.treatmentDate) - new Date(a.treatmentDate))[0].treatmentDate).toLocaleDateString('en-GB')}</span>
                                         </div>
-                                    );
-                                })()}
-                                <button 
-                                    className="btn btn-dark-blue"
-                                    onClick={() => navigate('/dashboard/pet-medical-record', { state: { pet } })}
-                                    style={{ width: '100%', marginTop: '8px', padding: '12px' }}
-                                >
-                                    📊 Expand Medical History
-                                </button>
+                                        <div className="doc-treatment-main">
+                                            <strong>{[...treatments].sort((a, b) => new Date(b.treatmentDate) - new Date(a.treatmentDate))[0].diagnosis}</strong>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                        )}
+
+                            <div className="doc-medical-column">
+                                <div className="doc-medical-title">
+                                    <span>💉</span> LATEST VACCINATION
+                                </div>
+                                {loadingHistory ? (
+                                    <div className="doc-medical-loading">Syncing...</div>
+                                ) : vaccinations.length === 0 ? (
+                                    <div className="doc-medical-empty">
+                                        <span>💉</span>
+                                        <p>No vaccine records found.</p>
+                                    </div>
+                                ) : (
+                                    <div className="doc-treatment-item">
+                                        <div className="doc-treatment-meta">
+                                            <span className="doc-treatment-date">{new Date([...vaccinations].sort((a, b) => new Date(b.vaccinationDate) - new Date(a.vaccinationDate))[0].vaccinationDate).toLocaleDateString('en-GB')}</span>
+                                        </div>
+                                        <div className="doc-treatment-main">
+                                            <strong>{[...vaccinations].sort((a, b) => new Date(b.vaccinationDate) - new Date(a.vaccinationDate))[0].vaccinationName}</strong>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <button
+                            className="btn btn-dark-blue"
+                            onClick={() => navigate('/dashboard/pet-medical-record', { state: { pet } })}
+                            style={{ width: '100%', marginTop: '16px', padding: '12px' }}
+                        >
+                            📊 Access Comprehensive Medical Vault
+                        </button>
                     </div>
 
-                    <div className="pet-detail-actions">
+                    <div className="pet-detail-actions" style={{ gap: '10px' }}>
                         <button className="btn btn-white" onClick={onClose} style={{ flex: 1 }}>Close</button>
                         <button className="btn btn-teal" onClick={openRecordModal} style={{ flex: 1.5 }}>+ Add Diagnosis</button>
+                        <button className="btn btn-teal" onClick={openVaccineModal} style={{ flex: 1.5 }}>+ Add Vaccine</button>
                     </div>
 
                     <p className="pet-detail-registered">
@@ -280,6 +386,59 @@ const DoctorPetDetail = ({ pet, onClose }) => {
                                     <div style={{ display: 'flex', gap: '12px' }}>
                                         <button type="button" className="btn btn-white" onClick={closeRecordModal} style={{ flex: 1 }}>Discard</button>
                                         <button type="submit" className="btn btn-teal" disabled={submitting} style={{ flex: 2 }}>{submitting ? 'Archiving...' : '🔒 Save Clinical Record'}</button>
+                                    </div>
+                                </form>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showVaccineModal && (
+                <div className="modal-overlay" onClick={closeVaccineModal}>
+                    <div className="modal-container" style={{ maxWidth: '600px' }} onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2 style={{ color: '#6366f1' }}>Add Vaccination Record</h2>
+                            <button className="close-btn" onClick={closeVaccineModal} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+                        </div>
+                        <div className="modal-body" style={{ padding: '24px' }}>
+                            {vaccineSuccess ? (
+                                <div style={{ textAlign: 'center', padding: '20px' }}>
+                                    <div style={{ fontSize: '3rem', marginBottom: '16px' }}>💉</div>
+                                    <h3>Vaccination Logged</h3>
+                                    <p style={{ color: 'var(--color-text-light)', marginBottom: '24px' }}>Immunization record for <strong>{pet.name}</strong> was saved.</p>
+                                    <button className="btn btn-teal" onClick={closeVaccineModal}>Return to Profile</button>
+                                </div>
+                            ) : (
+                                <form className="premium-form" onSubmit={submitVaccine}>
+                                    <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                                        <div className="form-group">
+                                            <label>Vaccination Date</label>
+                                            <input type="date" name="vaccinationDate" className="form-input" value={vaccineForm.vaccinationDate} onChange={handleVaccineChange} max={new Date().toISOString().split('T')[0]} />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Next Due Date</label>
+                                            <input type="date" name="dueDate" className="form-input" value={vaccineForm.dueDate} onChange={handleVaccineChange} min={new Date().toISOString().split('T')[0]} />
+                                        </div>
+                                    </div>
+                                    <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                                        <div className="form-group">
+                                            <label>Vaccine Name</label>
+                                            <input type="text" name="vaccinationName" className="form-input" value={vaccineForm.vaccinationName} onChange={handleVaccineChange} placeholder="e.g. Rabies" required />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Dosage</label>
+                                            <input type="text" name="dose" className="form-input" value={vaccineForm.dose} onChange={handleVaccineChange} placeholder="e.g. 1.0 ml" required />
+                                        </div>
+                                    </div>
+                                    <div className="form-group" style={{ marginBottom: '24px' }}>
+                                        <label>Administration Notes</label>
+                                        <textarea name="description" className="form-input" rows="3" value={vaccineForm.description} onChange={handleVaccineChange} placeholder="Observations, batch number, reaction..." />
+                                    </div>
+                                    {vaccineError && <div className="error-banner" style={{ marginBottom: '16px' }}>{vaccineError}</div>}
+                                    <div style={{ display: 'flex', gap: '12px' }}>
+                                        <button type="button" className="btn btn-white" onClick={closeVaccineModal} style={{ flex: 1 }}>Discard</button>
+                                        <button type="submit" className="btn btn-teal" disabled={submitting} style={{ flex: 2 }}>{submitting ? 'Archiving...' : '🔒 Save Vaccination'}</button>
                                     </div>
                                 </form>
                             )}

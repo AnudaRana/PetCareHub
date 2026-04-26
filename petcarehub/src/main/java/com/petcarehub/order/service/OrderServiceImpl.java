@@ -5,6 +5,7 @@ import com.petcarehub.order.dto.OrderItemDTO;
 import com.petcarehub.order.entity.Order;
 import com.petcarehub.order.entity.OrderItem;
 import com.petcarehub.order.entity.OrderStatus;
+import com.petcarehub.order.repository.ViewOrderItemRepository;
 import com.petcarehub.order.repository.ViewOrderRepository;
 import com.petcarehub.pet.entity.Pet;
 import com.petcarehub.pet.repository.PetRepository;
@@ -27,6 +28,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private ViewOrderRepository viewOrderRepository;
+
+    @Autowired
+    private ViewOrderItemRepository orderItemRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -170,5 +174,10 @@ public class OrderServiceImpl implements OrderService {
                         .lineTotal(item.getLineTotal())
                         .build()).collect(Collectors.toList()))
                 .build();
+    }
+
+    @Override
+    public boolean hasPurchasedProduct(Long userId, Long productId) {
+        return orderItemRepository.hasPurchasedProduct(userId, productId);
     }
 }

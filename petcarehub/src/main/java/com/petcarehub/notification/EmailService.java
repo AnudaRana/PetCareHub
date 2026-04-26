@@ -38,7 +38,7 @@ public class EmailService {
     public void sendVaccinationReminder(String to, String petName, String vaccinationName, LocalDate dueDate) {
         String subject = "Upcoming Vaccination Reminder - PetCareHub";
         String body = "Hello,\n\n" +
-                "Your pet " + petName + " has a vaccination due on " + dueDate + ".\n" +
+                "Your pet " + petName + " has a " + vaccinationName + " vaccination due on " + dueDate + ".\n" +
                 "Please book a vaccination appointment with your veterinarian in advance.\n\n" +
                 "Thank you,\n" +
                 "PetCareHub Team";

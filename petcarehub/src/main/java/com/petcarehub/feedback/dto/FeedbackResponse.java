@@ -15,5 +15,10 @@ public class FeedbackResponse {
     private String appointmentType;
     private String appointmentDoctor;
     private String appointmentDate;
+    private Long productId;
+    private String productName;
+    private String staffReply;
+    private Boolean isVerified;
+    private String feedbackType;
     private Date createdDate;
 }

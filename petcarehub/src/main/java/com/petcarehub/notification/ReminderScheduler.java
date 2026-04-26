@@ -25,14 +25,14 @@ public class ReminderScheduler {
     private final EmailService emailService;
 
     public ReminderScheduler(AppointmentRepository appointmentRepository,
-                             VaccinationRecordRepository vaccinationRecordRepository,
-                             EmailService emailService) {
+            VaccinationRecordRepository vaccinationRecordRepository,
+            EmailService emailService) {
         this.appointmentRepository = appointmentRepository;
         this.vaccinationRecordRepository = vaccinationRecordRepository;
         this.emailService = emailService;
     }
 
-    @Scheduled(cron = "0 0 7 * * ?")
+    @Scheduled(cron = "0 30 9 * * ?")
     @Transactional
     public void sendDailyReminders() {
         log.info("Running daily reminder scheduler...");
@@ -49,19 +49,23 @@ public class ReminderScheduler {
         for (VaccinationRecord vaccination : dueVaccinations) {
             Pet pet = vaccination.getPet();
             if (pet == null || pet.getOwner() == null) {
-                log.warn("Skipping vaccination reminder because pet or owner is missing for record {}", vaccination.getId());
+                log.warn("Skipping vaccination reminder because pet or owner is missing for record {}",
+                        vaccination.getId());
                 continue;
             }
 
             User owner = pet.getOwner();
             if (owner.getEmail() == null || owner.getEmail().isBlank()) {
-                log.warn("Skipping vaccination reminder because owner email is missing for owner {}", owner.getUserId());
+                log.warn("Skipping vaccination reminder because owner email is missing for owner {}",
+                        owner.getUserId());
                 continue;
             }
 
-            emailService.sendVaccinationReminder(owner.getEmail(), pet.getName(), vaccination.getVaccinationName(), vaccination.getDueDate());
-            log.info("Sent vaccination reminder to {} for pet {} due on {}", owner.getEmail(), pet.getName(), vaccination.getDueDate());
-            
+            emailService.sendVaccinationReminder(owner.getEmail(), pet.getName(), vaccination.getVaccinationName(),
+                    vaccination.getDueDate());
+            log.info("Sent vaccination reminder to {} for pet {} due on {}", owner.getEmail(), pet.getName(),
+                    vaccination.getDueDate());
+
             vaccination.setReminderStatus("SENT");
             vaccinationRecordRepository.save(vaccination);
         }
@@ -83,13 +87,16 @@ public class ReminderScheduler {
 
             User owner = appointment.getOwner() != null ? appointment.getOwner() : appointment.getUser();
             if (owner == null || owner.getEmail() == null || owner.getEmail().isBlank()) {
-                log.warn("Skipping appointment reminder because owner email is missing for appointment {}", appointment.getId());
+                log.warn("Skipping appointment reminder because owner email is missing for appointment {}",
+                        appointment.getId());
                 continue;
             }
 
             String petName = appointment.getPet() != null ? appointment.getPet().getName() : "your pet";
-            emailService.sendAppointmentReminder(owner.getEmail(), petName, appointment.getAppointmentType(), appointment.getDate(), appointment.getTimeSlot());
-            log.info("Sent appointment reminder to {} for appointment {} on {}", owner.getEmail(), appointment.getId(), appointment.getDate());
+            emailService.sendAppointmentReminder(owner.getEmail(), petName, appointment.getAppointmentType(),
+                    appointment.getDate(), appointment.getTimeSlot());
+            log.info("Sent appointment reminder to {} for appointment {} on {}", owner.getEmail(), appointment.getId(),
+                    appointment.getDate());
         }
     }
 }

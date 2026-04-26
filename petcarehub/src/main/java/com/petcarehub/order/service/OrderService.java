@@ -13,4 +13,6 @@ public interface OrderService {
     
     // Test endpoint utility
     void generateDummyOrders();
+
+    boolean hasPurchasedProduct(Long userId, Long productId);
 }

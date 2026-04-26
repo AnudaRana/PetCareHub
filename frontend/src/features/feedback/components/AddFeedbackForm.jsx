@@ -1,8 +1,17 @@
 import React, { useState } from 'react';
 import { submitFeedback } from '../../../services/feedbackApi';
+import StarRating from './StarRating';
 import '../styles/AddFeedbackForm.css';
 
-const AddFeedbackForm = ({ appointment, onClose, onSubmitSuccess, ownerId }) => {
+const AddFeedbackForm = ({ 
+  appointment = null, 
+  product = null,
+  onClose, 
+  onSubmitSuccess, 
+  ownerId,
+  feedbackType = "APPOINTMENT",
+  isVerified = false
+}) => {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -32,8 +41,11 @@ const AddFeedbackForm = ({ appointment, onClose, onSubmitSuccess, ownerId }) => 
       const feedbackData = {
         rating,
         comment: comment.trim(),
-        appointmentId: appointment.id,
-        ownerId
+        ownerId,
+        feedbackType,
+        isVerified,
+        appointmentId: appointment?.id || null,
+        productId: product?.productId || null
       };
 
       await submitFeedback(feedbackData);
@@ -41,17 +53,23 @@ const AddFeedbackForm = ({ appointment, onClose, onSubmitSuccess, ownerId }) => 
       onClose();
     } catch (err) {
       console.error('Error submitting feedback:', err);
-      setError(err.response?.data?.message || 'Failed to submit feedback. Please try again.');
+      setError(err.response?.data || 'Failed to submit feedback. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+  const getTitle = () => {
+    if (feedbackType === "PRODUCT") return `Review ${product?.name}`;
+    if (feedbackType === "APPOINTMENT") return `Rate Appointment`;
+    return "Add a Review";
+  };
+
   return (
-    <div className="feedback-form-container">
-      <div className="feedback-form">
+    <div className="feedback-form-container" onClick={onClose}>
+      <div className="feedback-form" onClick={(e) => e.stopPropagation()}>
         <div className="feedback-form__header">
-          <h3>Add Feedback</h3>
+          <h3>{getTitle()}</h3>
           <button
             type="button"
             className="feedback-form__close"
@@ -63,34 +81,41 @@ const AddFeedbackForm = ({ appointment, onClose, onSubmitSuccess, ownerId }) => 
         </div>
 
         <form onSubmit={handleSubmit} className="feedback-form__body">
-          {/* Appointment Info */}
-          <div className="feedback-form__appointment-info">
-            <p><strong>Pet:</strong> {appointment.pet?.name || appointment.petName}</p>
-            <p><strong>Type:</strong> {appointment.appointmentType}</p>
-            <p><strong>Doctor:</strong> {appointment.doctor}</p>
-            <p><strong>Date:</strong> {appointment.date}</p>
-          </div>
+          {/* Context Info */}
+          {feedbackType === "APPOINTMENT" && appointment && (
+            <div className="feedback-form__appointment-info">
+              <p><strong>Pet:</strong> {appointment.pet?.name || appointment.petName}</p>
+              <p><strong>Type:</strong> {appointment.appointmentType}</p>
+              <p><strong>Doctor:</strong> {appointment.doctor}</p>
+              <p><strong>Date:</strong> {appointment.date}</p>
+            </div>
+          )}
+
+          {feedbackType === "PRODUCT" && product && (
+            <div className="feedback-form__appointment-info">
+              <p><strong>Product:</strong> {product.name}</p>
+              <p><strong>Category:</strong> {product.category}</p>
+            </div>
+          )}
 
           {/* Rating Section */}
           <div className="feedback-form__section">
             <label className="feedback-form__label">
               Rate Your Experience <span className="required">*</span>
+              {isVerified && <span className="verified-pill-inline ml-2">Verified</span>}
             </label>
-            <div className="feedback-form__stars">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  className={`star-button ${star <= (hoveredRating || rating) ? 'active' : ''}`}
-                  onClick={() => handleStarClick(star)}
-                  onMouseEnter={() => handleStarHover(star)}
-                  onMouseLeave={() => setHoveredRating(0)}
-                  aria-label={`Rate ${star} stars`}
-                >
-                  ★
-                </button>
-              ))}
-              {rating > 0 && <span className="rating-text">{rating} out of 5</span>}
+            <div className="rating-selector-group">
+                <StarRating rating={rating} editable={false} showText={true} />
+                <input 
+                    type="range" 
+                    min="1" 
+                    max="5" 
+                    step="0.25" 
+                    value={rating || 5} 
+                    onChange={(e) => setRating(parseFloat(e.target.value))}
+                    className="rating-slider"
+                />
+                <p className="slider-hint">Slide to adjust rating (supports quarter stars)</p>
             </div>
           </div>
 

@@ -14,6 +14,7 @@ import OrderDetails from './features/cart/pages/OrderDetails.jsx';
 import PaymentPage from './features/cart/pages/PaymentPage.jsx';
 import PaymentSuccess from './features/payment/pages/PaymentSuccess';
 import PaymentCancel from './features/payment/pages/PaymentCancel';
+import ReviewsPage from './features/feedback/pages/ReviewsPage';
 
 const Protected = ({ children }) => {
   const { token, loading } = useAuth();
@@ -65,6 +66,7 @@ const App = () => (
       />
       <Route path="/payment-success" element={<PaymentSuccess />} />
       <Route path="/payment-cancel" element={<PaymentCancel />} />
+      <Route path="/reviews" element={<ReviewsPage />} />
       <Route
         path="/dashboard/*"
         element={

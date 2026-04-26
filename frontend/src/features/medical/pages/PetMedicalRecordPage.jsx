@@ -25,7 +25,7 @@ const PetMedicalRecordPage = () => {
   const [successTitle, setSuccessTitle] = useState('');
   const [newTreatment, setNewTreatment] = useState({ date: '', diagnosis: '', notes: '', prescription: '', observation: '', doctorName: '', doctorId: '' });
   const [editingTreatmentId, setEditingTreatmentId] = useState(null);
-  
+
   const [isVaccinationModalOpen, setVaccinationModalOpen] = useState(false);
   const [newVaccination, setNewVaccination] = useState({ date: '', name: '', dose: '', description: '', doctorName: '', doctorId: '', dueDate: '' });
   const [editingVaccinationId, setEditingVaccinationId] = useState(null);
@@ -53,15 +53,15 @@ const PetMedicalRecordPage = () => {
         const apiTreatments = await getTreatmentsByPetId(pet.petId);
         const mappedTreatments = Array.isArray(apiTreatments)
           ? apiTreatments.map((t) => ({
-              id: t.id,
-              date: t.treatmentDate,
-              diagnosis: t.diagnosis || '',
-              notes: t.treatmentNotes || '',
-              prescription: t.prescriptions || '',
-              observation: t.physicalObservation || '',
-              doctorName: t.doctorName || '',
-              doctorId: t.doctorId || '',
-            }))
+            id: t.id,
+            date: t.treatmentDate,
+            diagnosis: t.diagnosis || '',
+            notes: t.treatmentNotes || '',
+            prescription: t.prescriptions || '',
+            observation: t.physicalObservation || '',
+            doctorName: t.doctorName || '',
+            doctorId: t.doctorId || '',
+          }))
           : [];
 
         const apiVaccinations = await getVaccinationsByPetId(pet.petId);
@@ -238,8 +238,8 @@ const PetMedicalRecordPage = () => {
             ) : treatments.length === 0 ? (
               <div className="empty-state" style={{ padding: '60px 20px' }}>
                 <span className="empty-state-icon">📋</span>
-                <h3>No medical history found</h3>
-                <p>This patient has no clinical treatment records registered in the system.</p>
+                <h3>No treatment records found</h3>
+                <p>This patient has no clinical treatment history registered in the system.</p>
               </div>
             ) : (
               <TreatmentList
@@ -280,10 +280,10 @@ const PetMedicalRecordPage = () => {
                 <p style={{ color: 'var(--color-text-light)', marginTop: '16px', fontWeight: 500 }}>Loading vaccination records...</p>
               </div>
             ) : (
-              <VaccinationList 
-                vaccinations={vaccinations} 
-                isDoctor={isDoctor} 
-                onEdit={handleEditVaccination} 
+              <VaccinationList
+                vaccinations={vaccinations}
+                isDoctor={isDoctor}
+                onEdit={handleEditVaccination}
               />
             )}
           </section>
@@ -372,7 +372,7 @@ const PetMedicalRecordPage = () => {
                   </label>
                 </div>
 
-                <label>Next Due Date <span style={{fontWeight: 'normal', color: 'var(--color-text-light)'}}>(for follow-up dosages)</span>
+                <label>Next Due Date <span style={{ fontWeight: 'normal', color: 'var(--color-text-light)' }}>(for follow-up dosages)</span>
                   <input type="date" value={newVaccination.dueDate} onChange={(e) => setNewVaccination({ ...newVaccination, dueDate: e.target.value })} />
                 </label>
 

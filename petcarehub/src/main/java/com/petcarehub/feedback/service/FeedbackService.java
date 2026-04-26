@@ -8,6 +8,9 @@ import com.petcarehub.feedback.entity.Feedback;
 import com.petcarehub.feedback.repository.FeedbackRepository;
 import com.petcarehub.user.entity.User;
 import com.petcarehub.user.repository.UserRepository;
+import com.petcarehub.order.repository.ViewOrderItemRepository;
+import com.petcarehub.product.entity.Product;
+import com.petcarehub.product.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,36 +24,75 @@ public class FeedbackService {
     private FeedbackRepository feedbackRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private AppointmentRepository appointmentRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private ViewOrderItemRepository orderItemRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     public FeedbackResponse submitFeedback(FeedbackRequest request) {
-        Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
-
-        if (!"COMPLETED".equalsIgnoreCase(appointment.getStatus())) {
-            throw new RuntimeException("Feedback can only be submitted for completed appointments.");
-        }
-
-        List<Feedback> existingFeedbacks = feedbackRepository.findByAppointment_Id(appointment.getId());
-        if (existingFeedbacks.size() >= 3) {
-            throw new RuntimeException("Maximum of 3 feedbacks allowed per appointment.");
-        }
-
         User owner = userRepository.findById(request.getOwnerId())
                 .orElseThrow(() -> new RuntimeException("Owner not found"));
 
-        Feedback feedback = Feedback.builder()
+        Feedback.FeedbackBuilder feedbackBuilder = Feedback.builder()
                 .rating(request.getRating())
                 .comment(request.getComment())
                 .owner(owner)
-                .appointment(appointment)
-                .build();
+                .feedbackType(request.getFeedbackType() != null ? request.getFeedbackType() : "GENERAL")
+                .isVerified(request.getIsVerified() != null ? request.getIsVerified() : false);
 
-        Feedback savedFeedback = feedbackRepository.save(feedback);
+        if ("APPOINTMENT".equalsIgnoreCase(request.getFeedbackType()) && request.getAppointmentId() != null) {
+            Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
+                    .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+            if (!"COMPLETED".equalsIgnoreCase(appointment.getStatus())) {
+                throw new RuntimeException("Feedback can only be submitted for completed appointments.");
+            }
+
+            List<Feedback> existingFeedbacks = feedbackRepository.findByAppointment_Id(appointment.getId());
+            if (existingFeedbacks.size() >= 3) {
+                throw new RuntimeException("Maximum of 3 feedbacks allowed per appointment.");
+            }
+            feedbackBuilder.appointment(appointment);
+        } else if ("PRODUCT".equalsIgnoreCase(request.getFeedbackType()) && request.getProductId() != null) {
+            // Verify purchase
+            boolean hasPurchased = orderItemRepository.hasPurchasedProduct(request.getOwnerId(), request.getProductId());
+            if (!hasPurchased) {
+                throw new RuntimeException("You must purchase the product before reviewing it.");
+            }
+            feedbackBuilder.productId(request.getProductId());
+        }
+
+        Feedback savedFeedback = feedbackRepository.save(feedbackBuilder.build());
         return mapToResponse(savedFeedback);
+    }
+
+    public FeedbackResponse addStaffReply(Long feedbackId, String reply) {
+        Feedback feedback = feedbackRepository.findById(feedbackId)
+                .orElseThrow(() -> new RuntimeException("Feedback not found"));
+        feedback.setStaffReply(reply);
+        return mapToResponse(feedbackRepository.save(feedback));
+    }
+
+    public List<FeedbackResponse> getPublicFeedbacks() {
+        return feedbackRepository.findAllByOrderByCreatedDateDesc()
+                .stream()
+                .filter(f -> !"PRODUCT".equalsIgnoreCase(f.getFeedbackType())) // Don't show product store reviews in public testimonials
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<FeedbackResponse> getFeedbacksByProduct(Long productId) {
+        return feedbackRepository.findAllByOrderByCreatedDateDesc()
+                .stream()
+                .filter(f -> productId.equals(f.getProductId()))
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     public List<FeedbackResponse> getAllFeedbacks() {
@@ -90,6 +132,16 @@ public class FeedbackService {
         }
         
         response.setCreatedDate(feedback.getCreatedDate());
+        response.setStaffReply(feedback.getStaffReply());
+        response.setIsVerified(feedback.getIsVerified());
+        response.setFeedbackType(feedback.getFeedbackType());
+        response.setProductId(feedback.getProductId());
+
+        if (feedback.getProductId() != null) {
+            productRepository.findById(feedback.getProductId()).ifPresent(p -> {
+                response.setProductName(p.getName());
+            });
+        }
         return response;
     }
 }

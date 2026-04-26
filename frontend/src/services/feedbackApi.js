@@ -46,3 +46,32 @@ export const getFeedbackById = async (id) => {
         throw error;
     }
 };
+
+export const addStaffReply = async (id, reply) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/${id}/reply`, reply, { 
+            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' } 
+        });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getPublicFeedbacks = async () => {
+    try {
+        const response = await axios.get(`${BASE_URL}/public`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getFeedbacksByProduct = async (productId) => {
+    try {
+        const response = await axios.get(`${BASE_URL}/product/${productId}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};

@@ -45,4 +45,24 @@ public class FeedbackController {
     public ResponseEntity<FeedbackResponse> getFeedbackById(@PathVariable Long id) {
         return ResponseEntity.ok(feedbackService.getFeedbackById(id));
     }
+
+    @PostMapping("/{id}/reply")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<FeedbackResponse> addStaffReply(@PathVariable Long id, @RequestBody String reply) {
+        // Remove quotes if passed as JSON string
+        if (reply.startsWith("\"") && reply.endsWith("\"")) {
+            reply = reply.substring(1, reply.length() - 1);
+        }
+        return ResponseEntity.ok(feedbackService.addStaffReply(id, reply));
+    }
+
+    @GetMapping("/public")
+    public ResponseEntity<List<FeedbackResponse>> getPublicFeedbacks() {
+        return ResponseEntity.ok(feedbackService.getPublicFeedbacks());
+    }
+
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<List<FeedbackResponse>> getFeedbacksByProduct(@PathVariable Long productId) {
+        return ResponseEntity.ok(feedbackService.getFeedbacksByProduct(productId));
+    }
 }

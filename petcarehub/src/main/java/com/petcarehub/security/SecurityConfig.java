@@ -39,7 +39,9 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/uploads/**",
                                 "/error",
-                                "/api/payments/**"
+                                "/api/payments/**",
+                                "/api/feedbacks/public",
+                                "/api/feedbacks/product/**"
                         ).permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products/*/image").permitAll()

@@ -46,3 +46,9 @@ export const generateDummyOrders = async () => {
         headers: getAuthHeaders()
     });
 };
+export const checkPurchase = async (userId, productId) => {
+    const res = await axios.get(`/api/orders/check-purchase?userId=${userId}&productId=${productId}`, {
+        headers: getAuthHeaders()
+    });
+    return res.data;
+};

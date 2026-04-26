@@ -1,121 +1,134 @@
-import React, {useRef, useState} from 'react'
+import React, { useRef, useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { getPublicFeedbacks } from '../../../../services/feedbackApi'
 import './Testimonials.css'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import User1 from '../../../../assets/user1.jpg';
-import User2 from '../../../../assets/user2.jpg';
-import User3 from '../../../../assets/user3.jpg';
-import User4 from '../../../../assets/user4.jpg';
-import StarIcon from '@mui/icons-material/Star';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
+import StarRating from '../../../feedback/components/StarRating';
 
 const Testimonials = () => {
+    const [feedbacks, setFeedbacks] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const slider = useRef();
+    const [currentIndex, setCurrentIndex] = useState(0);
 
-    const slider  = useRef();
-    let tx = 0;
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                const data = await getPublicFeedbacks();
+                // Cap at 10 reviews for the home page slider
+                setFeedbacks(data.slice(0, 10)); 
+            } catch (err) {
+                console.error("Failed to fetch testimonials", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchReviews();
+    }, []);
+
+    const itemsPerView = 2;
+    const maxIndex = Math.max(0, feedbacks.length - itemsPerView);
 
     const slideForward = () => {
-        if(tx > -50){
-            tx -= 25;
-        } 
-        slider.current.style.transform = `translateX(${tx}%)`;
+        if (currentIndex < maxIndex) {
+            const nextIndex = currentIndex + 1;
+            setCurrentIndex(nextIndex);
+            // Move by one parent width (which contains itemsPerView items)
+            // Each parent width is (100 / totalParentWidths) percent of the UL
+            const totalParentWidths = Math.ceil(feedbacks.length / itemsPerView);
+            slider.current.style.transform = `translateX(-${nextIndex * (100 / totalParentWidths / itemsPerView)}%)`;
+        }
     }
 
     const slideBackward = () => {
-        if(tx < 0){
-            tx += 25;
+        if (currentIndex > 0) {
+            const nextIndex = currentIndex - 1;
+            setCurrentIndex(nextIndex);
+            const totalParentWidths = Math.ceil(feedbacks.length / itemsPerView);
+            slider.current.style.transform = `translateX(-${nextIndex * (100 / totalParentWidths / itemsPerView)}%)`;
         }
-        slider.current.style.transform = `translateX(${tx}%)`;
     }
 
-    const renderStars = (rating) => {
-        return [...Array(5)].map((_, index) =>
-            index < rating ? (
-            <StarIcon key={index} className="star filled" />
-            ) : (
-            <StarBorderIcon key={index} className="star" />
-            )
+    if (loading) return <div className="testimonials-loading">Loading Testimonials...</div>;
+
+    if (feedbacks.length === 0) {
+        return (
+            <div className="testimonials empty">
+                
+                <p className="no-reviews-msg">No reviews yet. Be the first to share your experience!</p>
+                <div className="view-more-container">
+                    <Link to="/reviews" className="view-more-link">
+                        Write a Review <ArrowForwardIcon style={{ fontSize: '18px', marginLeft: '5px' }} />
+                    </Link>
+                </div>
+            </div>
         );
-    };
+    }
 
     return (
-    <div className="testimonials">
-        <h1 className="container-title"> Testimonials</h1>
-        <ArrowBackIcon className='prev-btn' onClick={slideBackward}/>
-        <ArrowForwardIcon className='next-btn' onClick={slideForward} />
-        <div className="slider">
-            <ul ref={slider}>
-                <li>
-                    <div className="slide">
-                        <div className="user-info">
-                            <img src={User1} alt="User 1"/>
-                            <div>
-                                <h3>Piyal Rathnapala</h3>
-                                <span>Pugoda</span><br/>
-                                <span>Pet: Rocky (3 years old Labrador)</span>
-                            </div>
-                        </div>
-                        <div className="rating">
-                            {renderStars(5)}
-                        </div>
-                        <p>Dr. Prasanna and his team saved my Rocky when he had a serious infection. They stayed late to treat him and monitored him 9pm, way past closing time. That's dedication I've never seen before. Forever grateful.</p>
-                    </div>
-                </li>
+        <div className="testimonials">
+            
+            
+            {feedbacks.length > 2 && (
+                <>
+                    <ArrowBackIcon className={`prev-btn ${currentIndex === 0 ? 'disabled' : ''}`} onClick={slideBackward} />
+                    <ArrowForwardIcon className={`next-btn ${currentIndex >= maxIndex ? 'disabled' : ''}`} onClick={slideForward} />
+                </>
+            )}
 
-                <li>
-                    <div className="slide">
-                        <div className="user-info">
-                            <img src={User2} alt="User 2"/>
-                            <div>
-                                <h3>Nimali Perera</h3>
-                                <span>Kosgama</span><br/>
-                                <span>Pet: Bella (8 yr old Persian Cat)</span>
-                            </div>
-                        </div>
-                        <div className="rating">
-                            {renderStars(5)}
-                        </div>
-                        <p>I was so nervous bringing my senior cat for dental surgery. Dr. Sanjeewani explained everything patiently and a staff member even called the next day to check on Bella. The facility is clean and the staff truly cares. Will definitely return.</p>
-                    </div>
-                </li>
+            <div className="slider">
+                <ul ref={slider} style={{ width: `${Math.ceil(feedbacks.length / 2) * 100}%` }}>
+                    {feedbacks.map((review) => (
+                        <li key={review.id} style={{ width: `${100 / (Math.ceil(feedbacks.length / 2) * 2)}%` }}>
+                            <div className="slide">
+                                <div className="user-info">
+                                    <div className="user-avatar-mini">
+                                        {review.ownerName?.charAt(0) || 'U'}
+                                    </div>
+                                    <div>
+                                        <h3>{review.ownerName}</h3>
+                                        <span>{new Date(review.createdDate).toLocaleDateString()}</span><br />
+                                        {review.feedbackType === 'PRODUCT' && (
+                                            <span className="review-context-tag">Product: {review.productName}</span>
+                                        )}
+                                        {review.feedbackType === 'APPOINTMENT' && (
+                                            <span className="review-context-tag">Service: {review.appointmentType}</span>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="rating">
+                                    <StarRating rating={review.rating} showText={true} />
+                                </div>
+                                <p className="testimonial-comment">"{review.comment}"</p>
+                                
+                                {review.comment && review.comment.length > 120 && (
+                                    <Link 
+                                        className="testimonial-read-more" 
+                                        to={`/reviews#feedback-${review.id}`}
+                                    >
+                                        Read More
+                                    </Link>
+                                )}
 
-                <li>
-                    <div className="slide">
-                        <div className="user-info">
-                            <img src={User3} alt="User 3"/>
-                            <div>
-                                <h3>Ruwan Jayasinghe</h3>
-                                <span>Avissawella</span><br/>
-                                <span>Pet: Max (German Shepherd)</span>
+                                {review.staffReply && (
+                                    <div className="testimonial-reply">
+                                        <strong>Reply:</strong> <span className="reply-preview">{review.staffReply}</span>
+                                    </div>
+                                )}
                             </div>
-                        </div>
-                        <div className="rating">
-                            {renderStars(5)}
-                        </div>
-                        <p>After three other vets couldn't figure out what was wrong with Max, Dr. Prasanna diagnosed his condition in minutes. Reasonably priced and genuinely passionate about animals.</p>
-                    </div>    
-                </li>
+                        </li>
+                    ))}
+                </ul>
+            </div>
 
-                <li>
-                    <div className="slide">
-                        <div className="user-info">
-                            <img src={User4} alt="User 4"/>
-                            <div>
-                                <h3>Dilini Weerasinghe</h3>
-                                <span>Hanwella</span><br/>
-                                <span>Pet: Cookie (Rabbit) & Mithu (Parrot)</span>
-                            </div>
-                        </div>
-                        <div className="rating">
-                            {renderStars(5)}
-                        </div>
-                        <p>Not many vets treat exotic pets, but Pugoda Animal Hospital handled both my rabbit and parrot with expertise. They're gentle and knowledgeable. So happy to have found them!</p>
-                    </div>               
-                </li>
-            </ul>
+            <div className="view-more-container">
+                <Link to="/reviews" className="view-more-link">
+                    View All Reviews <ArrowForwardIcon style={{ fontSize: '18px', marginLeft: '5px' }} />
+                </Link>
+            </div>
         </div>
-    </div>
     )
-    }
+}
 
-export default Testimonials
+export default Testimonials;

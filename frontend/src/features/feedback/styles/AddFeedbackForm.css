@@ -182,3 +182,44 @@
   padding: 0.75rem 1.5rem;
   font-size: 0.95rem;
 }
+
+.verified-pill-inline {
+  margin-left: 10px;
+  background-color: #dcfce7;
+  color: #166534;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 99px;
+  text-transform: uppercase;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.rating-selector-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.rating-slider {
+    width: 100%;
+    accent-color: #2dd4bf;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+}
+
+.slider-hint {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin: 0;
+    font-style: italic;
+}
+
+.ml-2 { margin-left: 0.5rem; }

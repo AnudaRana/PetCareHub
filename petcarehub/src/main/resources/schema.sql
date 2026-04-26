@@ -209,3 +209,23 @@ CREATE TABLE IF NOT EXISTS order_cancellations (
     PRIMARY KEY (cancellation_id),
     CONSTRAINT fk_cancellation_order FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- ============================================================
+-- FEEDBACKS
+-- ============================================================
+CREATE TABLE IF NOT EXISTS feedbacks (
+    id             BIGINT          NOT NULL AUTO_INCREMENT,
+    rating         INT             NOT NULL,
+    comment        VARCHAR(2000),
+    feedback_type  VARCHAR(50)     NOT NULL DEFAULT 'GENERAL',
+    is_verified    BIT(1)          NOT NULL DEFAULT b'0',
+    owner_id       BIGINT          NOT NULL,
+    appointment_id BIGINT          NULL,
+    product_id     BIGINT          NULL,
+    staff_reply    VARCHAR(2000),
+    created_date   DATETIME        DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_feedbacks_owner FOREIGN KEY (owner_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Ensure appointment_id is nullable if table already exists
+ALTER TABLE feedbacks MODIFY COLUMN appointment_id BIGINT NULL;

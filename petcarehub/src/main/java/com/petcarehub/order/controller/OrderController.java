@@ -52,4 +52,9 @@ public class OrderController {
         orderService.generateDummyOrders();
         return ResponseEntity.ok("Dummy orders generated successfully.");
     }
+
+    @GetMapping("/check-purchase")
+    public ResponseEntity<Boolean> hasPurchasedProduct(@RequestParam Long userId, @RequestParam Long productId) {
+        return ResponseEntity.ok(orderService.hasPurchasedProduct(userId, productId));
+    }
 }
