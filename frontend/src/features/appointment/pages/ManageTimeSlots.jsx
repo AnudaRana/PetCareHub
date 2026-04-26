@@ -4,18 +4,36 @@ import {
   getMySlots,
   addSlot,
   updateSlot,
-  deleteSlot,
 } from '../../../services/timeSlotService';
 import '../styles/ManageTimeSlots.css';
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Fixed slot definitions
+   Operations  : 9:00 AM – 12:00 PM  (1 hr / slot)
+   Vaccinations: 12:00 PM – 1:00 PM  (15 min / slot)
+───────────────────────────────────────────────────────────────────────── */
+
+const DEFAULT_SLOTS = [
+  { timeSlot: '09:00 AM', label: 'Operation Slot 1' },
+  { timeSlot: '10:00 AM', label: 'Operation Slot 2' },
+  { timeSlot: '11:00 AM', label: 'Operation Slot 3' },
+  { timeSlot: '12:00 PM', label: 'Vaccination Slot 1' },
+  { timeSlot: '12:15 PM', label: 'Vaccination Slot 2' },
+  { timeSlot: '12:30 PM', label: 'Vaccination Slot 3' },
+  { timeSlot: '12:45 PM', label: 'Vaccination Slot 4' },
+];
+
+/** Categorise a slot by its label prefix */
+const getCategory = (label = '') => {
+  if (label.startsWith('Operation'))  return 'operation';
+  if (label.startsWith('Vaccination')) return 'vaccination';
+  return 'other';
+};
 
 /* ─────────────────────────────────────────────────────────────────────────
    Helpers
 ───────────────────────────────────────────────────────────────────────── */
 
-/**
- * Convert a native <input type="time"> value ("HH:mm") to the display
- * format used throughout the app ("09:00 AM" / "02:30 PM").
- */
 const toDisplayTime = (hhmm) => {
   if (!hhmm) return '';
   const [hStr, mStr] = hhmm.split(':');
@@ -27,9 +45,6 @@ const toDisplayTime = (hhmm) => {
   return `${String(h).padStart(2, '0')}:${m} ${modifier}`;
 };
 
-/**
- * Convert a display time ("09:00 AM") back to "HH:mm" for the time input.
- */
 const toInputTime = (display) => {
   if (!display) return '';
   const [timePart, modifier] = display.trim().split(' ');
@@ -47,29 +62,21 @@ const toInputTime = (display) => {
 /** Inline edit form shown inside a slot card */
 const SlotEditForm = ({ slot, onSave, onCancel, saving }) => {
   const [timeValue, setTimeValue] = useState(toInputTime(slot.timeSlot));
-  const [labelValue, setLabelValue] = useState(slot.label || '');
 
   const handleSave = () => {
     const display = toDisplayTime(timeValue);
     if (!display) return;
-    onSave(slot.id, { timeSlot: display, label: labelValue });
+    onSave(slot.id, { timeSlot: display, label: slot.label });
   };
 
   return (
     <div className="mts-edit-form">
+      <div className="mts-edit-form-label">Update time for "{slot.label}"</div>
       <input
         id={`edit-time-${slot.id}`}
         type="time"
         value={timeValue}
         onChange={(e) => setTimeValue(e.target.value)}
-        disabled={saving}
-      />
-      <input
-        id={`edit-label-${slot.id}`}
-        type="text"
-        placeholder="Label (optional)"
-        value={labelValue}
-        onChange={(e) => setLabelValue(e.target.value)}
         disabled={saving}
       />
       <div className="mts-edit-actions">
@@ -95,13 +102,12 @@ const SlotEditForm = ({ slot, onSave, onCancel, saving }) => {
 };
 
 /** A single slot card */
-const SlotCard = ({ slot, onEdit, onDelete, deletingId, editingId, onSave, onCancelEdit, savingId }) => {
-  const isEditing  = editingId === slot.id;
-  const isDeleting = deletingId === slot.id;
-  const isSaving   = savingId === slot.id;
+const SlotCard = ({ slot, category, onEdit, editingId, onSave, onCancelEdit, savingId }) => {
+  const isEditing = editingId === slot.id;
+  const isSaving  = savingId  === slot.id;
 
   return (
-    <div className="mts-slot-card">
+    <div className={`mts-slot-card mts-slot-card--${category}`}>
       {isEditing ? (
         <SlotEditForm
           slot={slot}
@@ -112,28 +118,25 @@ const SlotCard = ({ slot, onEdit, onDelete, deletingId, editingId, onSave, onCan
       ) : (
         <>
           <div className="mts-slot-time">
-            <span className="mts-slot-time-icon">🕐</span>
-            {slot.timeSlot}
+            <span className="mts-slot-time-icon">
+              {category === 'operation' ? '🔪' : '💉'}
+            </span>
+            <span className="mts-slot-time-text">{slot.timeSlot}</span>
           </div>
-          {slot.label && (
-            <div className="mts-slot-label">{slot.label}</div>
-          )}
+
+          <div className="mts-slot-label">{slot.label}</div>
+
+          <div className="mts-slot-duration-tag">
+            {category === 'operation' ? '1 hr · Operation' : '15 min · Vaccination'}
+          </div>
+
           <div className="mts-slot-actions">
             <button
               className="mts-btn-edit"
               onClick={() => onEdit(slot.id)}
               type="button"
-              disabled={isDeleting}
             >
-              Edit
-            </button>
-            <button
-              className="mts-btn-danger"
-              onClick={() => onDelete(slot.id)}
-              type="button"
-              disabled={isDeleting}
-            >
-              {isDeleting ? 'Removing…' : 'Remove'}
+              ✏️ Edit Time
             </button>
           </div>
         </>
@@ -141,6 +144,38 @@ const SlotCard = ({ slot, onEdit, onDelete, deletingId, editingId, onSave, onCan
     </div>
   );
 };
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Section component
+───────────────────────────────────────────────────────────────────────── */
+
+const SlotSection = ({ title, subtitle, icon, category, slots, editingId, savingId, onEdit, onSave, onCancelEdit }) => (
+  <div className={`mts-section mts-section--${category}`}>
+    <div className="mts-section-header">
+      <div className="mts-section-icon">{icon}</div>
+      <div>
+        <h3 className="mts-section-title">{title}</h3>
+        <p className="mts-section-subtitle">{subtitle}</p>
+      </div>
+      <span className="mts-section-badge">{slots.length} slot{slots.length !== 1 ? 's' : ''}</span>
+    </div>
+
+    <div className="mts-slots-grid">
+      {slots.map((slot) => (
+        <SlotCard
+          key={slot.id}
+          slot={slot}
+          category={category}
+          onEdit={onEdit}
+          onSave={onSave}
+          onCancelEdit={onCancelEdit}
+          editingId={editingId}
+          savingId={savingId}
+        />
+      ))}
+    </div>
+  </div>
+);
 
 /* ─────────────────────────────────────────────────────────────────────────
    Main Component
@@ -152,71 +187,71 @@ const ManageTimeSlots = () => {
   /* ── State ── */
   const [slots, setSlots]           = useState([]);
   const [loading, setLoading]       = useState(true);
+  const [seeding, setSeeding]       = useState(false);
   const [error, setError]           = useState('');
   const [success, setSuccess]       = useState('');
 
-  // Add form
-  const [newTime, setNewTime]       = useState('');
-  const [newLabel, setNewLabel]     = useState('');
-  const [adding, setAdding]         = useState(false);
-
-  // Inline edit / delete tracking
+  // Inline edit tracking
   const [editingId, setEditingId]   = useState(null);
   const [savingId, setSavingId]     = useState(null);
-  const [deletingId, setDeletingId] = useState(null);
-
-  /* ── Data fetching ── */
-  const fetchSlots = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await getMySlots();
-      setSlots(data || []);
-    } catch (err) {
-      setError('Failed to load your time slots. Please refresh.');
-      console.error('ManageTimeSlots fetch error:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (user?.userId) fetchSlots();
-  }, [user, fetchSlots]);
 
   /* ── Flash helpers ── */
   const showSuccess = (msg) => {
     setSuccess(msg);
     setTimeout(() => setSuccess(''), 3500);
   };
-
   const showError = (msg) => {
     setError(msg);
     setTimeout(() => setError(''), 4500);
   };
 
-  /* ── Handlers ── */
-  const handleAdd = async () => {
-    const display = toDisplayTime(newTime);
-    if (!display) {
-      showError('Please select a valid time.');
-      return;
-    }
-
-    setAdding(true);
-    setError('');
+  /* ── Auto-seed default slots if vet has none ── */
+  const seedDefaultSlots = useCallback(async () => {
+    setSeeding(true);
     try {
-      const saved = await addSlot({ timeSlot: display, label: newLabel.trim() || undefined });
-      setSlots((prev) => [...prev, saved]);
-      setNewTime('');
-      setNewLabel('');
-      showSuccess(`Time slot ${saved.timeSlot} added successfully.`);
+      const created = [];
+      for (const def of DEFAULT_SLOTS) {
+        try {
+          const saved = await addSlot(def);
+          created.push(saved);
+        } catch {
+          // If duplicate exists (e.g. from a partial earlier seed), skip silently
+        }
+      }
+      setSlots(created);
+      showSuccess('Your default time slots have been configured.');
     } catch (err) {
-      showError(err.response?.data?.message || 'Failed to add time slot.');
+      showError('Failed to set up default time slots. Please refresh.');
+      console.error('Seed error:', err);
     } finally {
-      setAdding(false);
+      setSeeding(false);
     }
-  };
+  }, []);
 
+  /* ── Data fetching ── */
+  const fetchSlots = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await getMySlots();
+      if (!data || data.length === 0) {
+        // No slots yet — auto-seed
+        await seedDefaultSlots();
+      } else {
+        setSlots(data);
+      }
+    } catch (err) {
+      showError('Failed to load your time slots. Please refresh.');
+      console.error('ManageTimeSlots fetch error:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [seedDefaultSlots]);
+
+  useEffect(() => {
+    if (user?.userId) fetchSlots();
+  }, [user, fetchSlots]);
+
+  /* ── Handlers ── */
   const handleEdit = (id) => {
     setEditingId(id);
     setError('');
@@ -242,34 +277,21 @@ const ManageTimeSlots = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Remove this time slot? Existing booked appointments are not affected.')) return;
-    setDeletingId(id);
-    setError('');
-    try {
-      await deleteSlot(id);
-      setSlots((prev) => prev.filter((s) => s.id !== id));
-      showSuccess('Time slot removed.');
-    } catch (err) {
-      showError(err.response?.data?.message || 'Failed to delete slot.');
-    } finally {
-      setDeletingId(null);
-    }
-  };
+  /* ── Categorise slots ── */
+  const operationSlots  = slots.filter((s) => getCategory(s.label) === 'operation');
+  const vaccinationSlots = slots.filter((s) => getCategory(s.label) === 'vaccination');
 
   /* ── Render ── */
   return (
     <div className="mts-container animate-fade-up">
-      {/* Header */}
+      {/* Page header */}
       <div className="mts-header">
         <div>
-          <h2>Manage Time Slots</h2>
-          <p>Define the time slots during which patients can book appointments with you.</p>
+          <h2>Time Slot Schedule</h2>
+          <p>Your fixed daily schedule. Click <strong>Edit Time</strong> on any slot to adjust it if needed.</p>
         </div>
-        {!loading && (
-          <span className="mts-count-badge">
-            {slots.length} {slots.length === 1 ? 'slot' : 'slots'}
-          </span>
+        {!loading && !seeding && (
+          <span className="mts-count-badge">{slots.length} / 7 slots</span>
         )}
       </div>
 
@@ -277,76 +299,43 @@ const ManageTimeSlots = () => {
       {error   && <div className="mts-error"  role="alert">{error}</div>}
       {success && <div className="mts-success" role="status">{success}</div>}
 
-      {/* Add slot form */}
-      <div className="mts-add-card">
-        <h3>➕ Add New Time Slot</h3>
-        <div className="mts-add-form">
-          <div className="mts-field">
-            <label htmlFor="new-slot-time">Time *</label>
-            <input
-              id="new-slot-time"
-              type="time"
-              value={newTime}
-              onChange={(e) => setNewTime(e.target.value)}
-              disabled={adding}
-            />
-          </div>
-          <div className="mts-field">
-            <label htmlFor="new-slot-label">Label (optional)</label>
-            <input
-              id="new-slot-label"
-              type="text"
-              placeholder="e.g. Morning Consultation"
-              value={newLabel}
-              onChange={(e) => setNewLabel(e.target.value)}
-              disabled={adding}
-            />
-          </div>
-          <button
-            className="mts-btn-primary"
-            onClick={handleAdd}
-            disabled={adding || !newTime}
-            type="button"
-          >
-            {adding ? 'Adding…' : 'Add Slot'}
-          </button>
+      {/* Loading / seeding states */}
+      {(loading || seeding) ? (
+        <div className="mts-loading">
+          <div className="spinner" />
+          <p>{seeding ? 'Setting up your default time slots…' : 'Loading your schedule…'}</p>
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Operations section */}
+          <SlotSection
+            title="Operations"
+            subtitle="9:00 AM – 12:00 PM · 1 hour per slot"
+            icon="🔪"
+            category="operation"
+            slots={operationSlots}
+            editingId={editingId}
+            savingId={savingId}
+            onEdit={handleEdit}
+            onSave={handleSaveEdit}
+            onCancelEdit={handleCancelEdit}
+          />
 
-      {/* Slots list */}
-      <div className="mts-list-card">
-        <h3>
-          Your Available Slots
-        </h3>
-
-        {loading ? (
-          <div className="mts-loading">
-            <div className="spinner" />
-            <p>Loading your time slots…</p>
-          </div>
-        ) : slots.length === 0 ? (
-          <div className="mts-empty">
-            <div className="mts-empty-icon">🕐</div>
-            <p>No time slots configured yet.<br />Add your first slot above so patients can book appointments.</p>
-          </div>
-        ) : (
-          <div className="mts-slots-grid">
-            {slots.map((slot) => (
-              <SlotCard
-                key={slot.id}
-                slot={slot}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onSave={handleSaveEdit}
-                onCancelEdit={handleCancelEdit}
-                editingId={editingId}
-                savingId={savingId}
-                deletingId={deletingId}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+          {/* Vaccinations section */}
+          <SlotSection
+            title="Vaccinations"
+            subtitle="12:00 PM – 1:00 PM · 15 minutes per slot"
+            icon="💉"
+            category="vaccination"
+            slots={vaccinationSlots}
+            editingId={editingId}
+            savingId={savingId}
+            onEdit={handleEdit}
+            onSave={handleSaveEdit}
+            onCancelEdit={handleCancelEdit}
+          />
+        </>
+      )}
     </div>
   );
 };

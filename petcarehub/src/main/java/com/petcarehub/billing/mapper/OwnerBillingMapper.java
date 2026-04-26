@@ -32,8 +32,17 @@ public class OwnerBillingMapper {
             if (invoice != null) {
                 response.invoiceNumber = invoice.getInvoiceNumber();
                 response.paymentMethod = invoice.getPaymentMethod();
-                response.paymentStatus = invoice.getPaymentStatus() != null ? invoice.getPaymentStatus().name() : "PENDING";
             }
+        }
+        
+        // Prioritize order's payment status (e.g. if paid via Stripe online)
+        if (order.getPaymentStatus() != null && "PAID".equals(order.getPaymentStatus().name())) {
+            response.paymentStatus = "PAID";
+        } else if (invoiceExists) {
+            Invoice invoice = invoiceRepository.findByOrder_OrderId(order.getOrderId()).orElse(null);
+            response.paymentStatus = invoice != null && invoice.getPaymentStatus() != null 
+                ? invoice.getPaymentStatus().name() 
+                : "PENDING";
         } else {
             response.paymentStatus = "AWAITING_INVOICE";
         }

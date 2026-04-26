@@ -8,6 +8,7 @@ export default function PaymentSuccess() {
   const [searchParams] = useSearchParams();
 
   const sessionId = searchParams.get("session_id");
+  const paymentType = searchParams.get("type"); // e.g. "ORDER" or "APPOINTMENT"
 
   const [confirming, setConfirming] = useState(true);
   const [confirmed, setConfirmed] = useState(false);
@@ -58,8 +59,8 @@ export default function PaymentSuccess() {
         </h1>
 
         <p className="prp-subtitle">
-          {confirming && "Please wait while we verify and update your appointment payment status."}
-          {!confirming && confirmed && "Your appointment payment has been processed successfully and marked as PAID."}
+          {confirming && `Please wait while we verify and update your ${paymentType === 'ORDER' ? 'order' : 'appointment'} payment status.`}
+          {!confirming && confirmed && `Your ${paymentType === 'ORDER' ? 'order' : 'appointment'} payment has been processed successfully and marked as PAID.`}
           {!confirming && error && error}
         </p>
 
@@ -72,8 +73,10 @@ export default function PaymentSuccess() {
 
         <div className="prp-details-grid">
           <div className="prp-detail-item">
-            <span className="prp-detail-icon">📅</span>
-            <span className="prp-detail-text">Appointment payment recorded</span>
+            <span className="prp-detail-icon">{paymentType === 'ORDER' ? '🛍️' : '📅'}</span>
+            <span className="prp-detail-text">
+              {paymentType === 'ORDER' ? 'Order payment recorded' : 'Appointment payment recorded'}
+            </span>
           </div>
           <div className="prp-detail-item">
             <span className="prp-detail-icon">💳</span>
@@ -90,9 +93,15 @@ export default function PaymentSuccess() {
             Go to Dashboard
           </button>
 
-          <button className="prp-btn prp-btn--secondary" onClick={() => navigate("/dashboard/my-appointments")}>
-            View Appointments
-          </button>
+          {paymentType === 'ORDER' ? (
+            <button className="prp-btn prp-btn--secondary" onClick={() => navigate("/store")}>
+              Go to Shop
+            </button>
+          ) : (
+            <button className="prp-btn prp-btn--secondary" onClick={() => navigate("/dashboard/my-appointments")}>
+              View Appointments
+            </button>
+          )}
         </div>
       </div>
     </div>

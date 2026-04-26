@@ -13,7 +13,7 @@ public class StripeService {
 
             SessionCreateParams params = SessionCreateParams.builder()
                     .setMode(SessionCreateParams.Mode.PAYMENT)
-                    .setSuccessUrl("http://localhost:3000/payment-success?session_id={CHECKOUT_SESSION_ID}")
+                    .setSuccessUrl("http://localhost:3000/payment-success?session_id={CHECKOUT_SESSION_ID}&type=" + referenceType)
                     .setCancelUrl("http://localhost:3000/payment-cancel?refId=" + referenceId + "&type=" + referenceType)
                     .putMetadata("referenceId", String.valueOf(referenceId))
                     .putMetadata("referenceType", referenceType)

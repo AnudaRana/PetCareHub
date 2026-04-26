@@ -3,7 +3,6 @@ import axios from "axios";
 import "../../../styles/MyAppointments.css";
 import { useAuth } from "../../auth/contexts/AuthContext";
 import { getAllVets } from "../../../services/vetService";
-import { createCheckoutSession } from "../../../services/paymentService";
 import AddFeedbackForm from "../../feedback/components/AddFeedbackForm";
 import { getFeedbackByAppointment } from "../../../services/feedbackApi";
 
@@ -203,7 +202,7 @@ const MyAppointments = () => {
   const upcomingAppointments = useMemo(
     () => filteredAppointments.filter((a) => {
         const s = (a.status || "").toUpperCase();
-        return s === "UPCOMING" || s === "OVERDUE";
+        return s === "UPCOMING" || s === "OVERDUE" || s === "PENDING";
     }),
     [filteredAppointments]
   );
@@ -409,16 +408,6 @@ const MyAppointments = () => {
                       <button className="btn btn-teal" onClick={() => openUpdateModal(appt)}>
                         Update
                       </button>
-
-                      {isPaid ? (
-                        <button className="btn btn-white" onClick={() => handlePayment(appt)}>
-                          PAID
-                        </button>
-                      ) : (
-                        <button className="btn btn-teal" onClick={() => handlePayment(appt)}>
-                          {paymentStatus === "FAILED" || paymentStatus === "PENDING" ? "Retry Payment" : "Pay Now"}
-                        </button>
-                      )}
                     </div>
                   );
                 })

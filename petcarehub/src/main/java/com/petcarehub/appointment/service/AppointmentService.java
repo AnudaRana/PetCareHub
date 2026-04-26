@@ -74,7 +74,7 @@ public class AppointmentService {
         appointment.setTimeSlot(request.getTimeSlot());
         appointment.setPrice(request.getPrice());
         appointment.setNotes(request.getNotes());
-        appointment.setStatus("UPCOMING");
+        appointment.setStatus("PENDING"); // Appointment is pending payment
         appointment.setUpdated(false);
 
         Appointment saved = appointmentRepository.save(appointment);
@@ -123,7 +123,7 @@ public class AppointmentService {
         appointment.setTimeSlot(request.getTimeSlot());
         appointment.setPrice(request.getPrice());
         appointment.setNotes(request.getNotes());
-        appointment.setStatus("UPCOMING");
+        // Status remains unchanged during update unless logic dictates otherwise
         appointment.setUpdated(true);
 
         Appointment updated = appointmentRepository.save(appointment);

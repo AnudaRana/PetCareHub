@@ -10,7 +10,7 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Header row */
+/* ── Page header ── */
 .mts-header {
   display: flex;
   justify-content: space-between;
@@ -33,160 +33,189 @@
   color: #64748b;
 }
 
-/* Add-slot card */
-.mts-add-card {
-  background: #fff;
-  border: 1px solid var(--color-border, #e2e8f0);
-  border-radius: 14px;
-  padding: 24px 28px;
+/* ── Section blocks ── */
+.mts-section {
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 24px 28px 28px;
   margin-bottom: 28px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  background: #fff;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s;
 }
 
-.mts-add-card h3 {
-  margin: 0 0 18px;
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--color-primary, #0f1f52);
+.mts-section:hover {
+  box-shadow: 0 4px 22px rgba(0, 0, 0, 0.07);
 }
 
-.mts-add-form {
+/* Operations — deep navy/blue accent */
+.mts-section--operation {
+  border-top: 4px solid #3b5bdb;
+}
+
+/* Vaccinations — teal/green accent */
+.mts-section--vaccination {
+  border-top: 4px solid #0ca678;
+}
+
+/* ── Section header ── */
+.mts-section-header {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
   flex-wrap: wrap;
-  align-items: flex-end;
 }
 
-.mts-add-form .mts-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1;
-  min-width: 160px;
+.mts-section-icon {
+  font-size: 1.8rem;
+  line-height: 1;
 }
 
-.mts-add-form .mts-field label {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: #334155;
-}
-
-.mts-add-form .mts-field input {
-  padding: 10px 14px;
-  border: 1px solid #dbe4ee;
-  border-radius: 10px;
-  font-size: 0.93rem;
-  outline: none;
-  box-sizing: border-box;
-  background: #f8fafc;
-  transition: border-color 0.2s;
-}
-
-.mts-add-form .mts-field input:focus {
-  border-color: var(--color-primary, #0f1f52);
-  background: #fff;
-}
-
-/* Slots list card */
-.mts-list-card {
-  background: #fff;
-  border: 1px solid var(--color-border, #e2e8f0);
-  border-radius: 14px;
-  padding: 24px 28px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-}
-
-.mts-list-card h3 {
-  margin: 0 0 18px;
-  font-size: 1rem;
+.mts-section-title {
+  margin: 0 0 3px;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--color-primary, #0f1f52);
 }
 
-/* Empty state */
-.mts-empty {
-  text-align: center;
-  padding: 48px 20px;
-  color: #94a3b8;
-}
-
-.mts-empty-icon {
-  font-size: 2.5rem;
-  margin-bottom: 12px;
-}
-
-.mts-empty p {
-  font-size: 0.95rem;
+.mts-section-subtitle {
   margin: 0;
+  font-size: 0.82rem;
+  color: #64748b;
 }
 
-/* Slots grid */
+.mts-section-badge {
+  margin-left: auto;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.mts-section--operation .mts-section-badge {
+  background: rgba(59, 91, 219, 0.09);
+  color: #3b5bdb;
+  border: 1px solid rgba(59, 91, 219, 0.2);
+}
+
+.mts-section--vaccination .mts-section-badge {
+  background: rgba(12, 166, 120, 0.09);
+  color: #0ca678;
+  border: 1px solid rgba(12, 166, 120, 0.2);
+}
+
+/* ── Slots grid ── */
 .mts-slots-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   gap: 14px;
 }
 
-/* Individual slot card */
+/* ── Individual slot card ── */
 .mts-slot-card {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  padding: 16px 18px;
+  padding: 18px 18px 14px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  transition: box-shadow 0.2s, border-color 0.2s;
+  gap: 6px;
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
 }
 
 .mts-slot-card:hover {
-  box-shadow: 0 4px 14px rgba(0,0,0,0.07);
-  border-color: rgba(15, 31, 82, 0.2);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.09);
+  transform: translateY(-2px);
 }
 
+.mts-slot-card--operation {
+  border-left: 3px solid #3b5bdb;
+}
+
+.mts-slot-card--vaccination {
+  border-left: 3px solid #0ca678;
+}
+
+/* ── Slot time display ── */
 .mts-slot-time {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--color-primary, #0f1f52);
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .mts-slot-time-icon {
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
 
+.mts-slot-time-text {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--color-primary, #0f1f52);
+  letter-spacing: 0.02em;
+}
+
+/* ── Slot label (e.g. "Operation Slot 1") ── */
 .mts-slot-label {
-  font-size: 0.82rem;
-  color: #64748b;
-  font-style: italic;
+  font-size: 0.81rem;
+  font-weight: 600;
+  color: #475569;
 }
 
+/* ── Duration tag ── */
+.mts-slot-duration-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.74rem;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 2px 8px;
+  margin-top: 2px;
+  width: fit-content;
+}
+
+.mts-slot-card--operation .mts-slot-duration-tag {
+  background: rgba(59, 91, 219, 0.08);
+  color: #3b5bdb;
+}
+
+.mts-slot-card--vaccination .mts-slot-duration-tag {
+  background: rgba(12, 166, 120, 0.08);
+  color: #0ca678;
+}
+
+/* ── Slot actions ── */
 .mts-slot-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 4px;
+  margin-top: 10px;
 }
 
-/* Inline edit form inside a slot card */
+/* ── Inline edit form ── */
 .mts-edit-form {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.mts-edit-form input {
-  padding: 8px 12px;
+.mts-edit-form-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 2px;
+}
+
+.mts-edit-form input[type='time'] {
+  padding: 9px 12px;
   border: 1px solid #dbe4ee;
   border-radius: 8px;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   outline: none;
   background: #fff;
   box-sizing: border-box;
+  width: 100%;
+  transition: border-color 0.2s;
 }
 
-.mts-edit-form input:focus {
+.mts-edit-form input[type='time']:focus {
   border-color: var(--color-primary, #0f1f52);
 }
 
@@ -195,10 +224,10 @@
   gap: 8px;
 }
 
-/* Error / success banners */
+/* ── Error / success banners ── */
 .mts-error {
-  background: rgba(239,68,68,0.08);
-  border: 1px solid rgba(239,68,68,0.25);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
   color: #dc2626;
   border-radius: 10px;
   padding: 12px 16px;
@@ -207,8 +236,8 @@
 }
 
 .mts-success {
-  background: rgba(34,197,94,0.08);
-  border: 1px solid rgba(34,197,94,0.25);
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.25);
   color: #16a34a;
   border-radius: 10px;
   padding: 12px 16px;
@@ -216,24 +245,39 @@
   margin-bottom: 16px;
 }
 
-/* Loading spinner (reuses project spinner class) */
+/* ── Loading spinner ── */
 .mts-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 60px 0;
-  gap: 14px;
+  padding: 80px 0;
+  gap: 16px;
   color: #94a3b8;
+  font-size: 0.95rem;
 }
 
-/* Button helpers scoped to mts */
+/* ── Count badge (header) ── */
+.mts-count-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(15, 31, 82, 0.06);
+  color: var(--color-primary, #0f1f52);
+  border: 1px solid rgba(15, 31, 82, 0.12);
+  border-radius: 20px;
+  padding: 3px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ── Buttons ── */
 .mts-btn-primary {
-  padding: 10px 20px;
+  padding: 9px 18px;
   background: var(--color-primary, #0f1f52);
   color: #fff;
   border: none;
-  border-radius: 10px;
-  font-size: 0.88rem;
+  border-radius: 9px;
+  font-size: 0.87rem;
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.2s, transform 0.15s;
@@ -241,22 +285,22 @@
 }
 
 .mts-btn-primary:hover:not(:disabled) {
-  opacity: 0.88;
+  opacity: 0.87;
   transform: translateY(-1px);
 }
 
 .mts-btn-primary:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .mts-btn-ghost {
-  padding: 10px 16px;
+  padding: 9px 15px;
   background: transparent;
   color: var(--color-primary, #0f1f52);
-  border: 1px solid rgba(15,31,82,0.2);
-  border-radius: 10px;
-  font-size: 0.88rem;
+  border: 1px solid rgba(15, 31, 82, 0.2);
+  border-radius: 9px;
+  font-size: 0.87rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
@@ -264,76 +308,52 @@
 }
 
 .mts-btn-ghost:hover:not(:disabled) {
-  background: rgba(15,31,82,0.05);
+  background: rgba(15, 31, 82, 0.05);
 }
 
 .mts-btn-ghost:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.mts-btn-danger {
-  padding: 8px 14px;
-  background: transparent;
-  color: #dc2626;
-  border: 1px solid rgba(220,38,38,0.25);
-  border-radius: 8px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-  white-space: nowrap;
-}
-
-.mts-btn-danger:hover:not(:disabled) {
-  background: rgba(220,38,38,0.06);
-}
-
-.mts-btn-danger:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .mts-btn-edit {
-  padding: 8px 14px;
+  width: 100%;
+  padding: 9px 0;
   background: transparent;
-  color: #0ea5e9;
-  border: 1px solid rgba(14,165,233,0.25);
+  color: #3b5bdb;
+  border: 1px solid rgba(59, 91, 219, 0.25);
   border-radius: 8px;
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s;
-  white-space: nowrap;
+  transition: background 0.2s, border-color 0.2s;
+  text-align: center;
 }
 
-.mts-btn-edit:hover:not(:disabled) {
-  background: rgba(14,165,233,0.07);
+.mts-slot-card--vaccination .mts-btn-edit {
+  color: #0ca678;
+  border-color: rgba(12, 166, 120, 0.25);
 }
 
-/* Count badge */
-.mts-count-badge {
-  display: inline-flex;
-  align-items: center;
-  background: rgba(15,31,82,0.06);
-  color: var(--color-primary, #0f1f52);
-  border: 1px solid rgba(15,31,82,0.12);
-  border-radius: 20px;
-  padding: 3px 12px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-left: 10px;
+.mts-btn-edit:hover {
+  background: rgba(59, 91, 219, 0.06);
+  border-color: rgba(59, 91, 219, 0.45);
 }
 
-/* Responsive */
+.mts-slot-card--vaccination .mts-btn-edit:hover {
+  background: rgba(12, 166, 120, 0.06);
+  border-color: rgba(12, 166, 120, 0.45);
+}
+
+/* ── Responsive ── */
 @media (max-width: 640px) {
-  .mts-add-form {
-    flex-direction: column;
-  }
   .mts-slots-grid {
     grid-template-columns: 1fr;
   }
   .mts-header {
     flex-direction: column;
+  }
+  .mts-section {
+    padding: 18px 16px 20px;
   }
 }
