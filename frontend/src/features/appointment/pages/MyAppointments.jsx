@@ -794,13 +794,14 @@ const MyAppointments = () => {
         </div>
       )}
 
-      {/* Feedback Form Modal */}
       {showFeedbackForm && appointmentForFeedback && (
         <AddFeedbackForm
           appointment={appointmentForFeedback}
           ownerId={userId}
           onClose={() => setShowFeedbackForm(false)}
           onSubmitSuccess={handleFeedbackSuccess}
+          feedbackType="APPOINTMENT"
+          isVerified={true}
         />
       )}
 

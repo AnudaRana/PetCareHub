@@ -62,11 +62,6 @@ const ReviewsPage = () => {
                                 <span className="reviews-brand-name">PetCare Hub</span>
                             </div>
                         </div>
-                        <nav className="reviews-breadcrumb">
-                            <span onClick={() => navigate('/')}>Home</span>
-                            <span className="breadcrumb-separator">/</span>
-                            <span className="active">Reviews</span>
-                        </nav>
                     </div>
                 </div>
 

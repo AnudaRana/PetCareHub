@@ -43,8 +43,7 @@ public class FeedbackService {
                 .rating(request.getRating())
                 .comment(request.getComment())
                 .owner(owner)
-                .feedbackType(request.getFeedbackType() != null ? request.getFeedbackType() : "GENERAL")
-                .isVerified(request.getIsVerified() != null ? request.getIsVerified() : false);
+                .feedbackType(request.getFeedbackType() != null ? request.getFeedbackType() : "GENERAL");
 
         if ("APPOINTMENT".equalsIgnoreCase(request.getFeedbackType()) && request.getAppointmentId() != null) {
             Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
@@ -59,6 +58,7 @@ public class FeedbackService {
                 throw new RuntimeException("Maximum of 3 feedbacks allowed per appointment.");
             }
             feedbackBuilder.appointment(appointment);
+            feedbackBuilder.isVerified(true); // Automatically verify appointment reviews
         } else if ("PRODUCT".equalsIgnoreCase(request.getFeedbackType()) && request.getProductId() != null) {
             // Verify purchase
             boolean hasPurchased = orderItemRepository.hasPurchasedProduct(request.getOwnerId(), request.getProductId());
@@ -66,6 +66,9 @@ public class FeedbackService {
                 throw new RuntimeException("You must purchase the product before reviewing it.");
             }
             feedbackBuilder.productId(request.getProductId());
+            feedbackBuilder.isVerified(true); // Automatically verify product reviews
+        } else {
+            feedbackBuilder.isVerified(false); // General reviews are not verified
         }
 
         Feedback savedFeedback = feedbackRepository.save(feedbackBuilder.build());
