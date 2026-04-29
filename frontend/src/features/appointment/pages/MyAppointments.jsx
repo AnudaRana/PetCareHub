@@ -202,7 +202,7 @@ const MyAppointments = () => {
   const upcomingAppointments = useMemo(
     () => filteredAppointments.filter((a) => {
         const s = (a.status || "").toUpperCase();
-        return s === "UPCOMING" || s === "OVERDUE" || s === "PENDING";
+        return s === "UPCOMING" || s === "OVERDUE" || s === "PENDING" || s === "AWAITING_PAYMENT";
     }),
     [filteredAppointments]
   );

@@ -186,7 +186,7 @@ public class PaymentService {
                     .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
             // Mark appointment as confirmed (UPCOMING) now that it is paid
-            if ("PENDING".equalsIgnoreCase(appointment.getStatus())) {
+            if ("AWAITING_PAYMENT".equalsIgnoreCase(appointment.getStatus())) {
                 appointment.setStatus("UPCOMING");
                 appointmentRepository.save(appointment);
                 System.out.println("Appointment status updated to UPCOMING for appointmentId=" + appointment.getId());

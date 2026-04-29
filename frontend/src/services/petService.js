@@ -11,15 +11,15 @@ export const API_BASE_URL = typeof import.meta !== 'undefined' && import.meta.en
 export const getImageUrl = (path) => {
     if (!path) return null;
     if (path.startsWith('http')) return path;
-    
+
     let normalizedPath = path.replace(/^[\\\/]+/, '').replace(/\\/g, '/');
-    
+
     // Ensure the path is correctly prefixed if missing but expected by backend mapping
     if (!normalizedPath.startsWith('uploads/') && !normalizedPath.startsWith('api/')) {
         // If the backend stores only the filename, we need to prepend uploads/
         normalizedPath = `uploads/${normalizedPath}`;
     }
-    
+
     // If API_BASE_URL exists, use it. Otherwise, use relative path so Vite proxy handles it.
     return API_BASE_URL ? `${API_BASE_URL}/${normalizedPath}` : `/${normalizedPath}`;
 };

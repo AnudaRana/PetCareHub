@@ -5,8 +5,8 @@ const API_BASE_URL = typeof import.meta !== 'undefined' && import.meta.env?.VITE
   : '';
 
 const getAuthHeaders = () => {
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    return token ? { Authorization: `Bearer ${token}` } : {};
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 /**
@@ -16,7 +16,7 @@ const getAuthHeaders = () => {
  */
 export const getTreatmentsByPetId = async (petId) => {
   const response = await axios.get(`${API_BASE_URL}/api/medical-records/treatments/pet/${petId}`, {
-      headers: getAuthHeaders()
+    headers: getAuthHeaders()
   });
   return response.data;
 };
@@ -43,7 +43,7 @@ export const createTreatment = async (petId, treatmentData) => {
  */
 export const getTreatmentById = async (treatmentId) => {
   const response = await axios.get(`${API_BASE_URL}/api/medical-records/treatments/${treatmentId}`, {
-      headers: getAuthHeaders()
+    headers: getAuthHeaders()
   });
   return response.data;
 };

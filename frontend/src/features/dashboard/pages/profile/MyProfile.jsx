@@ -189,11 +189,11 @@ const MyProfile = () => {
                 {!isEditing ? (
                     <div className="profile-details-view">
                         <div className="detail-box">
-                            <span className="detail-label">First Registry Name</span>
+                            <span className="detail-label">First Name</span>
                             <span className="detail-value">{profile.firstName || 'Not Documented'}</span>
                         </div>
                         <div className="detail-box">
-                            <span className="detail-label">Last Registry Name</span>
+                            <span className="detail-label">Last Name</span>
                             <span className="detail-value">{profile.lastName || 'Not Documented'}</span>
                         </div>
                         <div className="detail-box">
@@ -201,7 +201,7 @@ const MyProfile = () => {
                             <span className="detail-value">{profile.mobileNumber || 'No verified number'}</span>
                         </div>
                         <div className="detail-box">
-                            <span className="detail-label">Registry Address</span>
+                            <span className="detail-label">Address</span>
                             <span className="detail-value">{profile.address || 'No physical address linked'}</span>
                         </div>
                     </div>

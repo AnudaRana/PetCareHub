@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import api from '../../../api/axios';
 import { API_BASE_URL } from '../../../services/petService';
 import '../../../styles/StaffAllAppointments.css';
 
@@ -18,7 +18,7 @@ const StaffAllAppointments = () => {
     try {
       setLoading(true);
       setError('');
-      const response = await axios.get(`${API_BASE_URL}/api/appointments`);
+      const response = await api.get(`${API_BASE_URL}/api/appointments`);
       const data = response.data?.data || response.data || [];
       setAppointments(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -77,8 +77,8 @@ const StaffAllAppointments = () => {
     return (
       <div className="staff-appointments-page">
         <div className="loading-container" style={{ padding: '80px 0' }}>
-            <div className="spinner" />
-            <p style={{ color: 'var(--color-text-light)', marginTop: '16px', fontWeight: 500 }}>Syncing Clinic Schedule...</p>
+          <div className="spinner" />
+          <p style={{ color: 'var(--color-text-light)', marginTop: '16px', fontWeight: 500 }}>Syncing Clinic Schedule...</p>
         </div>
       </div>
     );
@@ -130,9 +130,9 @@ const StaffAllAppointments = () => {
 
       {filteredAppointments.length === 0 ? (
         <div className="empty-state" style={{ padding: '60px 20px' }}>
-            <span className="empty-state-icon">📋</span>
-            <h3>No sessions found</h3>
-            <p>No medical appointments match your active filter criteria.</p>
+          <span className="empty-state-icon">📋</span>
+          <h3>No sessions found</h3>
+          <p>No medical appointments match your active filter criteria.</p>
         </div>
       ) : (
         <div className="staff-appointments-table-wrapper shadow-premium">
