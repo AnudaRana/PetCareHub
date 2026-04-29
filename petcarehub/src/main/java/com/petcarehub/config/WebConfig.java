@@ -19,7 +19,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://localhost:5173",
                         "http://localhost:4200",
                         "http://localhost:8081"
-                        // The real FE link after deployment
+                // The real FE link after deployment
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowedHeaders("*")
@@ -27,13 +27,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .maxAge(3600);
     }
 
-
     @Bean
     public MultipartResolver multipartResolver() {
         StandardServletMultipartResolver resolver = new StandardServletMultipartResolver();
         return resolver;
     }
-
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

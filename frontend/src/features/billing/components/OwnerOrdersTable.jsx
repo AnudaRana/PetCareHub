@@ -23,7 +23,6 @@ export default function OwnerOrdersTable({ orders, onViewInvoice }) {
             <th>Order Status</th>
             <th>Payment Status</th>
             <th>Invoice</th>
-            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -42,27 +41,39 @@ export default function OwnerOrdersTable({ orders, onViewInvoice }) {
                 <InvoiceStatusBadge status={order.paymentStatus} />
               </td>
               <td>
-                {order.invoiceAvailable ? (
-                  <span className="invoice-available">✓ {order.invoiceNumber}</span>
-                ) : (
-                  <span className="invoice-not-available">Not Generated</span>
-                )}
-              </td>
-              <td>
-                {order.invoiceAvailable ? (
-                  <button 
-                    className="btn-view-invoice"
+                {order.paymentMethod === 'CARD' ? (
+                  order.paymentStatus === 'PAID' ? (
+                    <span 
+                      className="invoice-card-payment" 
+                      style={{ color: '#059669', fontWeight: '600', cursor: 'pointer', textDecoration: 'underline' }}
+                      onClick={() => onViewInvoice(order)}
+                      title="View Receipt"
+                    >
+                      ✓ Card Payment
+                    </span>
+                  ) : (
+                    <span className="invoice-awaiting-payment" style={{ color: '#6366f1', fontStyle: 'italic' }}>
+                      Awaiting Payment
+                    </span>
+                  )
+                ) : order.invoiceAvailable ? (
+                  <span 
+                    className="invoice-number-link" 
                     onClick={() => onViewInvoice(order)}
+                    style={{ 
+                      cursor: 'pointer', 
+                      color: 'var(--color-primary)', 
+                      fontWeight: 'bold',
+                      textDecoration: 'underline'
+                    }}
+                    title="View Invoice"
                   >
-                    View Invoice
-                  </button>
+                    {order.invoiceNumber}
+                  </span>
                 ) : (
-                  <button 
-                    className="btn-disabled"
-                    disabled
-                  >
+                  <span className="invoice-not-available" style={{ color: '#6b7280', fontStyle: 'italic' }}>
                     Awaiting Invoice
-                  </button>
+                  </span>
                 )}
               </td>
             </tr>

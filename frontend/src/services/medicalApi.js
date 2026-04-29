@@ -63,9 +63,21 @@ export const addTreatmentToPet = async (petId, treatmentData) => {
   return response.data;
 };
 
+/**
+ * Delete a medical treatment record
+ * @param {number} treatmentId - The treatment ID
+ * @returns {Promise<void>}
+ */
+export const deleteTreatment = async (treatmentId) => {
+  await axios.delete(`${API_BASE_URL}/api/medical-records/treatments/${treatmentId}`, {
+    headers: getAuthHeaders()
+  });
+};
+
 export default {
   getTreatmentsByPetId,
   createTreatment,
   addTreatmentToPet,
   getTreatmentById,
+  deleteTreatment,
 };

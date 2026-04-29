@@ -65,3 +65,10 @@ temp/
 *.swp
 *.swo
 *~
+
+# Runtime uploads
+uploads/
+petcarehub/uploads/
+
+# Local Spring config
+petcarehub/src/main/resources/application-local.properties

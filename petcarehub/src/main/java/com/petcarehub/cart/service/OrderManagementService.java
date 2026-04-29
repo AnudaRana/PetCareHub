@@ -52,6 +52,20 @@ public class OrderManagementService {
             throw new RuntimeException("Order is already cancelled.");
         }
 
+        // Restore deducted stock or release reserved stock
+        if (order.getPaymentStatus() == PaymentStatus.PAID) {
+            for (com.petcarehub.cart.entity.OrderItem item : order.getItems()) {
+                com.petcarehub.product.entity.Product product = item.getProduct();
+                product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+            }
+        } else if (order.getPaymentMethod() != com.petcarehub.cart.enums.PaymentMethod.CARD && order.getOrderStatus() == OrderStatus.PLACED) {
+            for (com.petcarehub.cart.entity.OrderItem item : order.getItems()) {
+                com.petcarehub.product.entity.Product product = item.getProduct();
+                int currentReserved = product.getReservedStockQuantity() != null ? product.getReservedStockQuantity() : 0;
+                product.setReservedStockQuantity(Math.max(0, currentReserved - item.getQuantity()));
+            }
+        }
+
         order.setOrderStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
 
@@ -83,6 +97,23 @@ public class OrderManagementService {
     @Transactional
     public CustomerOrder verifyPayment(Long orderId) {
         CustomerOrder order = getOrderById(orderId);
+        
+        if (order.getPaymentStatus() == PaymentStatus.PAID) {
+            return order;
+        }
+
+        // Finalize stock deduction for non-card methods
+        if (order.getPaymentMethod() != com.petcarehub.cart.enums.PaymentMethod.CARD) {
+            for (com.petcarehub.cart.entity.OrderItem item : order.getItems()) {
+                com.petcarehub.product.entity.Product product = item.getProduct();
+                int reserved = product.getReservedStockQuantity() != null ? product.getReservedStockQuantity() : 0;
+                int toDeduct = item.getQuantity();
+                
+                product.setReservedStockQuantity(Math.max(0, reserved - toDeduct));
+                product.setStockQuantity(Math.max(0, product.getStockQuantity() - toDeduct));
+            }
+        }
+
         order.setPaymentStatus(PaymentStatus.PAID);
         return orderRepository.save(order);
     }

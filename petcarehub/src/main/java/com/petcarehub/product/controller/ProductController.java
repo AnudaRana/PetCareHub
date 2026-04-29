@@ -25,15 +25,19 @@ public class ProductController {
         return new ResponseEntity<>(productService.getAllProducts(), HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
-        return new ResponseEntity<>(productService.createProduct(request), HttpStatus.CREATED);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductResponse> createProduct(
+            @ModelAttribute ProductRequest request,
+            @RequestParam(value = "image", required = false) MultipartFile image) {
+        return new ResponseEntity<>(productService.createProduct(request, image), HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable("id") Long id,
-            @RequestBody ProductRequest request) {
-        return new ResponseEntity<>(productService.updateProduct(id, request), HttpStatus.OK);
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductResponse> updateProduct(
+            @PathVariable("id") Long id,
+            @ModelAttribute ProductRequest request,
+            @RequestParam(value = "image", required = false) MultipartFile image) {
+        return new ResponseEntity<>(productService.updateProduct(id, request, image), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -68,8 +72,13 @@ public class ProductController {
         Product product = productService.getProductById(id);
         byte[] image = productService.getProductImage(id);
         
+        String contentType = product.getImageContentType();
+        if (contentType == null || contentType.isEmpty()) {
+            contentType = "image/jpeg";
+        }
+
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(product.getImageContentType()))
+                .contentType(MediaType.parseMediaType(contentType))
                 .body(image);
     }
 

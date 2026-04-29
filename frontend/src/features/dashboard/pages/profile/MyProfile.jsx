@@ -133,11 +133,11 @@ const MyProfile = () => {
             <div className="profile-header-banner">
                 <div className="banner-info">
                     <h2>Account Overview</h2>
-                    <p>Verified Professional Hub Presence & Registry Data</p>
+                    <p>User Information</p>
                 </div>
                 {!isEditing && (
                     <button className="btn btn-teal" onClick={() => setIsEditing(true)}>
-                        🛠️ Modify Hub Identity
+                        🛠️ Edit Profile
                     </button>
                 )}
             </div>
@@ -179,7 +179,7 @@ const MyProfile = () => {
                         <div className="profile-roles">
                             {profile.roles?.map(r => (
                                 <span key={r} className="role-tag">
-                                    {r.replace('ROLE_', '') === 'VET' ? '⚕️ VET' : r.replace('ROLE_', '') === 'STAFF' ? '📋 STAFF' : '👤 OWNER'}
+                                    {r.replace('ROLE_', '') === 'VET' ? '⚕️ VET' : r.replace('ROLE_', '') === 'STAFF' ? '📋 STAFF' : r.replace('ROLE_', '') === 'ADMIN' ? '🛡️ ADMIN' : '👤 OWNER'}
                                 </span>
                             ))}
                         </div>
@@ -203,10 +203,6 @@ const MyProfile = () => {
                         <div className="detail-box">
                             <span className="detail-label">Registry Address</span>
                             <span className="detail-value">{profile.address || 'No physical address linked'}</span>
-                        </div>
-                        <div className="detail-box" style={{ gridColumn: '1 / -1', background: 'rgba(20,27,61,0.02)', border: '1px dashed rgba(20,27,61,0.1)' }}>
-                            <span className="detail-label">Database Footprint</span>
-                            <span className="detail-value" style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}>VERIFIED_USER_{profile.userId}</span>
                         </div>
                     </div>
                 ) : (

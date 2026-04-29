@@ -115,6 +115,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: none;
@@ -168,18 +169,14 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 32px 24px 24px;
+    padding: 30px 10px 10px;
     position: relative;
     z-index: 1;
 }
 
 .sidebar-logo-image {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-glow);
-    object-fit: cover;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 120px;
+    height: 100px;
 }
 
 .sidebar-logo-text h2 {
@@ -261,20 +258,20 @@
 }
 
 .sidebar-nav::-webkit-scrollbar {
-  width: 6px;
+    width: 6px;
 }
 
 .sidebar-nav::-webkit-scrollbar-track {
-  background: transparent;
+    background: transparent;
 }
 
 .sidebar-nav::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
 }
 
 .sidebar-nav::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .sidebar-footer {
@@ -353,11 +350,13 @@
 }
 
 /* ── Role Specific Sidebar Variants ────────────────────────── */
-.doc-sidebar, .staff-sidebar {
+.doc-sidebar,
+.staff-sidebar {
     background: linear-gradient(180deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
 }
 
-.doc-sidebar-role-badge, .staff-sidebar-role-badge {
+.doc-sidebar-role-badge,
+.staff-sidebar-role-badge {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -379,12 +378,35 @@
         transform: translateX(-100%);
         width: 280px;
     }
+
     .sidebar.mobile-open {
         transform: translateX(0);
     }
+
     .dashboard-main {
         margin-left: 0;
     }
+
+    .mobile-toggle {
+        display: flex !important;
+    }
+}
+
+.mobile-toggle {
+    display: none;
+    color: var(--color-text);
+}
+
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 90;
+    backdrop-filter: blur(2px);
+    transition: opacity 0.3s ease;
 }
 
 /* ── Premium Card Shadows & Effects ────────────────────────── */
@@ -397,7 +419,8 @@
 }
 
 /* ── Portal Greetings & Stats (Shared across roles) ────────── */
-.doc-home-greeting, .staff-home-greeting {
+.doc-home-greeting,
+.staff-home-greeting {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -406,20 +429,23 @@
     gap: 16px;
 }
 
-.doc-home-greeting h1, .staff-home-greeting h1 {
+.doc-home-greeting h1,
+.staff-home-greeting h1 {
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--color-primary);
     margin: 0 0 6px;
 }
 
-.doc-home-greeting p, .staff-home-greeting p {
+.doc-home-greeting p,
+.staff-home-greeting p {
     color: var(--color-text-light);
     font-size: 0.9rem;
     margin: 0;
 }
 
-.doc-role-badge, .staff-role-badge {
+.doc-role-badge,
+.staff-role-badge {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -433,14 +459,18 @@
     white-space: nowrap;
 }
 
-.doc-stats-grid, .staff-stats-grid {
+.doc-stats-grid,
+.staff-stats-grid,
+.admin-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 16px;
     margin-bottom: 32px;
 }
 
-.doc-stat-card, .staff-stat-card {
+.doc-stat-card,
+.staff-stat-card,
+.admin-stat-card {
     background: var(--color-white);
     border-radius: 16px;
     padding: 24px;
@@ -451,54 +481,68 @@
     flex-direction: column;
 }
 
-.doc-stat-card:hover, .staff-stat-card:hover {
+.doc-stat-card:hover,
+.staff-stat-card:hover,
+.admin-stat-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-md);
 }
 
-.doc-stat-icon {
+.doc-stat-icon,
+.staff-stat-icon,
+.admin-stat-icon {
     font-size: 1.8rem;
     margin-bottom: 12px;
 }
 
-.doc-stat-value {
+.doc-stat-value,
+.staff-stat-value,
+.admin-stat-value {
     font-size: 2.2rem;
     font-weight: 800;
     color: var(--accent, var(--color-accent));
     line-height: 1;
 }
 
-.doc-stat-label {
+.doc-stat-label,
+.staff-stat-label,
+.admin-stat-label {
     font-size: 0.88rem;
     font-weight: 700;
     color: var(--color-text);
     margin-top: 8px;
 }
 
-.doc-stat-sub {
+.doc-stat-sub,
+.staff-stat-sub,
+.admin-stat-sub {
     font-size: 0.75rem;
     color: var(--color-text-light);
     margin-top: 2px;
 }
 
-.doc-quick-actions, .staff-quick-actions {
+.doc-quick-actions,
+.staff-quick-actions {
     margin-top: 40px;
 }
 
-.doc-quick-actions h3, .staff-quick-actions h3 {
+.doc-quick-actions h3,
+.staff-quick-actions h3 {
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--color-text);
     margin-bottom: 16px;
 }
 
-.doc-action-cards, .staff-action-cards {
+.doc-action-cards,
+.staff-action-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 16px;
 }
 
-.doc-action-card, .staff-action-card {
+.doc-action-card,
+.staff-action-card {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -510,7 +554,8 @@
     transition: all 0.2s;
 }
 
-.doc-action-card:hover, .staff-action-card:hover {
+.doc-action-card:hover,
+.staff-action-card:hover {
     border-color: var(--color-accent);
     background: rgba(0, 240, 255, 0.04);
     transform: translateY(-2px);

@@ -23,6 +23,10 @@
     color: var(--color-text-light);
 }
 
+.doc-stat-card {
+    max-width: 300px;
+}
+
 .doc-pets-table-row {
     display: grid;
     grid-template-columns: 2.5fr 1.8fr 1.5fr 0.8fr 0.8fr 1fr;
@@ -39,7 +43,8 @@
 
 .doc-pets-table-row:hover {
     background: rgba(0, 240, 255, 0.04);
-    padding-left: 32px; /* Subtle slide effect */
+    padding-left: 32px;
+    /* Subtle slide effect */
 }
 
 .doc-pet-name-cell {
@@ -174,10 +179,12 @@
 }
 
 @media (max-width: 1024px) {
-    .doc-pets-table-header, .doc-pets-table-row {
+
+    .doc-pets-table-header,
+    .doc-pets-table-row {
         grid-template-columns: 2.5fr 1.5fr 1.5fr 1fr;
     }
-    
+
     .doc-pets-table-header span:nth-child(4),
     .doc-pets-table-header span:nth-child(5),
     .doc-pets-table-row span:nth-child(4),

@@ -52,11 +52,12 @@ public class InvoiceController {
                 Arrays.asList(OrderStatus.PLACED, OrderStatus.READY, OrderStatus.COMPLETED)
         );
         
-        // Filter out orders that already have invoices
+        // Filter out orders that already have invoices and exclude CARD payments
         List<EligibleOrderDto> eligibleOrders = eligibleStatusOrders.stream()
                 .filter(order -> !invoiceRepository.existsByOrder_OrderId(order.getOrderId()))
                 .filter(order -> order.getItems() != null && !order.getItems().isEmpty())
                 .filter(order -> order.getPaymentMethod() != null)
+                .filter(order -> !"CARD".equals(order.getPaymentMethod().name()))
                 .map(InvoiceMapper::toEligibleOrderDto)
                 .collect(Collectors.toList());
         

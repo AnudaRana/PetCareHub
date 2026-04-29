@@ -10,63 +10,22 @@ import PetMedicalRecordPage from '../../medical/pages/PetMedicalRecordPage';
 import ManageTimeSlots from '../../appointment/pages/ManageTimeSlots';
 import { getAllPets } from '../../../services/petService';
 
-// Icons
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import EventNoteOutlinedIcon from '@mui/icons-material/EventNoteOutlined';
 import HealingOutlinedIcon from '@mui/icons-material/HealingOutlined';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 
 const VetDashboard = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState({
-    totalPatients: 0,
-    dailySchedule: 0,
-    admissions: 0,
-    loading: true
-  });
-
-  useEffect(() => {
-    if (!user?.userId) return;
-
-    const fetchVetStats = async () => {
-      try {
-        setStats(prev => ({ ...prev, loading: true }));
-        const petsResponse = await getAllPets();
-        const pets = Array.isArray(petsResponse.data) ? petsResponse.data : (Array.isArray(petsResponse) ? petsResponse : []);
-
-        const appointmentsRes = await axios.get(`/api/appointments/vet/${user.userId}`);
-        const appointments = Array.isArray(appointmentsRes.data) ? appointmentsRes.data : [];
-        const today = new Date().toISOString().split('T')[0];
-        const scheduleToday = appointments.filter(a => a.date === today && (a.status || '').toUpperCase() !== 'CANCELLED').length;
-        const upcomingCount = appointments.filter(a => (a.status || '').toUpperCase() === 'UPCOMING').length;
-
-        setStats({
-          totalPatients: pets.length,
-          dailySchedule: scheduleToday,
-          admissions: upcomingCount,
-          loading: false
-        });
-      } catch (error) {
-        console.error('Failed to fetch vet dashboard stats:', error);
-        setStats(prev => ({ ...prev, loading: false }));
-      }
-    };
-
-    fetchVetStats();
-  }, [user?.userId]);
 
   const vetMenu = [
     { name: 'Home', icon: HomeOutlinedIcon, path: '/' },
     { name: 'My Dashboard', icon: DashboardIcon, path: '/dashboard' },
-    { name: 'My Profile', icon: PersonOutlineOutlinedIcon, path: '/dashboard/profile' },
-    { name: 'All Pets', icon: HealingOutlinedIcon, path: '/dashboard/vet-patients' },
+    { name: 'Patient Records', icon: HealingOutlinedIcon, path: '/dashboard/vet-patients' },
     { name: 'My Appointments', icon: EventNoteOutlinedIcon, path: '/dashboard/vet-appointments' },
     { name: 'Time Slots', icon: AccessTimeOutlinedIcon, path: '/dashboard/manage-slots' },
-    { name: 'Settings', icon: SettingsOutlinedIcon, path: '/dashboard/settings', disabled: true }
   ];
 
   if (loading) return <div className="loading-state">Syncing Professional Data...</div>;
@@ -74,64 +33,7 @@ const VetDashboard = () => {
   return (
     <DashboardLayout menuItems={vetMenu}>
       <Routes>
-        <Route index element={
-          <div className="animate-fade-up">
-            <div className="doc-home-greeting">
-              <div>
-                <h1>Welcome back, Dr. {user?.firstName || 'Vet'}!</h1>
-                <p>Monitor your patient records, medical history, and upcoming clinic visits.</p>
-              </div>
-              <div className="doc-role-badge">
-                <span className="doc-sidebar-role-icon">⚕️</span>
-                VETERINARIAN
-              </div>
-            </div>
-
-            <div className="doc-stats-grid">
-              <div className="doc-stat-card" style={{ '--accent': 'var(--color-primary)' }}>
-                <div className="doc-stat-icon">🐕</div>
-                <div className="doc-stat-value">{stats.loading ? '...' : stats.totalPatients}</div>
-                <div className="doc-stat-label">Total Patients</div>
-                <div className="doc-stat-sub">Clinic active database</div>
-              </div>
-
-              <div className="doc-stat-card" style={{ '--accent': '#2dd4bf' }}>
-                <div className="doc-stat-icon">📅</div>
-                <div className="doc-stat-value">{stats.loading ? '...' : stats.dailySchedule}</div>
-                <div className="doc-stat-label">Daily Schedule</div>
-                <div className="doc-stat-sub">Today's appointments</div>
-              </div>
-
-              <div className="doc-stat-card" style={{ '--accent': '#6366f1' }}>
-                <div className="doc-stat-icon">🏥</div>
-                <div className="doc-stat-value">{stats.loading ? '...' : stats.admissions}</div>
-                <div className="doc-stat-label">Admissions</div>
-                <div className="doc-stat-sub">Current inpatient cases</div>
-              </div>
-            </div>
-
-            <div className="doc-quick-actions">
-              <h3>Doctor Portals</h3>
-              <div className="doc-action-cards">
-                <div className="doc-action-card" onClick={() => navigate('/dashboard/vet-patients')}>
-                  <div className="doc-action-icon">📋</div>
-                  <div className="doc-action-label">Patient Database</div>
-                  <div className="doc-action-arrow">→</div>
-                </div>
-                <div className="doc-action-card" onClick={() => navigate('/dashboard/vet-appointments')}>
-                  <div className="doc-action-icon">🕒</div>
-                  <div className="doc-action-label">My Schedule</div>
-                  <div className="doc-action-arrow">→</div>
-                </div>
-                <div className="doc-action-card" onClick={() => navigate('/dashboard/profile')}>
-                  <div className="doc-action-icon">👤</div>
-                  <div className="doc-action-label">Clinic Profile</div>
-                  <div className="doc-action-arrow">→</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        } />
+        <Route index element={<MyProfile />} />
 
         <Route path="vet-patients" element={<DoctorAllPets />} />
         <Route path="profile" element={<MyProfile />} />

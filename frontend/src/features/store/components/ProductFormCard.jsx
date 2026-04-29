@@ -63,29 +63,36 @@ const ProductFormCard = ({ product, onClose, onRefresh, onToast }) => {
         e.preventDefault();
         try {
             setSaving(true);
-            const config = {
-                headers: { Authorization: `Bearer ${token}` }
-            };
-
-            let productId = product?.productId;
-            if (isEdit) {
-                await axios.put(`/api/products/${product.productId}`, formData, config);
-                onToast?.("Product updated successfully!");
-            } else {
-                const res = await axios.post('/api/products', formData, config);
-                productId = res.data.productId;
-                onToast?.("Product added successfully!");
+            
+            const data = new FormData();
+            data.append('name', formData.name);
+            data.append('description', formData.description);
+            data.append('price', formData.price);
+            data.append('stockQuantity', formData.stockQuantity);
+            data.append('category', formData.category);
+            data.append('imageUrl', formData.imageUrl);
+            data.append('brand', formData.brand);
+            data.append('variants', formData.variants);
+            data.append('colors', formData.colors);
+            data.append('flavors', formData.flavors);
+            
+            if (imageFile) {
+                data.append('image', imageFile);
             }
 
-            if (imageFile && productId) {
-                const imgData = new FormData();
-                imgData.append('file', imageFile);
-                await axios.post(`/api/products/${productId}/image`, imgData, {
-                    headers: { 
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'multipart/form-data'
-                    }
-                });
+            const config = {
+                headers: { 
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            };
+
+            if (isEdit) {
+                await axios.put(`/api/products/${product.productId}`, data, config);
+                onToast?.("Product updated successfully!");
+            } else {
+                await axios.post('/api/products', data, config);
+                onToast?.("Product added successfully!");
             }
 
             onRefresh();

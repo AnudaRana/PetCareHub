@@ -3,10 +3,10 @@
   --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Core Colors */
-  --color-primary: #36b8b7;
+  --color-primary: #02edfe;
   --color-primary-dark: #141b3d;
   --color-primary-light: #5eead4;
-  
+
   --color-accent: #00f0ff;
   --color-accent-dark: #00b8c4;
   --color-accent-light: #e0f2fe;
@@ -36,7 +36,6 @@
   --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.12);
   --shadow-glow: 0 0 15px rgba(0, 240, 255, 0.3);
-  
+
   --sidebar-width: 280px;
 }
-

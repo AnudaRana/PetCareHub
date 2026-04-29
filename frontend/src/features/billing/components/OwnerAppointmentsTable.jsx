@@ -106,7 +106,6 @@ export default function OwnerAppointmentsTable({ appointments }) {
               <th>Status</th>
               <th>Payment Status</th>
               <th>Invoice</th>
-              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -139,25 +138,18 @@ export default function OwnerAppointmentsTable({ appointments }) {
                   </td>
                   <td>
                     {isPaid ? (
-                      <span className="invoice-available">
-                        ✓ LKR {appt.price ? Number(appt.price).toLocaleString('en-US', { minimumFractionDigits: 2 }) : '—'}
+                      <span
+                        className="invoice-card-payment"
+                        style={{ color: '#059669', fontWeight: '600', cursor: 'pointer', textDecoration: 'underline' }}
+                        onClick={() => setSelectedAppt(appt)}
+                        title="View Receipt"
+                      >
+                        ✓ Card Payment
                       </span>
                     ) : (
-                      <span className="invoice-not-available">Not Available</span>
-                    )}
-                  </td>
-                  <td>
-                    {isPaid ? (
-                      <button
-                        className="btn-view-invoice"
-                        onClick={() => setSelectedAppt(appt)}
-                      >
-                        View Receipt
-                      </button>
-                    ) : (
-                      <button className="btn-disabled" disabled>
-                        {paymentStatus === 'PENDING' ? 'Awaiting Payment' : 'Not Paid'}
-                      </button>
+                      <span className="invoice-not-available" style={{ color: '#6b7280', fontStyle: 'italic' }}>
+                        {paymentStatus === 'PENDING' || paymentStatus === 'AWAITING_PAYMENT' ? 'Awaiting Payment' : 'Awaiting Invoice'}
+                      </span>
                     )}
                   </td>
                 </tr>

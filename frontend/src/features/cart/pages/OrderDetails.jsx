@@ -75,7 +75,6 @@ export default function OrderDetails() {
     if (!form.fullName.trim()) nextErrors.fullName = "Full name is required.";
     if (!form.email.trim()) nextErrors.email = "Email is required.";
     if (!form.contactNumber.trim()) nextErrors.contactNumber = "Contact number is required.";
-    if (!form.petId) nextErrors.petId = "Please select a pet.";
     if (!form.pickupDate) nextErrors.pickupDate = "Pickup date is required.";
     setFieldErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
@@ -99,7 +98,7 @@ export default function OrderDetails() {
     try {
       const order = await orderService.createOrderFromCart(userId, {
         ...form,
-        petId: Number(form.petId)
+        petId: form.petId ? Number(form.petId) : null
       });
       navigate(`/checkout/payment/${order.orderId}`);
     } catch (err) {
@@ -156,9 +155,9 @@ export default function OrderDetails() {
               </div>
 
               <div className="form-field">
-                <label htmlFor="petId">Pet*</label>
+                <label htmlFor="petId">Pet (Optional)</label>
                 <select id="petId" name="petId" value={form.petId} onChange={handleChange}>
-                  <option value="">Select your pet</option>
+                  <option value="">No pet selected</option>
                   {context.pets.map((pet) => (
                     <option key={pet.petId} value={pet.petId}>{pet.displayName}</option>
                   ))}

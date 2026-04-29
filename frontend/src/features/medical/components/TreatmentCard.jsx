@@ -1,6 +1,6 @@
 import React from 'react';
 
-const TreatmentCard = ({ treatment, isDoctor, onEdit }) => {
+const TreatmentCard = ({ treatment, isDoctor, onEdit, onDelete }) => {
     const formattedDate = new Date(treatment.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
     const day = new Date(treatment.date).getDate();
     const month = new Date(treatment.date).toLocaleDateString('en-GB', { month: 'short' });
@@ -15,9 +15,14 @@ const TreatmentCard = ({ treatment, isDoctor, onEdit }) => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <strong>{treatment.diagnosis || 'Clinical Consultation'}</strong>
                     {isDoctor && (
-                        <button className="staff-view-btn" onClick={() => onEdit(treatment.id)} style={{ padding: '4px 12px', fontSize: '0.7rem' }}>
-                            Modify Record
-                        </button>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <button className="staff-view-btn" onClick={() => onEdit(treatment.id)} style={{ padding: '4px 12px', fontSize: '0.7rem' }}>
+                                Modify Record
+                            </button>
+                            <button className="staff-view-btn" onClick={() => onDelete(treatment.id)} style={{ padding: '4px 12px', fontSize: '0.7rem', backgroundColor: '#fee2e2', color: '#dc2626', borderColor: '#fca5a5' }}>
+                                Delete
+                            </button>
+                        </div>
                     )}
                 </div>
                 <p>{treatment.notes || 'No treatment notes recorded for this session.'}</p>

@@ -42,24 +42,28 @@ public class OrderServiceImpl implements OrderService {
     private ProductRepository productRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<OrderDTO> getOrdersByOwnerId(Long ownerId) {
         return viewOrderRepository.findByUser_UserIdOrderByCreatedAtDesc(ownerId)
                 .stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OrderDTO> getAllOrders() {
         return viewOrderRepository.findAllByOrderByCreatedAtDesc()
                 .stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OrderDTO> getPendingOrders() {
         return viewOrderRepository.findByOrderStatusOrderByCreatedAtAsc(OrderStatus.PENDING)
                 .stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrderDTO getOrderById(Long orderId) {
         Order order = viewOrderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));

@@ -58,6 +58,15 @@ public class PaymentService {
         } else if ("ORDER".equalsIgnoreCase(referenceType)) {
             CustomerOrder order = orderRepository.findById(referenceId)
                     .orElseThrow(() -> new RuntimeException("Order not found"));
+            
+            // Validate stock before allowing payment
+            for (com.petcarehub.cart.entity.OrderItem item : order.getItems()) {
+                com.petcarehub.product.entity.Product product = item.getProduct();
+                if (item.getQuantity() > product.getAvailableStockQuantity()) {
+                    throw new RuntimeException("Insufficient stock for product: " + product.getName());
+                }
+            }
+
             amount = order.getTotal().doubleValue();
         } else {
             throw new RuntimeException("Unsupported reference type: " + referenceType);
@@ -206,6 +215,13 @@ public class PaymentService {
         } else if ("ORDER".equalsIgnoreCase(payment.getReferenceType())) {
             CustomerOrder order = orderRepository.findById(payment.getReferenceId())
                     .orElseThrow(() -> new RuntimeException("Order not found"));
+            
+            // Deduct stock permanently upon successful card payment
+            for (com.petcarehub.cart.entity.OrderItem item : order.getItems()) {
+                com.petcarehub.product.entity.Product product = item.getProduct();
+                product.setStockQuantity(Math.max(0, product.getStockQuantity() - item.getQuantity()));
+            }
+
             order.setPaymentStatus(com.petcarehub.cart.enums.PaymentStatus.PAID);
             order.setOrderStatus(com.petcarehub.cart.enums.OrderStatus.PLACED);
             order.setPlacedAt(java.time.LocalDateTime.now());

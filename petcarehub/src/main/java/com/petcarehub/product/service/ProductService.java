@@ -23,9 +23,19 @@ public class ProductService {
     private final ProductAttributeRepository productAttributeRepository;
 
     @Transactional
-    public ProductResponse createProduct(ProductRequest request) {
+    public ProductResponse createProduct(ProductRequest request, MultipartFile image) {
         Product product = new Product();
         updateProductFields(product, request);
+
+        if (image != null && !image.isEmpty()) {
+            try {
+                product.setImage(image.getBytes());
+                product.setImageContentType(image.getContentType());
+            } catch (IOException e) {
+                throw new RuntimeException("Could not store product image.", e);
+            }
+        }
+
         Product savedProduct = productRepository.save(product);
 
         ProductAttribute attribute = new ProductAttribute();
@@ -37,10 +47,20 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductResponse updateProduct(Long id, ProductRequest request) {
+    public ProductResponse updateProduct(Long id, ProductRequest request, MultipartFile image) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         updateProductFields(product, request);
+
+        if (image != null && !image.isEmpty()) {
+            try {
+                product.setImage(image.getBytes());
+                product.setImageContentType(image.getContentType());
+            } catch (IOException e) {
+                throw new RuntimeException("Could not store product image.", e);
+            }
+        }
+
         Product savedProduct = productRepository.save(product);
 
         ProductAttribute attribute = productAttributeRepository.findById(id)
@@ -91,14 +111,22 @@ public class ProductService {
     private ProductResponse mapToDTO(Product product, boolean includeRelated) {
         ProductAttribute attr = productAttributeRepository.findById(product.getProductId()).orElse(null);
 
+        String effectiveImageUrl = product.getImageUrl();
+        if (product.getImage() != null) {
+            effectiveImageUrl = "/api/products/" + product.getProductId() + "/image";
+        }
+
         ProductResponse dto = ProductResponse.builder()
                 .productId(product.getProductId())
                 .name(product.getName())
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .stockQuantity(product.getStockQuantity())
+                .reservedStockQuantity(
+                        product.getReservedStockQuantity() != null ? product.getReservedStockQuantity() : 0)
+                .availableStockQuantity(product.getAvailableStockQuantity())
                 .category(attr != null && attr.getCategory() != null ? attr.getCategory() : product.getCategory())
-                .imageUrl(product.getImageUrl())
+                .imageUrl(effectiveImageUrl)
                 .brand(attr != null ? attr.getBrand() : null)
                 .variants(attr != null ? attr.getVariants() : null)
                 .colors(attr != null ? attr.getColors() : null)

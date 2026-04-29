@@ -26,4 +26,10 @@ public class MedicalRecordController {
         return ResponseEntity.ok(medicalTreatmentService.addTreatment(petId, dto));
     }
 
+    @DeleteMapping("/treatments/{id}")
+    public ResponseEntity<Void> deleteTreatment(@PathVariable Long id) {
+        medicalTreatmentService.deleteTreatment(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

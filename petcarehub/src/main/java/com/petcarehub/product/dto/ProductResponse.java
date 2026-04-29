@@ -18,6 +18,8 @@ public class ProductResponse {
     private String description;
     private BigDecimal price;
     private Integer stockQuantity;
+    private Integer reservedStockQuantity;
+    private Integer availableStockQuantity;
     private String category;
     private String imageUrl;
     private String brand;

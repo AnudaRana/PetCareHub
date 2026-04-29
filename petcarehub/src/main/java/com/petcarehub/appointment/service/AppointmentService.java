@@ -12,7 +12,10 @@ import com.petcarehub.user.entity.User;
 import com.petcarehub.user.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
 
 import java.util.List;
 import java.util.Map;
@@ -29,10 +32,10 @@ public class AppointmentService {
     private final PaymentService paymentService;
 
     public AppointmentService(AppointmentRepository appointmentRepository,
-                              AppointmentEmailService emailService,
-                              UserRepository userRepository,
-                              PetRepository petRepository,
-                              PaymentService paymentService) {
+            AppointmentEmailService emailService,
+            UserRepository userRepository,
+            PetRepository petRepository,
+            PaymentService paymentService) {
         this.appointmentRepository = appointmentRepository;
         this.emailService = emailService;
         this.userRepository = userRepository;
@@ -74,16 +77,10 @@ public class AppointmentService {
         appointment.setTimeSlot(request.getTimeSlot());
         appointment.setPrice(request.getPrice());
         appointment.setNotes(request.getNotes());
-        appointment.setStatus("PENDING"); // Appointment is pending payment
+        appointment.setStatus("AWAITING_PAYMENT");
         appointment.setUpdated(false);
 
-        Appointment saved = appointmentRepository.save(appointment);
-
-        if (user.getEmail() != null && !user.getEmail().isBlank()) {
-            emailService.sendAppointmentConfirmation(user.getEmail(), saved);
-        }
-
-        return saved;
+        return appointmentRepository.save(appointment);
     }
 
     public Appointment updateAppointment(Long appointmentId, AppointmentRequest request) {
@@ -184,14 +181,23 @@ public class AppointmentService {
         return cancelled;
     }
 
+    public void deleteAppointment(Long appointmentId) {
+        if (appointmentRepository.existsById(appointmentId)) {
+            appointmentRepository.deleteById(appointmentId);
+            log.info("[deleteAppointment] Deleted appointmentId={}", appointmentId);
+        } else {
+            throw new IllegalArgumentException("Appointment not found");
+        }
+    }
+
     public AppointmentResponse completeAppointment(Long appointmentId) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
 
         String currentStatus = appointment.getStatus();
 
-        if ("CANCELLED".equalsIgnoreCase(currentStatus)) {
-            throw new IllegalStateException("Cannot complete a cancelled appointment.");
+        if ("CANCELLED".equalsIgnoreCase(currentStatus) || "EXPIRED".equalsIgnoreCase(currentStatus)) {
+            throw new IllegalStateException("Cannot complete a cancelled or expired appointment.");
         }
 
         if ("COMPLETED".equalsIgnoreCase(currentStatus)) {
@@ -205,6 +211,47 @@ public class AppointmentService {
         appointment.setStatus("COMPLETED");
         Appointment saved = appointmentRepository.save(appointment);
         return toDto(saved);
+    }
+
+    @Transactional
+    public AppointmentResponse confirmPayment(Long appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
+
+        if (!"AWAITING_PAYMENT".equalsIgnoreCase(appointment.getStatus())) {
+            throw new IllegalStateException("Appointment is not awaiting payment. Status: " + appointment.getStatus());
+        }
+
+        // Verify payment status with PaymentService
+        if (!paymentService.isAppointmentPaid(appointmentId)) {
+            throw new IllegalStateException("Payment verification failed. Appointment remains unconfirmed.");
+        }
+
+        appointment.setStatus("UPCOMING");
+        Appointment confirmed = appointmentRepository.save(appointment);
+
+        User user = confirmed.getUser();
+        if (user != null && user.getEmail() != null && !user.getEmail().isBlank()) {
+            emailService.sendAppointmentConfirmation(user.getEmail(), confirmed);
+        }
+
+        log.info("[confirmPayment] Appointment confirmed: {}", appointmentId);
+        return toDto(confirmed);
+    }
+
+    @Scheduled(fixedRate = 60000)
+    @Transactional
+    public void cleanupExpiredAppointments() {
+        LocalDateTime threshold = LocalDateTime.now().minusMinutes(15);
+        List<Appointment> expired = appointmentRepository.findByStatusAndCreatedAtBefore("AWAITING_PAYMENT", threshold);
+
+        if (!expired.isEmpty()) {
+            log.info("[Scheduled Cleanup] Expiring {} appointments awaiting payment", expired.size());
+            for (Appointment a : expired) {
+                a.setStatus("EXPIRED");
+                appointmentRepository.save(a);
+            }
+        }
     }
 
     public List<AppointmentResponse> getAllAppointments() {
@@ -276,7 +323,7 @@ public class AppointmentService {
                 : appointmentRepository.findByDate(date);
 
         return appointments.stream()
-                .filter(a -> !"CANCELLED".equalsIgnoreCase(a.getStatus()))
+                .filter(a -> !"CANCELLED".equalsIgnoreCase(a.getStatus()) && !"EXPIRED".equalsIgnoreCase(a.getStatus()))
                 .map(a -> {
                     java.util.Map<String, String> slot = new java.util.HashMap<>();
                     slot.put("timeSlot", a.getTimeSlot());

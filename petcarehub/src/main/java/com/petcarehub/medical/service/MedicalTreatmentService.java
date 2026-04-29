@@ -63,4 +63,11 @@ public class MedicalTreatmentService {
         dto.setPetId(treatment.getPet().getPetId());
         return dto;
     }
+
+    public void deleteTreatment(Long id) {
+        if (!medicalTreatmentRepository.existsById(id)) {
+            throw new RuntimeException("Treatment not found");
+        }
+        medicalTreatmentRepository.deleteById(id);
+    }
 }

@@ -11,26 +11,9 @@
   box-sizing: border-box;
 }
 
-.channeling-header {
-  margin-top: 0;
-  margin-bottom: 24px;
-}
-
-.channeling-header h1 {
-  margin: 0 0 4px;
-  font-size: 1.8rem;
-  color: var(--color-primary);
-}
-
-.channeling-header p {
-  margin: 0;
-  color: #64748b;
-  font-size: 0.95rem;
-}
-
 /* ---- card ---- */
 .view-slots-card {
-  max-width: 850px;
+  width: 100%;
   margin: 0;
   background: var(--color-white, #fff);
   padding: 32px;
@@ -76,6 +59,20 @@
 
 
 
+/* ---- split layout grid ---- */
+.dc-split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.dc-left-panel,
+.dc-right-panel {
+  display: flex;
+  flex-direction: column;
+}
+
 .form-row {
   display: grid;
   grid-template-columns: 170px 1fr;
@@ -108,7 +105,6 @@
 }
 
 .slot-section {
-  margin: 24px 0;
   padding: 18px;
   border-radius: 18px;
   background: var(--color-white);
@@ -377,13 +373,13 @@
   border: 1px solid rgba(12, 166, 120, 0.2);
 }
 
-/* ── slot-grid inside groups: 3 columns for operations, 4 for vaccinations ── */
+/* ── slot-grid inside groups: 1 column for vertical stacking ── */
 .dc-slot-group--operation .slot-grid {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
 }
 
 .dc-slot-group--vaccination .slot-grid {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 1fr;
 }
 
 /* ── Slot button category colour variants ── */
@@ -427,10 +423,7 @@
 
 /* ---- responsive ---- */
 @media (max-width: 1100px) {
-  .dc-slot-group--operation .slot-grid,
-  .dc-slot-group--vaccination .slot-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  /* Removed multi-column grid overrides to maintain vertical stack */
 }
 
 @media (max-width: 900px) {
@@ -456,6 +449,11 @@
     align-items: stretch;
   }
 
+  .dc-split-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
   .form-row {
     grid-template-columns: 1fr;
   }
@@ -463,16 +461,8 @@
   .my-appointments-btn {
     width: 100%;
   }
-
-  .dc-slot-group--operation .slot-grid,
-  .dc-slot-group--vaccination .slot-grid {
-    grid-template-columns: 1fr 1fr;
-  }
 }
 
 @media (max-width: 600px) {
-  .dc-slot-group--operation .slot-grid,
-  .dc-slot-group--vaccination .slot-grid {
-    grid-template-columns: 1fr;
-  }
+  /* Maintained vertical stack */
 }

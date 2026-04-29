@@ -14,6 +14,8 @@ import ManageOrdersPage from '../../order/pages/ManageOrdersPage';
 import ManageShopPage from '../../store/pages/ManageShopPage';
 import StoreOutlinedIcon from '@mui/icons-material/StoreOutlined';
 import FeedbackManagement from '../../feedback/pages/FeedbackManagement';
+import ManageTimeSlots from '../../appointment/pages/ManageTimeSlots';
+import ManageAppointments from '../../appointment/pages/ManageAppointments';
 
 // Icons
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -29,80 +31,31 @@ import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import FeedbackOutlinedIcon from '@mui/icons-material/FeedbackOutlined';
+import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
+import ContentPasteSearchOutlinedIcon from '@mui/icons-material/ContentPasteSearchOutlined';
 
 const AdminDashboard = () => {
   const { user, loading: authLoading, token, hasRole } = useAuth();
   const isVet = hasRole('VET');
 
-  const [stats, setStats] = useState({
-    vets: 0,
-    staff: 0,
-    totalProducts: 0,
-    totalOrders: 0,
-    appointmentsToday: 0,
-    totalPatients: 0,
-    loading: true
-  });
+  // Removed admin stats logic as the home page now displays the profile instead
 
-  useEffect(() => {
-    if (!token) return;
-
-    const fetchAdminStats = async () => {
-      try {
-        setStats(prev => ({ ...prev, loading: true }));
-
-        // 1. Fetch Backend Stats
-        const statsRes = await axios.get('/api/admin/users/stats', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const apiStats = statsRes.data || {};
-
-        let apptsToday = 0;
-        let patients = 0;
-
-        // 2. If Admin is also a Vet, fetch Vet-specific stats
-        if (isVet && user?.userId) {
-          const petsRes = await getAllPets();
-          patients = Array.isArray(petsRes.data) ? petsRes.data.length : (Array.isArray(petsRes) ? petsRes.length : 0);
-
-          const appointmentsRes = await axios.get(`/api/appointments/vet/${user.userId}`);
-          const appointments = Array.isArray(appointmentsRes.data) ? appointmentsRes.data : [];
-          const today = new Date().toISOString().split('T')[0];
-          apptsToday = appointments.filter(a => a.date === today && a.status !== 'CANCELLED').length;
-        }
-
-        setStats({
-          vets: apiStats.vets || 0,
-          staff: apiStats.staff || 0,
-          totalProducts: apiStats.totalProducts || 0,
-          totalOrders: apiStats.totalOrders || 0,
-          appointmentsToday: apptsToday,
-          totalPatients: patients,
-          loading: false
-        });
-      } catch (error) {
-        console.error("Failed to fetch admin stats:", error);
-        setStats(prev => ({ ...prev, loading: false }));
-      }
-    };
-
-    fetchAdminStats();
-  }, [token, isVet, user?.userId]);
-
-  // Define the menu ONCE here
   const adminMenu = [
     { name: 'Home', icon: HomeOutlinedIcon, path: '/' },
     { name: 'My Dashboard', icon: DashboardIcon, path: '/dashboard' },
-    { name: 'My Profile', icon: PersonOutlineOutlinedIcon, path: '/dashboard/profile' },
-    { name: 'Manage Shop', icon: StoreOutlinedIcon, path: '/dashboard/manage-shop' },
-    { name: 'Manage Orders', icon: ShoppingBagIcon, path: '/dashboard/manage-orders' },
-    { name: 'Feedback Management', icon: FeedbackOutlinedIcon, path: '/dashboard/feedbacks' },
+
+    ...(!isVet ? [
+      { name: 'Manage Shop', icon: StoreOutlinedIcon, path: '/dashboard/manage-shop' },
+      { name: 'Manage Orders', icon: ShoppingBagIcon, path: '/dashboard/manage-orders' },
+      { name: 'Feedback Management', icon: FeedbackOutlinedIcon, path: '/dashboard/feedbacks' },
+    ] : []),
     ...(isVet ? [
-      { name: 'Patient Records', icon: HealingOutlinedIcon, path: '/dashboard/patients' },
+      { name: 'Patient Records', icon: HealingOutlinedIcon, path: '/dashboard/vet-patients' },
       { name: 'My Appointments', icon: EventNoteOutlinedIcon, path: '/dashboard/vet-appointments' },
+      { name: 'Time Slots', icon: AccessTimeOutlinedIcon, path: '/dashboard/manage-slots' },
     ] : []),
     { name: 'Manage Staff', icon: PeopleAltOutlinedIcon, path: '/dashboard/manage-staff' },
-    { name: 'Settings', icon: SettingsOutlinedIcon, path: '/dashboard/settings' }
+    { name: 'Manage Appointments', icon: EventNoteOutlinedIcon, path: '/dashboard/manage-appointments' },
   ];
 
   if (authLoading) return <div className="loading-state">Loading Admin Dashboard...</div>;
@@ -110,92 +63,19 @@ const AdminDashboard = () => {
   return (
     <DashboardLayout menuItems={adminMenu}>
       <Routes>
-        <Route index element={
-          <>
-            <div className="dashboard-header-banner">
-              <h2>Welcome back, {user?.firstName || 'Admin'}!</h2>
-              <p>Manage clinic staff, vets, and system settings.</p>
-            </div>
-
-            <div className="dashboard-stats-grid">
-              <div className="stat-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div>
-                    <h3>Registered Veterinarians</h3>
-                    <p>{stats.loading ? '...' : `${stats.vets} professionals`}</p>
-                  </div>
-                  <AssignmentIndOutlinedIcon style={{ color: '#6366f1', opacity: 0.8, fontSize: '32px' }} />
-                </div>
-              </div>
-
-              <div className="stat-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div>
-                    <h3>Total Clinic Staff</h3>
-                    <p>{stats.loading ? '...' : `${stats.staff} members`}</p>
-                  </div>
-                  <BadgeOutlinedIcon style={{ color: '#f59e0b', opacity: 0.8, fontSize: '32px' }} />
-                </div>
-              </div>
-
-              <div className="stat-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div>
-                    <h3>Total Shop Orders</h3>
-                    <p>{stats.loading ? '...' : `${stats.totalOrders} processed`}</p>
-                  </div>
-                  <ShoppingBagIcon style={{ color: '#ec4899', opacity: 0.8, fontSize: '32px' }} />
-                </div>
-              </div>
-
-              <div className="stat-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div>
-                    <h3>Inventory Items</h3>
-                    <p>{stats.loading ? '...' : `${stats.totalProducts} products`}</p>
-                  </div>
-                  <StoreOutlinedIcon style={{ color: '#8b5cf6', opacity: 0.8, fontSize: '32px' }} />
-                </div>
-              </div>
-
-              {/* Conditional Vet-Admin Stats */}
-              {isVet && (
-                <>
-                  <div className="stat-card">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div>
-                        <h3>Appointments Today</h3>
-                        <p>{stats.loading ? '...' : `${stats.appointmentsToday} scheduled`}</p>
-                      </div>
-                      <EventAvailableIcon style={{ color: '#2dd4bf', opacity: 0.8, fontSize: '32px' }} />
-                    </div>
-                  </div>
-
-                  <div className="stat-card">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div>
-                        <h3>Total Patient Records</h3>
-                        <p>{stats.loading ? '...' : `${stats.totalPatients} in system`}</p>
-                      </div>
-                      <GroupsIcon style={{ color: 'var(--color-primary)', opacity: 0.8, fontSize: '32px' }} />
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          </>
-        } />
+        <Route index element={<MyProfile />} />
 
         {/* Nested Admin Pages */}
         <Route path="manage-staff" element={<ManageStaff />} />
         <Route path="profile" element={<MyProfile />} />
-        <Route path="patients" element={<DoctorAllPets />} />
+        <Route path="vet-patients" element={<DoctorAllPets />} />
         <Route path="vet-appointments" element={<VetAppointments />} />
         <Route path="manage-orders" element={<ManageOrdersPage />} />
         <Route path="manage-shop" element={<ManageShopPage />} />
         <Route path="feedbacks" element={<FeedbackManagement />} />
-        
-        {/* Catch-all to redirect back to main dashboard if path is wrong */}
+        <Route path="manage-slots" element={<ManageTimeSlots />} />
+        <Route path="manage-appointments" element={<ManageAppointments />} />
+
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </DashboardLayout>

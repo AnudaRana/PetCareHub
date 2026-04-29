@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.petcarehub.user.entity.User;
 import com.petcarehub.pet.entity.Pet;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "appointments")
@@ -42,7 +44,24 @@ public class Appointment {
     private String notes;
 
     @Column(nullable = false)
-    private String status = "UPCOMING";
+    private String status = "AWAITING_PAYMENT";
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 
     @Column(nullable = false)
     private boolean updated = false;
@@ -175,5 +194,21 @@ public String getCancelledBy() {
 
 public void setCancelledBy(String cancelledBy) {
     this.cancelledBy = cancelledBy;
+}
+
+public LocalDateTime getCreatedAt() {
+    return createdAt;
+}
+
+public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+}
+
+public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+}
+
+public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
 }
 }

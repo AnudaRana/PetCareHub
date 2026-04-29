@@ -7,9 +7,9 @@ import '../../../../styles/MyPets.css';
 import '../../../../styles/DoctorDashboard.css';
 
 const DoctorAllPets = () => {
-    const { user } = useAuth();
-    const [pets, setPets] = useState([]);
-    // ... rest of state stays same
+  const { user } = useAuth();
+  const [pets, setPets] = useState([]);
+  // ... rest of state stays same
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -73,12 +73,6 @@ const DoctorAllPets = () => {
           <div className="doc-stat-value">{!loading && !error ? pets.length : '—'}</div>
           <div className="doc-stat-label">Total Patients</div>
           <div className="doc-stat-sub">Clinic registered</div>
-        </div>
-        <div className="doc-stat-card" style={{ '--accent': '#2dd4bf' }}>
-          <div className="doc-stat-icon">📈</div>
-          <div className="doc-stat-value">{!loading && !error ? filtered.length : '—'}</div>
-          <div className="doc-stat-label">Results</div>
-          <div className="doc-stat-sub">Active search filters</div>
         </div>
       </div>
 

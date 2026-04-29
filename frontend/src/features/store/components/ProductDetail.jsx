@@ -116,8 +116,8 @@ const ProductDetail = ({ product: initialProduct, onClose, onAddToCart }) => {
             <div className="product-detail-price-row">
               <span className="product-detail-price">{formattedPrice}</span>
               <div className="product-detail-stock">
-                <span className={`stock-dot ${product.stockQuantity > 0 ? 'in-stock' : 'out-of-stock'}`}></span>
-                <span className="stock-text">{product.stockQuantity > 0 ? `${product.stockQuantity} Left` : 'Sold Out'}</span>
+                <span className={`stock-dot ${product.availableStockQuantity > 0 ? 'in-stock' : 'out-of-stock'}`}></span>
+                <span className="stock-text">{product.availableStockQuantity > 0 ? `${product.availableStockQuantity} Left` : 'Sold Out'}</span>
               </div>
             </div>
 
@@ -125,11 +125,11 @@ const ProductDetail = ({ product: initialProduct, onClose, onAddToCart }) => {
               <button
                 className="btn btn-dark-blue product-detail-add-btn"
                 style={{ width: '100%', height: '56px', fontSize: '1rem' }}
-                disabled={product.stockQuantity <= 0}
+                disabled={product.availableStockQuantity <= 0}
                 onClick={() => onAddToCart?.(product)}
               >
                 <ShoppingCartOutlinedIcon style={{ fontSize: '20px', marginRight: '10px' }} />
-                {product.stockQuantity > 0 ? 'Add to Cart' : 'Temporarily Unavailable'}
+                {product.availableStockQuantity > 0 ? 'Add to Cart' : 'Temporarily Unavailable'}
               </button>
             </div>
           </div>

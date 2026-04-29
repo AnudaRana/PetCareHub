@@ -8,7 +8,7 @@ import productService from '../../../services/productService';
 import { cartService } from '../../cart/services/cartService';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import './PetStore.css';
-import logo from '../../../assets/logo-weyes.png';
+import logo from '../../../assets/logo-b.png';
 
 import AppsIcon from '@mui/icons-material/Apps';
 import PetsIcon from '@mui/icons-material/Pets';

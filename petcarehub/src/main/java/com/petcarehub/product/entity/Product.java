@@ -32,10 +32,17 @@ public class Product {
     @Column(name = "stock_quantity", nullable = false)
     private Integer stockQuantity;
 
+    @Column(name = "reserved_stock_quantity", nullable = false)
+    private Integer reservedStockQuantity = 0;
+
+    public Integer getAvailableStockQuantity() {
+        return stockQuantity - (reservedStockQuantity != null ? reservedStockQuantity : 0);
+    }
+
 
     @Column
     private String imageUrl;
-    
+
     @Column(name = "image_content_type")
     private String imageContentType;
 

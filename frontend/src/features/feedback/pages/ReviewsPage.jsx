@@ -8,7 +8,7 @@ import FeedbackDetailModal from '../components/FeedbackDetailModal';
 import '../styles/ReviewsPage.css';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import logo from '../../../assets/logo-weyes.png';
+import logo from '../../../assets/logo-b.png';
 
 const ReviewsPage = () => {
     const [feedbacks, setFeedbacks] = useState([]);

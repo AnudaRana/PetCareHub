@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "./PaymentResultPages.css";
 import { failPayment } from "../../../services/paymentService";
+import axios from "axios";
 
 export default function PaymentCancel() {
   const navigate = useNavigate();
@@ -11,15 +12,30 @@ export default function PaymentCancel() {
 
   useEffect(() => {
     if (refId && type) {
-      failPayment(refId, type, "Payment unsuccessful or cancelled by user").catch(console.error);
+      const cleanup = async () => {
+        try {
+          await failPayment(refId, type, "Payment unsuccessful or cancelled by user");
+          
+          if (type === "APPOINTMENT") {
+            await axios.delete(`/api/appointments/${refId}`);
+            // Automatically redirect back to channeling page with error flag
+            sessionStorage.setItem('showPaymentFailedPopup', 'true');
+            navigate("/dashboard/doctor-channeling");
+          }
+        } catch (err) {
+          console.error("Payment cleanup failed:", err);
+        }
+      };
+      cleanup();
     }
-  }, [refId, type]);
+  }, [refId, type, navigate]);
 
   const handleRetry = () => {
     if (type === "ORDER") {
       navigate(`/checkout/payment/${refId}`);
     } else if (type === "APPOINTMENT" || !type) {
-      navigate("/dashboard/my-appointments");
+      sessionStorage.setItem('showPaymentFailedPopup', 'true');
+      navigate("/dashboard/doctor-channeling");
     }
   };
 
@@ -48,7 +64,6 @@ export default function PaymentCancel() {
           <span className="prp-notice__icon">ℹ️</span>
           <p className="prp-notice__text">
             If you experienced an issue, please try again or contact our support team.
-            Your session details are still available.
           </p>
         </div>
 

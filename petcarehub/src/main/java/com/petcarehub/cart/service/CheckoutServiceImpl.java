@@ -121,10 +121,15 @@ public class CheckoutServiceImpl implements CheckoutService {
         List<OrderItem> orderItems = new ArrayList<>();
 
         for (Cart cartItem : cartItems) {
+            com.petcarehub.product.entity.Product product = cartItem.getProduct();
+            if (cartItem.getQuantity() > product.getAvailableStockQuantity()) {
+                throw new ResponseStatusException(BAD_REQUEST, "Insufficient stock for product: " + product.getName());
+            }
+
             OrderItem orderItem = new OrderItem();
-            orderItem.setProduct(cartItem.getProduct());
-            orderItem.setProductName(cartItem.getProduct().getName());
-            orderItem.setProductPrice(cartItem.getProduct().getPrice());
+            orderItem.setProduct(product);
+            orderItem.setProductName(product.getName());
+            orderItem.setProductPrice(product.getPrice());
             orderItem.setQuantity(cartItem.getQuantity());
 
             BigDecimal lineTotal = cartItem.getProduct().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
@@ -242,6 +247,22 @@ public class CheckoutServiceImpl implements CheckoutService {
         }
 
         if (paymentMethod != PaymentMethod.CARD) {
+            // Validate available stock before reserving
+            for (OrderItem item : order.getItems()) {
+                com.petcarehub.product.entity.Product product = item.getProduct();
+                if (item.getQuantity() > product.getAvailableStockQuantity()) {
+                    throw new ResponseStatusException(BAD_REQUEST, "Insufficient stock for product: " + product.getName());
+                }
+            }
+
+            // Temporarily reserve stock
+            for (OrderItem item : order.getItems()) {
+                com.petcarehub.product.entity.Product product = item.getProduct();
+                product.setReservedStockQuantity(
+                    (product.getReservedStockQuantity() != null ? product.getReservedStockQuantity() : 0) + item.getQuantity()
+                );
+            }
+
             order.setOrderStatus(OrderStatus.PLACED);
             order.setPlacedAt(LocalDateTime.now());
         }
@@ -253,6 +274,24 @@ public class CheckoutServiceImpl implements CheckoutService {
     public void cancelOrder(Long userId, Long orderId) {
         CustomerOrder order = orderRepository.findByOrderIdAndUser_UserId(orderId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found: " + orderId));
+
+        if (order.getOrderStatus() == OrderStatus.CANCELLED) {
+            throw new ResponseStatusException(BAD_REQUEST, "Order is already cancelled.");
+        }
+
+        // Restore deducted stock or release reserved stock
+        if (order.getPaymentStatus() == PaymentStatus.PAID) {
+            for (OrderItem item : order.getItems()) {
+                com.petcarehub.product.entity.Product product = item.getProduct();
+                product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+            }
+        } else if (order.getPaymentMethod() != PaymentMethod.CARD && order.getOrderStatus() == OrderStatus.PLACED) {
+            for (OrderItem item : order.getItems()) {
+                com.petcarehub.product.entity.Product product = item.getProduct();
+                int currentReserved = product.getReservedStockQuantity() != null ? product.getReservedStockQuantity() : 0;
+                product.setReservedStockQuantity(Math.max(0, currentReserved - item.getQuantity()));
+            }
+        }
 
         order.setOrderStatus(OrderStatus.CANCELLED);
         order.setUpdatedAt(LocalDateTime.now());

@@ -65,6 +65,7 @@ const DashboardLayout = ({ children, menuItems }) => {
 
     return (
         <div className="dashboard-layout">
+            {mobileOpen && <div className="sidebar-overlay" onClick={() => setMobileOpen(false)} />}
             <aside className={getSidebarClass() + (mobileOpen ? ' mobile-open' : '')}>
                 <div className="sidebar-decor-tr" />
                 <div className="sidebar-decor-bl" />
@@ -86,10 +87,10 @@ const DashboardLayout = ({ children, menuItems }) => {
 
                 <ul className="sidebar-nav">
                     {menuItems.map((item) => {
-                        const isActive = location.pathname === item.path || 
-                                       (item.path !== '/dashboard' && item.path !== '/' && location.pathname.startsWith(item.path));
+                        const isActive = location.pathname === item.path ||
+                            (item.path !== '/dashboard' && item.path !== '/' && location.pathname.startsWith(item.path));
                         const isDisabled = item.disabled;
-                        
+
                         return (
                             <li
                                 key={item.name}
@@ -121,10 +122,10 @@ const DashboardLayout = ({ children, menuItems }) => {
 
             <main className="dashboard-main">
                 <header className="dashboard-topbar">
-                    <button className="mobile-toggle" onClick={toggleMobileMenu} style={{ display: window.innerWidth <= 1024 ? 'flex' : 'none', background: 'none', border: 'none', cursor: 'pointer' }}>
+                    <button className="mobile-toggle" onClick={toggleMobileMenu}>
                         <MenuIcon />
                     </button>
-                    
+
                     {getBreadcrumbs()}
 
                     <div className="topbar-right">

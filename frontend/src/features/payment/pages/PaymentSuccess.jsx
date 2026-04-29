@@ -25,6 +25,9 @@ export default function PaymentSuccess() {
       try {
         await confirmPayment(sessionId);
         setConfirmed(true);
+        // Clear draft appointment data on success
+        sessionStorage.removeItem("draftAppointment");
+        sessionStorage.removeItem("draftAppointment_vetId");
       } catch (err) {
         console.error("Payment confirmation failed:", err);
         const backendMessage =

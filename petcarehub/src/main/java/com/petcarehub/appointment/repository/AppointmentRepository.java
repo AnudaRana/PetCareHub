@@ -9,11 +9,19 @@ import java.util.List;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
-    // Legacy name-based check — kept for backward compatibility with update flow
-    boolean existsByDateAndDoctorAndTimeSlot(String date, String doctor, String timeSlot);
+    // Legacy name-based check
+    @Query("SELECT COUNT(a) > 0 FROM Appointment a WHERE a.date = :date AND a.doctor = :doctor AND a.timeSlot = :timeSlot AND a.status NOT IN ('CANCELLED', 'EXPIRED')")
+    boolean existsByDateAndDoctorAndTimeSlot(@Param("date") String date, @Param("doctor") String doctor, @Param("timeSlot") String timeSlot);
 
-    // Relational duplicate check using vetId (used for new appointment creation)
-    boolean existsByDateAndVet_UserIdAndTimeSlot(String date, Long vetId, String timeSlot);
+    // Relational duplicate check using vetId — excludes cancelled/expired appointments
+    @Query("SELECT COUNT(a) > 0 FROM Appointment a WHERE a.date = :date AND a.vet.userId = :vetId AND a.timeSlot = :timeSlot AND a.status NOT IN ('CANCELLED', 'EXPIRED')")
+    boolean existsByDateAndVet_UserIdAndTimeSlot(@Param("date") String date, @Param("vetId") Long vetId, @Param("timeSlot") String timeSlot);
+
+    // Find appointments that have been stuck in AWAITING_PAYMENT too long
+    List<com.petcarehub.appointment.entity.Appointment> findByStatusAndCreatedAtBefore(String status, java.time.LocalDateTime threshold);
+
+    // Delete by status and threshold
+    void deleteByStatusAndCreatedAtBefore(String status, java.time.LocalDateTime threshold);
 
     // Fetch all appointments for a date (global)
     List<Appointment> findByDate(String date);

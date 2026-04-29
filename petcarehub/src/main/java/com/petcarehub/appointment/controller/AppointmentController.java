@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/appointments")
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"})
+@CrossOrigin(origins = { "http://localhost:3000", "http://localhost:5173" })
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
@@ -54,12 +54,24 @@ public class AppointmentController {
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<?> cancelAppointment(
             @PathVariable Long id,
-            @RequestBody Map<String, String> body
-    ) {
+            @RequestBody Map<String, String> body) {
         try {
             String reason = body.get("reason");
             Appointment cancelled = appointmentService.cancelAppointment(id, reason);
             return ResponseEntity.ok(cancelled);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    // Hard deletes an appointment by ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteAppointment(@PathVariable Long id) {
+        try {
+            appointmentService.deleteAppointment(id);
+            return ResponseEntity.ok(Map.of("message", "Appointment deleted successfully"));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
@@ -113,8 +125,7 @@ public class AppointmentController {
     @PatchMapping("/{id}/cancel-by-vet")
     public ResponseEntity<?> cancelByVet(
             @PathVariable Long id,
-            @RequestBody Map<String, String> body
-    ) {
+            @RequestBody Map<String, String> body) {
         try {
             Long vetId = Long.parseLong(body.get("vetId"));
             String reason = body.get("reason");
@@ -127,11 +138,26 @@ public class AppointmentController {
         }
     }
 
-    // Marks an appointment as COMPLETED; only allowed when current status is UPCOMING
+    // Marks an appointment as COMPLETED; only allowed when current status is
+    // UPCOMING
     @PatchMapping("/{id}/complete")
     public ResponseEntity<?> completeAppointment(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(appointmentService.completeAppointment(id));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    // Finalizes an appointment after successful payment verification
+    @PostMapping("/{id}/confirm")
+    public ResponseEntity<?> confirmPayment(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(appointmentService.confirmPayment(id));
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         } catch (IllegalArgumentException e) {

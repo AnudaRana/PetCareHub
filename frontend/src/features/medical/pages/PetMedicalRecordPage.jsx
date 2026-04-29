@@ -5,7 +5,7 @@ import TreatmentList from '../components/TreatmentList';
 import VaccinationList from '../components/VaccinationList';
 import ConfirmationModal from '../components/ConfirmationModel';
 import { useAuth } from '../../auth/contexts/AuthContext';
-import { getTreatmentsByPetId, addTreatmentToPet } from '../../../services/medicalApi';
+import { getTreatmentsByPetId, addTreatmentToPet, deleteTreatment } from '../../../services/medicalApi';
 import { getVaccinationsByPetId, addVaccinationToPet, updateVaccination } from '../../../services/vaccinationApi';
 
 const sortByDateDesc = (items) => [...items].sort((a, b) => {
@@ -155,6 +155,27 @@ const PetMedicalRecordPage = () => {
     }
   };
 
+  const doDeleteTreatment = async () => {
+    if (!editingTreatmentId) return;
+    try {
+      await deleteTreatment(editingTreatmentId);
+      setTreatments((old) => old.filter((t) => t.id !== editingTreatmentId));
+      setSuccessTitle('Medical Record Deleted');
+      setSuccessMessage('The clinical treatment documentation has been successfully removed.');
+      setShowSuccessModal(true);
+    } catch (err) {
+      console.error('Failed to delete treatment:', err);
+    } finally {
+      setEditingTreatmentId(null);
+    }
+  };
+
+  const handleDeleteRequest = (id) => {
+    setConfirmAction('delete_treatment');
+    setEditingTreatmentId(id);
+    setShowConfirmModal(true);
+  };
+
   const handleSaveRequest = (action = 'treatment') => {
     setConfirmAction(action);
     setShowConfirmModal(true);
@@ -166,6 +187,8 @@ const PetMedicalRecordPage = () => {
       await doSaveTreatment();
     } else if (confirmAction === 'vaccination') {
       await doSaveVaccination();
+    } else if (confirmAction === 'delete_treatment') {
+      await doDeleteTreatment();
     }
   };
 
@@ -194,9 +217,10 @@ const PetMedicalRecordPage = () => {
   };
 
   return (
-    <div className="medical-page-container animate-fade-up">
-      <div className="medical-page">
-        <header style={{ marginBottom: '40px', borderBottom: '1px solid var(--color-border)', paddingBottom: '24px' }}>
+    <>
+      <div className="medical-page-container animate-fade-up">
+        <div className="medical-page">
+          <header style={{ marginBottom: '40px', borderBottom: '1px solid var(--color-border)', paddingBottom: '24px' }}>
           <h1 className="section-title">Clinical History & Registry</h1>
           <p style={{ margin: '8px 0 0', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span className="pet-detail-species-badge" style={{ margin: 0 }}>{pet?.species?.toUpperCase()}</span>
@@ -246,6 +270,7 @@ const PetMedicalRecordPage = () => {
                 treatments={latestTreatments}
                 isDoctor={isDoctor}
                 onEdit={handleEditTreatment}
+                onDelete={handleDeleteRequest}
               />
             )}
           </section>
@@ -288,6 +313,7 @@ const PetMedicalRecordPage = () => {
             )}
           </section>
         </div>
+      </div>
       </div>
 
       {isTreatmentModalOpen && (
@@ -403,10 +429,20 @@ const PetMedicalRecordPage = () => {
         <div className="confirm-backdrop" role="dialog" aria-modal="true">
           <div className="confirm-box">
             <h3>Final Authorization</h3>
-            <p>Confirm integrity and archive this {confirmAction === 'treatment' ? 'medical treatment' : 'vaccination'} record to the vault?</p>
+            <p>
+              {confirmAction === 'delete_treatment'
+                ? 'Are you sure you want to permanently delete this medical treatment record?'
+                : `Confirm integrity and archive this ${confirmAction === 'treatment' ? 'medical treatment' : 'vaccination'} record to the vault?`}
+            </p>
             <div className="confirm-actions">
               <button className="btn btn-white" onClick={() => setShowConfirmModal(false)} style={{ flex: 1 }}>Review</button>
-              <button className="btn btn-teal" onClick={handleConfirmSave} style={{ flex: 2 }}>Yes, Archive Record</button>
+              <button 
+                className={confirmAction === 'delete_treatment' ? 'btn' : 'btn btn-teal'} 
+                style={confirmAction === 'delete_treatment' ? { flex: 2, backgroundColor: '#dc2626', color: 'white' } : { flex: 2 }} 
+                onClick={handleConfirmSave}
+              >
+                {confirmAction === 'delete_treatment' ? 'Yes, Delete Record' : 'Yes, Archive Record'}
+              </button>
             </div>
           </div>
         </div>
@@ -418,7 +454,7 @@ const PetMedicalRecordPage = () => {
         message={successMessage}
         onDone={() => setShowSuccessModal(false)}
       />
-    </div>
+    </>
   );
 };
 

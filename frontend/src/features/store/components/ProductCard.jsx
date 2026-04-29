@@ -73,15 +73,15 @@ const ProductCard = ({ product, onClick, onQuickAdd }) => {
               onQuickAdd?.(product);
             }}
             aria-label="Quick Add"
-            disabled={product.stockQuantity <= 0}
+            disabled={product.availableStockQuantity <= 0}
           >
             <ShoppingCartOutlinedIcon style={{ fontSize: '20px' }} />
           </button>
         </div>
 
         <div className="product-card-stock">
-          <span className={`stock-dot ${product.stockQuantity > 0 ? 'in-stock' : 'out-of-stock'}`}></span>
-          <span>{product.stockQuantity > 0 ? 'In Stock' : 'Out of Stock'}</span>
+          <span className={`stock-dot ${product.availableStockQuantity > 0 ? 'in-stock' : 'out-of-stock'}`}></span>
+          <span>{product.availableStockQuantity > 0 ? 'In Stock' : 'Out of Stock'}</span>
         </div>
       </div>
     </article>

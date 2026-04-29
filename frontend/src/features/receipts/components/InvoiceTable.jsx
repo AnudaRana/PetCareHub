@@ -25,13 +25,32 @@ export default function InvoiceTable({ invoices }) {
             <th>Payment Method</th>
             <th>Status</th>
             <th>Generated At</th>
-            <th>Action</th>
           </tr>
         </thead>
         <tbody>
           {invoices.map((invoice) => (
             <tr key={invoice.invoiceId}>
-              <td className="table-bold">{invoice.invoiceNumber}</td>
+              <td>
+                {invoice.paymentMethod === 'CARD' ? (
+                  <span className="invoice-card-payment" style={{ color: '#059669', fontWeight: '600' }}>
+                    ✓ Card Payment
+                  </span>
+                ) : (
+                  <span 
+                    className="invoice-number-link" 
+                    onClick={() => navigate(`/dashboard/receipts/${invoice.invoiceId}`)}
+                    style={{ 
+                      cursor: 'pointer', 
+                      color: 'var(--color-primary)', 
+                      fontWeight: 'bold',
+                      textDecoration: 'underline'
+                    }}
+                    title="View Details"
+                  >
+                    {invoice.invoiceNumber}
+                  </span>
+                )}
+              </td>
               <td>{invoice.orderNumber}</td>
               <td>
                 <div>{invoice.ownerName}</div>
@@ -45,14 +64,6 @@ export default function InvoiceTable({ invoices }) {
                 </span>
               </td>
               <td>{invoice.createdAt ? format(new Date(invoice.createdAt), 'MMM dd, yyyy HH:mm') : '—'}</td>
-              <td>
-                <button 
-                  className="btn-view-invoice"
-                  onClick={() => navigate(`/dashboard/receipts/${invoice.invoiceId}`)}
-                >
-                  View
-                </button>
-              </td>
             </tr>
           ))}
         </tbody>

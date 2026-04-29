@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../../auth/contexts/AuthContext';
 import {
   getMySlots,
@@ -7,21 +7,12 @@ import {
 } from '../../../services/timeSlotService';
 import '../styles/ManageTimeSlots.css';
 
+import { getDefaultTimeSlots } from '../../../services/appointmentManagementService';
+
 /* ─────────────────────────────────────────────────────────────────────────
-   Fixed slot definitions
    Operations  : 9:00 AM – 12:00 PM  (1 hr / slot)
    Vaccinations: 12:00 PM – 1:00 PM  (15 min / slot)
 ───────────────────────────────────────────────────────────────────────── */
-
-const DEFAULT_SLOTS = [
-  { timeSlot: '09:00 AM', label: 'Operation Slot 1' },
-  { timeSlot: '10:00 AM', label: 'Operation Slot 2' },
-  { timeSlot: '11:00 AM', label: 'Operation Slot 3' },
-  { timeSlot: '12:00 PM', label: 'Vaccination Slot 1' },
-  { timeSlot: '12:15 PM', label: 'Vaccination Slot 2' },
-  { timeSlot: '12:30 PM', label: 'Vaccination Slot 3' },
-  { timeSlot: '12:45 PM', label: 'Vaccination Slot 4' },
-];
 
 /** Categorise a slot by its label prefix */
 const getCategory = (label = '') => {
@@ -190,6 +181,8 @@ const ManageTimeSlots = () => {
   const [seeding, setSeeding]       = useState(false);
   const [error, setError]           = useState('');
   const [success, setSuccess]       = useState('');
+  
+  const isSeedingRef = useRef(false);
 
   // Inline edit tracking
   const [editingId, setEditingId]   = useState(null);
@@ -207,10 +200,13 @@ const ManageTimeSlots = () => {
 
   /* ── Auto-seed default slots if vet has none ── */
   const seedDefaultSlots = useCallback(async () => {
+    if (isSeedingRef.current) return;
+    isSeedingRef.current = true;
     setSeeding(true);
     try {
+      const defaultSlots = await getDefaultTimeSlots();
       const created = [];
-      for (const def of DEFAULT_SLOTS) {
+      for (const def of defaultSlots) {
         try {
           const saved = await addSlot(def);
           created.push(saved);
@@ -225,6 +221,7 @@ const ManageTimeSlots = () => {
       console.error('Seed error:', err);
     } finally {
       setSeeding(false);
+      isSeedingRef.current = false;
     }
   }, []);
 
